@@ -71,18 +71,20 @@ class KodiWidget(QWidget):
 def monitor_controller(kodi_api):
     print("Iniciando monitor do controle!")
     controller_connected = True
-
-    while True:
-        connected = is_controller_connected()
-        if not connected and controller_connected:
-            print("Controller disconnected. Pausing Kodi...")
-            kodi_api.pause()
-            app = QApplication(sys.argv)
-            window = KodiWidget(kodi_api)
-            window.show()
-            app.exec_()
-        controller_connected = connected
-        time.sleep(1)
+    try:
+        while True:
+            connected = is_controller_connected()
+            if not connected and controller_connected:
+                print("Controller disconnected. Pausing Kodi...")
+                kodi_api.pause()
+                app = QApplication(sys.argv)
+                window = KodiWidget(kodi_api)
+                window.show()
+                app.exec_()
+            controller_connected = connected
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
 
 def is_controller_connected():
@@ -146,20 +148,6 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        logging.debug("Interrupt received, setting quit flag.")
+        logging.info("Interrupt received, setting quit flag.")
         flag.set()
-    finally:
-        # Ensure that the flag is set regardless since program is terminating
-        logging.debug("Starting termination, setting quit flag.")
-        flag.set()
-
-        # Join the threads
-        logging.debug("Attempting to join threads...")
-        if thread:
-            thread.join(0.1)
-            if thread.is_alive():
-                logging.debug("Thread %s not ready to join" % thread.name)
-            else:
-                logging.debug("Thread %s successfully joined" % thread.name)
-                thread.join()
-        logging.debug("Program terminated.")
+        sys.exit(0)
