@@ -33,11 +33,12 @@ console_handler.setFormatter(
 )
 logger.addHandler(console_handler)
 
+KODI_API = KodiJsonRpc("localhost")
+
 
 class KodiWidget(QWidget):
-    def __init__(self, kodi):
+    def __init__(self):
         super().__init__()
-        self.kodi = kodi
         self.init_ui()
 
     def init_ui(self):
@@ -61,24 +62,24 @@ class KodiWidget(QWidget):
         self.setLayout(layout)
 
     def on_yes(self):
-        self.kodi.open_kodi()
+        KODI_API.open_kodi()
         self.close()
 
     def on_no(self):
         self.close()
 
 
-def monitor_controller(kodi_api):
+def monitor_controller():
     print("Iniciando monitor do controle!")
     controller_connected = True
     try:
         while True:
             connected = is_controller_connected()
-            if not connected and controller_connected:
+            if not connected and controller_connected or True:
                 print("Controller disconnected. Pausing Kodi...")
-                kodi_api.pause()
+                KODI_API.pause()
                 app = QApplication(sys.argv)
-                window = KodiWidget(kodi_api)
+                window = KodiWidget()
                 window.show()
                 app.exec_()
             controller_connected = connected
@@ -117,7 +118,7 @@ class Task:
             logging.debug("Task %s started" % self.name)
             while not self.quit_flag:
                 logging.debug("Task %s is doing something" % self.name)
-                monitor_controller(KodiJsonRpc("localhost"))
+                monitor_controller()
                 time.sleep(self.interval)
         finally:
             logging.debug("Task %s performing cleanup..." % self.name)

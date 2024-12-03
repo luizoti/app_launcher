@@ -1,6 +1,7 @@
-import requests
-import json
 import argparse
+import subprocess
+
+import requests
 
 
 class KodiJsonRpc:
@@ -44,7 +45,9 @@ class KodiJsonRpc:
             return None
 
     def get_movies(self):
-        response = self.send_request("VideoLibrary.GetMovies", {"properties": ["title"]})
+        response = self.send_request(
+            "VideoLibrary.GetMovies", {"properties": ["title"]}
+        )
         if response and "result" in response and "movies" in response["result"]:
             return response["result"]["movies"]
         print("Failed to fetch movies.")
@@ -67,7 +70,14 @@ class KodiJsonRpc:
         player_id = response["result"][0]["playerid"]
         params = {
             "playerid": player_id,
-            "properties": ["title", "showtitle", "season", "episode", "album", "artist"],
+            "properties": [
+                "title",
+                "showtitle",
+                "season",
+                "episode",
+                "album",
+                "artist",
+            ],
         }
         response = self.send_request("Player.GetItem", params)
         if response and "result" in response and "item" in response["result"]:
@@ -128,16 +138,36 @@ class KodiJsonRpc:
         else:
             print("Failed to shut down Kodi.")
 
+    def open_kodi(self):
+        result = subprocess.run(
+            ["kodi"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        return result.stdout.decode("utf-8")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Kodi CLI Manager")
     parser.add_argument("host", help="Kodi server IP address")
-    parser.add_argument("--list-movies", action="store_true", help="List all movies in the library")
+    parser.add_argument(
+        "--list-movies", action="store_true", help="List all movies in the library"
+    )
     parser.add_argument("--play-movie", type=int, help="Play a movie by its ID")
-    parser.add_argument("--current", action="store_true", help="Show currently playing item")
-    parser.add_argument("--clean-library", action="store_true", help="Clean the Kodi library")
-    parser.add_argument("--scan-library", action="store_true", help="Scan the Kodi library for new items")
-    parser.add_argument("--pause", action="store_true", help="Pause or resume the current playback")
+    parser.add_argument(
+        "--current", action="store_true", help="Show currently playing item"
+    )
+    parser.add_argument(
+        "--clean-library", action="store_true", help="Clean the Kodi library"
+    )
+    parser.add_argument(
+        "--scan-library",
+        action="store_true",
+        help="Scan the Kodi library for new items",
+    )
+    parser.add_argument(
+        "--pause", action="store_true", help="Pause or resume the current playback"
+    )
     parser.add_argument("--stop", action="store_true", help="Stop the current playback")
     parser.add_argument("--quit", action="store_true", help="Quit Kodi safely")
 
