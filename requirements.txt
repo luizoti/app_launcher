@@ -1,5 +1,6 @@
-requests
-pyqt5
+requests~=2.32.3
+pyqt5~=5.15.11
 pyqt5-sip
 systemd-python==234
 
+pynput~=1.7.7
