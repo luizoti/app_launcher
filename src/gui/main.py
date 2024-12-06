@@ -221,7 +221,18 @@ class KodiMainWindow(QMainWindow):
 
     def restart_kodi(self):
         print("Restart kodi...")
-        self.hide()
+        current_playing = KODI_API.get_currently_playing()
+        KODI_API.pause()
+        KODI_API.stop()
+        KODI_API.quit()
+        sleep(3)
+        KODI_API.open_kodi()
+        while not KODI_API.is_kodi_running():
+            try:
+                KODI_API.play_movie(current_playing)
+                sleep(1)
+            except Exception as Err:
+                print(f"Tentativa de reiniciar reprodução: {Err}")
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:  # Código da tecla Enter

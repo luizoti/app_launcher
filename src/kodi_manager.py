@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import traceback
 
 import requests
 
@@ -43,6 +44,23 @@ class KodiJsonRpc:
         except requests.exceptions.RequestException as e:
             print(f"Error connecting to Kodi: {e}")
             return None
+
+    def is_kodi_running(self):
+        """
+        Check if Kodi is running by sending a JSONRPC.Ping request.
+
+        Returns:
+            bool: True if Kodi is running, False otherwise.
+        """
+        try:
+            response = self.send_request("JSONRPC.Ping")
+            if response and response.get("result") == "pong":
+                return True
+        except:
+            print(f"Is Running Error: {traceback.format_exc()}")
+            pass
+        print("Kodi is not responding to JSON-RPC requests.")
+        return False
 
     def get_movies(self):
         response = self.send_request(
