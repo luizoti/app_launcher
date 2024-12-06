@@ -71,37 +71,60 @@ class KodiJsonRpc:
         print("Failed to fetch movies.")
         return []
 
-    def play_movie(self, movie_id):
-        params = {"item": {"movieid": movie_id}}
+    def play_content(self, content_id, content_type):
+        """
+        Play any content on Kodi using its ID and type.
+
+        Args:
+            content_id (int): The ID of the content to be played.
+            content_type (str): The type of the content (e.g., "movie", "episode", "song", "channel").
+
+        Returns:
+            None
+        """
+        # Mapear o tipo de conteúdo para a propriedade esperada
+        item_key = f"{content_type}id"
+        params = {"item": {item_key: content_id}}
+
+        # Enviar a solicitação para reproduzir o conteúdo
         response = self.send_request("Player.Open", params)
+
+        # Verificar a resposta
         if response and "result" in response:
-            print(f"Playing movie ID {movie_id}.")
+            print(f"Playing {content_type} ID {content_id}.")
         else:
-            print(f"Failed to play movie ID {movie_id}.")
+            print(f"Failed to play {content_type} ID {content_id}.")
 
     def get_currently_playing(self):
+        """
+        Get the ID and type of the currently playing content.
+
+        Returns:
+            dict or None: A dictionary containing 'content_id' and 'content_type',
+                          or None if no content is playing.
+        """
+        # Verificar players ativos
         response = self.send_request("Player.GetActivePlayers")
         if not response or "result" not in response or not response["result"]:
             print("No active players.")
             return None
 
         player_id = response["result"][0]["playerid"]
+
+        # Obter o item sendo atualmente reproduzido
         params = {
             "playerid": player_id,
-            "properties": [
-                "title",
-                "showtitle",
-                "season",
-                "episode",
-                "album",
-                "artist",
-            ],
+            "properties": ["type"],  # Pedir apenas o tipo do conteúdo
         }
         response = self.send_request("Player.GetItem", params)
-        if response and "result" in response and "item" in response["result"]:
-            return response["result"]["item"]
 
-        print("Failed to fetch currently playing item.")
+        # Verificar a resposta e retornar o ID e tipo do item
+        if response and "result" in response and "item" in response["result"]:
+            item = response["result"]["item"]
+            if "id" in item and "type" in item:
+                return {"content_id": item["id"], "content_type": item["type"]}
+
+        print("Failed to fetch the currently playing item's ID and type.")
         return None
 
     def clean_library(self):
