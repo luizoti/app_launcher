@@ -56,10 +56,10 @@ class KodiJsonRpc:
             response = self.send_request("JSONRPC.Ping")
             if response and response.get("result") == "pong":
                 return True
-        except:
+        except:  # noqa
             print(f"Is Running Error: {traceback.format_exc()}")
             pass
-        print("Kodi is not responding to JSON-RPC requests.")
+        print("INFO - Kodi is not responding to JSON-RPC requests.")
         return False
 
     def get_movies(self):
@@ -68,7 +68,7 @@ class KodiJsonRpc:
         )
         if response and "result" in response and "movies" in response["result"]:
             return response["result"]["movies"]
-        print("Failed to fetch movies.")
+        print("INFO - Failed to fetch movies.")
         return []
 
     def play_content(self, content_id, content_type):
@@ -106,7 +106,7 @@ class KodiJsonRpc:
         # Verificar players ativos
         response = self.send_request("Player.GetActivePlayers")
         if not response or "result" not in response or not response["result"]:
-            print("No active players.")
+            print("INFO - No active players.")
             return None
 
         player_id = response["result"][0]["playerid"]
@@ -124,50 +124,50 @@ class KodiJsonRpc:
             if "id" in item and "type" in item:
                 return {"content_id": item["id"], "content_type": item["type"]}
 
-        print("Failed to fetch the currently playing item's ID and type.")
+        print("INFO - Failed to fetch the currently playing item's ID and type.")
         return None
 
     def clean_library(self):
         response = self.send_request("VideoLibrary.Clean")
         if response and "result" in response:
-            print("Library cleaned successfully.")
+            print("INFO - Library cleaned successfully.")
         else:
-            print("Failed to clean the library.")
+            print("INFO - Failed to clean the library.")
 
     def scan_library(self):
         response = self.send_request("VideoLibrary.Scan")
         if response and "result" in response:
-            print("Library scan initiated successfully.")
+            print("INFO - Library scan initiated successfully.")
         else:
-            print("Failed to initiate library scan.")
+            print("INFO - Failed to initiate library scan.")
 
     def pause(self):
         response = self.send_request("Player.GetActivePlayers")
         if not response or "result" not in response or not response["result"]:
-            print("No active players to pause.")
+            print("INFO - No active players to pause.")
             return
 
         player_id = response["result"][0]["playerid"]
         params = {"playerid": player_id}
         response = self.send_request("Player.PlayPause", params)
         if response and "result" in response:
-            print("Playback paused/resumed.")
+            print("INFO - Playback paused/resumed.")
         else:
-            print("Failed to pause/resume playback.")
+            print("INFO - Failed to pause/resume playback.")
 
     def stop(self):
         response = self.send_request("Player.GetActivePlayers")
         if not response or "result" not in response or not response["result"]:
-            print("No active players to stop.")
+            print("INFO - No active players to stop.")
             return
 
         player_id = response["result"][0]["playerid"]
         params = {"playerid": player_id}
         response = self.send_request("Player.Stop", params)
         if response and "result" in response:
-            print("Playback stopped.")
+            print("INFO - Playback stopped.")
         else:
-            print("Failed to stop playback.")
+            print("INFO - Failed to stop playback.")
 
     def quit(self):
         """
@@ -175,11 +175,12 @@ class KodiJsonRpc:
         """
         response = self.send_request("Application.Quit")
         if response and "result" in response:
-            print("Kodi is shutting down.")
+            print("INFO - Kodi is shutting down.")
         else:
-            print("Failed to shut down Kodi.")
+            print("INFO - Failed to shut down Kodi.")
 
-    def open_kodi(self):
+    @classmethod
+    def open_kodi(cls):
         result = subprocess.run(
             ["kodi"],
             stdout=subprocess.PIPE,
@@ -216,45 +217,45 @@ def main():
     kodi = KodiJsonRpc(args.host)
 
     if args.list_movies:
-        print("Fetching movies...")
+        print("INFO - Fetching movies...")
         movies = kodi.get_movies()
         if movies:
             for movie in movies:
                 print(f"{movie['movieid']}: {movie['title']}")
         else:
-            print("No movies found.")
+            print("INFO - No movies found.")
 
-    if args.play_movie is not None:
-        print(f"Playing movie ID {args.play_movie}...")
-        kodi.play_movie(args.play_movie)
+    # if args.play_movie is not None:
+    #     print(f"Playing movie ID {args.play_movie}...")
+    #     kodi.play_movie(args.play_movie)
 
     if args.current:
-        print("Checking currently playing item...")
+        print("INFO - Checking currently playing item...")
         playing_item = kodi.get_currently_playing()
         if playing_item:
             title = playing_item.get("title") or playing_item.get("showtitle")
             print(f"Currently playing: {title}")
         else:
-            print("Kodi is not playing anything.")
+            print("INFO - Kodi is not playing anything.")
 
     if args.clean_library:
-        print("Cleaning library...")
+        print("INFO - Cleaning library...")
         kodi.clean_library()
 
     if args.scan_library:
-        print("Scanning library...")
+        print("INFO - Scanning library...")
         kodi.scan_library()
 
     if args.pause:
-        print("Pausing/resuming playback...")
+        print("INFO - Pausing/resuming playback...")
         kodi.pause()
 
     if args.stop:
-        print("Stopping playback...")
+        print("INFO - Stopping playback...")
         kodi.stop()
 
     if args.quit:
-        print("Shutting down Kodi...")
+        print("INFO - Shutting down Kodi...")
         kodi.quit()
 
 

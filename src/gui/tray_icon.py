@@ -1,7 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import QMenu, QSystemTrayIcon
 
-from src.utils import base64_to_icon, is_controller_connected
+from src import DEVICES_MAPPING
+from src.utils import base64_to_icon
 
 
 class ContextMenu(QMenu):
@@ -29,18 +30,21 @@ class ContextMenu(QMenu):
         self.close_signal.emit()
 
 
+def tray_icon_controller():
+    for device in DEVICES_MAPPING.values():
+        if device.get("tray") and device.get("connected"):
+            return True
+    return False
+
+
 # Classe para o ícone do tray
 class TrayIcon(QSystemTrayIcon):
     hide_show_signal = pyqtSignal()
 
-    def __init__(
-        self,
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, *args, **kwargs):
         super(TrayIcon, self).__init__(*args, **kwargs)
         self.activated.connect(self.left_click_action)
-        self.setIcon(base64_to_icon(connected=is_controller_connected()))
+        self.setIcon(base64_to_icon(connected=tray_icon_controller()))
         self.setVisible(True)
 
         # Set tray context menu

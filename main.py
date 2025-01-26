@@ -16,4 +16,5 @@ app = QApplication(sys.argv)
 if __name__ == "__main__":
     window = KodiMainWindow(main_app=app)
     window.hide()
+    print("INFO - App started")
     sys.exit(app.exec_())

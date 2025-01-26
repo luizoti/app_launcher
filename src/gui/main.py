@@ -1,37 +1,34 @@
 import subprocess
+import threading
+import time
 import traceback
-from datetime import datetime, timedelta
-from time import sleep
 
-import pygame
+from evdev import InputDevice, list_devices
 from PyQt5.QtCore import (
+    QObject,
+    QSize,
     Qt,
     QThread,
     pyqtSignal,
-    QObject,
-    QSize,
 )
 from PyQt5.QtWidgets import (
     QApplication,
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
     QHBoxLayout,
-    QPushButton,
     QLabel,
+    QMainWindow,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-from pynput import keyboard
 
-from src.gui.tray_icon import TrayIcon
+from src import ALLOWED_DEVICES, DEVICES_MAPPING
+from src.gui.tray_icon import TrayIcon, tray_icon_controller
 from src.kodi_manager import KodiJsonRpc
 from src.utils import (
-    is_controller_connected,
-    base64_to_icon,
     BUTTONS_ARRAY,
     are_processes_running,
+    base64_to_icon,
 )
-
-KODI_API = KodiJsonRpc("localhost")
 
 
 class CustomButton(QPushButton):
@@ -50,192 +47,153 @@ class CustomButton(QPushButton):
             super().keyPressEvent(event)  # Processa outros eventos normalmente
 
 
-# Worker para tarefas longas
-class KodiMonitorWorker(QObject):
-    connected = pyqtSignal()
-    disconnected = pyqtSignal()
+class DeviceMonitor(QObject):
+    pressed_hide_show = pyqtSignal()
 
-    finished = pyqtSignal()
-
-    def run(self):
-        """Tarefa longa que será executada em thread separada."""
-        connected = False
-        try:
-            while True:
-                is_connected = is_controller_connected()
-                sleep(1)
-                if is_connected and connected is False:
-                    connected = True
-                    print("Controle conectado. Abrir Kodi?")
-                    self.connected.emit()
-                elif not is_connected and connected is True:
-                    connected = False
-                    print("Controller disconnected. Pausing Kodi...")
-                    self.disconnected.emit()
-        except KeyboardInterrupt:
-            return None
-        finally:
-            self.finished.emit()
-
-
-class JoyStickMonitorWorker(QObject):
     button_up = pyqtSignal()
     button_down = pyqtSignal()
     button_left = pyqtSignal()
     button_right = pyqtSignal()
     button_enter = pyqtSignal()
-    pressed_hide_show = pyqtSignal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.running = True
-        self.joysticks = {}  # Armazena os joysticks conectados
+    connected = pyqtSignal()
+    disconnected = pyqtSignal()
+
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.monitored_devices = {}
+        self.lock = threading.Lock()
         self.buttons = {
-            4: self.button_up.emit,  # Botão "up"
-            6: self.button_down.emit,  # Botão "down"
-            7: self.button_left.emit,  # Botão "left"
-            5: self.button_right.emit,  # Botão "right"
-            14: self.button_enter.emit,  # Botão "X" como "enter"
-            16: self.pressed_hide_show.emit,  # Botão "SHARE" como "enter"
+            x: {a: self.__getattribute__(b) for a, b in y.items() if isinstance(a, int)}
+            for x, y in DEVICES_MAPPING.items()
         }
 
-    def run(self):
-        """Inicia o monitoramento do joystick."""
-        pygame.init()
-        pygame.joystick.init()
-        print("Monitor de joystick iniciado.")
-        self._initialize_joysticks()
+    def monitor_device(self, device_path):
+        device = InputDevice(device_path)
+        print(f"Monitorando eventos de: {device.name} ({device.path})")
 
-        while self.running:
-            if are_processes_running():
-                try:
-                    self._remove_joystick()
-                except:
-                    pass
-                continue
-            for event in pygame.event.get():
-                if event.type == pygame.JOYBUTTONDOWN:
-                    try:
-                        pressed_button = self.buttons[event.button]
-                        pressed_button()
-                    except (KeyError, TypeError):
-                        pass
+        try:
+            for event in device.read_loop():
+                if any([x for x in are_processes_running().values()]):
                     continue
-                if event.type == pygame.JOYDEVICEADDED:
-                    self._add_joystick(event.device_index)
-                elif event.type == pygame.JOYDEVICEREMOVED:
-                    self._remove_joystick(event.instance_id)
-
-    def stop(self):
-        """Interrompe o monitoramento."""
-        self.running = False
-        pygame.quit()
-        print("Monitor de joystick parado.")
-
-    def _initialize_joysticks(self):
-        """Inicializa os joysticks conectados no início."""
-        for i in range(pygame.joystick.get_count()):
-            self._add_joystick(i)
-
-    def _add_joystick(self, device_index):
-        """Adiciona um joystick."""
-        joystick = pygame.joystick.Joystick(device_index)
-        joystick.init()
-        self.joysticks[joystick.get_instance_id()] = joystick
-        print(
-            f"Joystick conectado: {joystick.get_name()} (ID: {joystick.get_instance_id()})"
-        )
-
-    def _remove_joystick(self, instance_id):
-        """Remove um joystick desconectado."""
-        if instance_id in self.joysticks:
-            print(
-                f"Joystick desconectado: {self.joysticks[instance_id].get_name()} (ID: {instance_id})"
-            )
-            del self.joysticks[instance_id]
-
-
-class KeyboardMonitorWorker(QObject):
-    pressed_hide_show = pyqtSignal()
-
-    def run(self):
-        """Tarefa longa que será executada em thread separada."""
-        try:
-            with keyboard.Listener(on_press=self.on_press) as listener:
-                print("Pressione qualquer tecla. Pressione ESC para sair.")
-                listener.join()
-        except KeyboardInterrupt:
-            return None
-        # finally:
-        #     self.finished.emit()
-
-    def on_press(self, key):
-        try:
-            if not are_processes_running():
-                if key == keyboard.Key.esc:
-                    self.pressed_hide_show.emit()
-        except AttributeError:
+                if event.value == 1:
+                    try:
+                        action = self.buttons[device.name][event.code]
+                        action.emit()
+                        print(f"EVNT - {device.name} - {action}")
+                    except:  # noqa
+                        pass
+        except OSError:
             pass
+        except Exception:
+            print(f"Erro ao monitorar {device.name}: {traceback.format_exc()}")
+        finally:
+            with self.lock:
+                if device_path in self.monitored_devices:
+                    del self.monitored_devices[device_path]
+                    print(
+                        f"Dispositivo removido do monitoramento: {device.name} ({device.path})"
+                    )
+
+    def refresh_devices(self):
+        """
+        Verifica dispositivos permitidos conectados e atualiza a lista monitorada.
+        """
+        allowed_devices = [
+            dev
+            for dev in [InputDevice(path) for path in list_devices()]
+            if dev.name in ALLOWED_DEVICES
+        ]
+        with self.lock:
+            # Adicionar novos dispositivos
+            for device in allowed_devices:
+                if device.path not in self.monitored_devices:
+                    print(f"Novo dispositivo detectado: {device.name} ({device.path})")
+                    DEVICES_MAPPING[device.name]["connected"] = True
+                    DEVICES_MAPPING[device.name]["path"] = device.path
+                    thread = threading.Thread(
+                        target=self.monitor_device, args=(device.path,), daemon=True
+                    )
+                    self.monitored_devices[device.path] = thread
+                    thread.start()
+                    self.connected.emit()
+
+            # Remover dispositivos desconectados
+            monitored_paths = list(self.monitored_devices.keys())
+            for path in monitored_paths:
+                if path not in [device.path for device in allowed_devices]:
+                    for device in DEVICES_MAPPING.values():
+                        if DEVICES_MAPPING[device].get("path") == path:
+                            print(f"Dispositivo desconectado: {path}")
+                            DEVICES_MAPPING[InputDevice]["connected"] = False
+                            del self.monitored_devices[path]
+                            self.disconnected.emit()
+        self.finished.emit()
+
+    def start_monitoring(self):
+        """
+        Inicia o monitoramento contínuo para detectar dispositivos adicionados/removidos.
+        """
+        try:
+            while True:
+                self.refresh_devices()
+                time.sleep(1)  # Atualiza a lista de dispositivos a cada segundo
+        except KeyboardInterrupt:
+            print("INFO - \nEncerrando monitoramento...")
 
 
 class KodiMainWindow(QMainWindow):
     def __init__(self, main_app: QApplication):
         super(KodiMainWindow, self).__init__()
-        self.button_layout = None
-        self.btn_carrousel = {}
-        self.btn_kodi = None
-        self.btn_emulationstation = None
-        self.btn_exit = None
-
-        self.main_app = main_app
-
         self.thread = QThread()
-        self.thread2 = QThread()
-        self.thread3 = QThread()
+        self.main_app = main_app
+        self.kodi_api = KodiJsonRpc("localhost")
 
-        self.kodi_worker = KodiMonitorWorker()
-        self.keyboard_worker = KeyboardMonitorWorker()
-        self.joystick_worker = JoyStickMonitorWorker()
+        self.buttons_carrousel = {}
+        self.button_layout = None
+        self.button_kodi = None
+        self.button_emulationstation = None
+        self.button_exit = None
 
+        # ____ SET TRAY ICON ____
         self.tray_icon = TrayIcon()
-        self.tray_icon.show()
-
-        # Sinais Tray
         self.tray_icon.menu.close_signal.connect(self.close)
         self.tray_icon.hide_show_signal.connect(self.hide_show_tray)
-        self.kodi_worker.moveToThread(self.thread)
-        self.keyboard_worker.moveToThread(self.thread2)
-        self.joystick_worker.moveToThread(self.thread3)
 
-        # Sinais Worker e thread
-        self.thread.started.connect(self.kodi_worker.run)
-        self.thread2.started.connect(self.keyboard_worker.run)
-        self.thread3.started.connect(self.joystick_worker.run)
-        self.kodi_worker.finished.connect(self.close)
+        self.tray_icon.show()
+        # ____ SET TRAY ICON ____
 
-        self.thread.finished.connect(self.thread.deleteLater)
-
-        self.kodi_worker.connected.connect(self.show)
-        self.kodi_worker.connected.connect(self.switch_icon)
-        self.kodi_worker.disconnected.connect(self.hide)
-        self.kodi_worker.disconnected.connect(self.switch_icon)
-
-        self.keyboard_worker.pressed_hide_show.connect(self.hide_show_tray)
-        self.joystick_worker.pressed_hide_show.connect(self.hide_show_tray)
+        # ____ SET DEVICE MONITOR ____
+        self.device_monitor_worker = DeviceMonitor()
+        self.device_monitor_worker.connected.connect(self.show)
+        self.device_monitor_worker.connected.connect(self.switch_icon)
+        self.device_monitor_worker.disconnected.connect(self.hide)
+        self.device_monitor_worker.disconnected.connect(self.switch_icon)
+        self.device_monitor_worker.pressed_hide_show.connect(self.hide_show_tray)
 
         # Conexões dos sinais
-        self.joystick_worker.button_up.connect(self.on_up_left)
-        self.joystick_worker.button_down.connect(self.on_down_right)
-        self.joystick_worker.button_left.connect(self.on_up_left)
-        self.joystick_worker.button_right.connect(self.on_down_right)
-        self.joystick_worker.button_enter.connect(self.on_enter)
+        self.device_monitor_worker.button_up.connect(self.on_up_left)
+        self.device_monitor_worker.button_down.connect(self.on_down_right)
+        self.device_monitor_worker.button_left.connect(self.on_up_left)
+        self.device_monitor_worker.button_right.connect(self.on_down_right)
+        self.device_monitor_worker.button_enter.connect(self.on_enter)
+
+        self.device_monitor_worker.moveToThread(self.thread)
+        self.device_monitor_worker.finished.connect(self.exit)
+
+        # ____ SET DEVICE MONITOR ____
+
+        # Sinais Worker e thread
+        self.thread.started.connect(self.device_monitor_worker.start_monitoring)
+        self.thread.finished.connect(self.thread.deleteLater)
 
         self.init_ui()
         self.thread.start()
-        self.thread2.start()
-        self.thread3.start()
 
     def init_ui(self):
+        print("INFO - Iniciando interface gráfica...")
         # Remover decorações da janela
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
@@ -263,33 +221,34 @@ class KodiMainWindow(QMainWindow):
         main_layout.addLayout(self.button_layout)
 
         # Botões para adicionar ao layout
-        self.btn_kodi = self.create_button(self.open_kodi)
-        self.btn_kodi.setIcon(base64_to_icon(BUTTONS_ARRAY.get("kodi")))
+        self.button_kodi = self.create_button(self.open_kodi)
+        self.button_kodi.setIcon(base64_to_icon(BUTTONS_ARRAY.get("kodi")))
 
-        self.btn_emulationstation = self.create_button(self.open_emulationstation)
-        self.btn_emulationstation.setIcon(
+        self.button_emulationstation = self.create_button(self.open_emulationstation)
+        self.button_emulationstation.setIcon(
             base64_to_icon(BUTTONS_ARRAY.get("emulationstation"))
         )
 
-        self.btn_exit = self.create_button(self.hide)
-        self.btn_exit.setIcon(base64_to_icon(BUTTONS_ARRAY.get("exit")))
+        self.button_exit = self.create_button(self.hide)
+        self.button_exit.setIcon(base64_to_icon(BUTTONS_ARRAY.get("exit")))
 
-        self.btn_carrousel.update(
+        self.buttons_carrousel.update(
             {
-                0: self.btn_kodi,
-                1: self.btn_emulationstation,
-                2: self.btn_exit,
+                0: self.button_kodi,
+                1: self.button_emulationstation,
+                2: self.button_exit,
             }
         )
         # Adiciona os botões ao layout
-        self.button_layout.addWidget(self.btn_kodi, alignment=Qt.AlignLeft)
+        self.button_layout.addWidget(self.button_kodi, alignment=Qt.AlignLeft)
         self.button_layout.addWidget(
-            self.btn_emulationstation, alignment=Qt.AlignCenter
+            self.button_emulationstation, alignment=Qt.AlignCenter
         )
-        self.button_layout.addWidget(self.btn_exit, alignment=Qt.AlignRight)
-
+        self.button_layout.addWidget(self.button_exit, alignment=Qt.AlignRight)
+        print("INFO - Interface gráfica iniciada com sucesso!")
         # Centralizar janela na tela
         self.center_on_screen()
+        print("INFO - Janela centralizada na tela.")
 
     def create_button(self, action):
         button = CustomButton(
@@ -297,22 +256,6 @@ class KodiMainWindow(QMainWindow):
         )
         button.clicked.connect(action)
         return button
-
-    def open_emulationstation(self):
-        print("Abrindo EmulationStation...")
-        self.hide()
-        result = subprocess.run(
-            ["emulationstation"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        return result.stdout.decode("utf-8")
-
-    def center_on_screen(self):
-        screen_geometry = QApplication.primaryScreen().geometry()
-        x = (screen_geometry.width() - self.width()) // 2
-        y = (screen_geometry.height() - self.height()) // 2
-        self.move(x, y)
 
     @staticmethod
     def create_button_style(
@@ -337,20 +280,25 @@ class KodiMainWindow(QMainWindow):
         }}
         """
 
-    def on_up_left(self):
-        current_focus = QApplication.focusWidget()
-        for index, btn in self.btn_carrousel.items():
-            if current_focus == btn:
-                list(self.btn_carrousel.values())[index - 1].setFocus()
+    def center_on_screen(self):
+        screen_geometry = QApplication.primaryScreen().geometry()
+        x = (screen_geometry.width() - self.width()) // 2
+        y = (screen_geometry.height() - self.height()) // 2
+        self.move(x, y)
 
-    def on_down_right(self):
-        current_focus = QApplication.focusWidget()
-        for index, btn in self.btn_carrousel.items():
-            if current_focus == btn:
-                try:
-                    list(self.btn_carrousel.values())[index + 1].setFocus()
-                except IndexError:
-                    list(self.btn_carrousel.values())[0].setFocus()
+    def open_emulationstation(self):
+        print("INFO - Abrindo EmulationStation...")
+        self.hide()
+        return subprocess.run(
+            ["emulationstation"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        ).stdout.decode("utf-8")
+
+    def open_kodi(self):
+        print("INFO - Abrindo o Kodi...")
+        self.hide()
+        self.kodi_api.open_kodi()
 
     @staticmethod
     def on_enter():
@@ -358,20 +306,26 @@ class KodiMainWindow(QMainWindow):
         if isinstance(focused_widget, QPushButton):
             focused_widget.click()
 
-    def hide_show(self):
-        if self.isVisible():
-            self.hide()
-            return True
-        self.show()
+    def on_up_left(self):
+        current_focus = QApplication.focusWidget()
+        for index, btn in self.buttons_carrousel.items():
+            if current_focus == btn:
+                list(self.buttons_carrousel.values())[index - 1].setFocus()
+
+    def on_down_right(self):
+        current_focus = QApplication.focusWidget()
+        for index, btn in self.buttons_carrousel.items():
+            if current_focus == btn:
+                try:
+                    list(self.buttons_carrousel.values())[index + 1].setFocus()
+                except IndexError:
+                    list(self.buttons_carrousel.values())[0].setFocus()
 
     def switch_icon(self):
-        self.tray_icon.setIcon(base64_to_icon(connected=is_controller_connected()))
+        self.tray_icon.setIcon(base64_to_icon(connected=tray_icon_controller()))
 
     def hide_show_tray(self):
-        if self.isVisible():
-            self.hide()
-            return True
-        self.show()
+        self.hide() if self.isVisible() else self.show()
 
     def exit(self):
         """Fecha o aplicativo."""
@@ -384,27 +338,3 @@ class KodiMainWindow(QMainWindow):
         except:  # noqa
             pass
         print(f"Exit error: {traceback.format_exc()}")
-
-    def open_kodi(self):
-        print("Abrindo o Kodi...")
-        self.hide()
-        KODI_API.open_kodi()
-
-    @staticmethod
-    def restart_kodi():
-        print("Restart kodi...")
-        timeout = datetime.now() + timedelta(minutes=5)
-        current_playing = KODI_API.get_currently_playing()
-        KODI_API.pause()
-        KODI_API.stop()
-        KODI_API.quit()
-        sleep(3)
-        KODI_API.open_kodi()
-        while not KODI_API.is_kodi_running():
-            if datetime.now() > timeout:
-                break
-            try:
-                KODI_API.play_content(**current_playing)
-                sleep(1)
-            except Exception as Err:
-                print(f"Tentativa de reiniciar reprodução: {Err}")

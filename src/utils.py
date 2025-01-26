@@ -1,6 +1,8 @@
 import base64
 
+import psutil
 from PyQt5.QtGui import QIcon, QImage, QPixmap
+
 
 BUTTONS_ARRAY = {
     "tray": {
@@ -26,46 +28,25 @@ def base64_to_icon(icon=None, connected=False):
     return QIcon(QPixmap.fromImage(image))
 
 
-import subprocess
-
-
 def are_processes_running():
-    try:
-        subprocess.run(
-            ["pgrep", "-f", "emulationstation|retroarch|kodi"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
-        return True  # Processos encontrados
-    except subprocess.CalledProcessError:
-        return False  # Nenhum processo encontrado
-    except FileNotFoundError:
-        raise RuntimeError("O comando 'pgrep' não foi encontrado no sistema")
+    resultados = {}
+    programas_para_verificar = ["emulationstation", "retroarch", "kodi"]
 
+    # Converte a lista de programas para minúsculas para garantir consistência
+    programas_para_verificar = [p.lower() for p in programas_para_verificar]
 
-def is_controller_connected():
-    """
-    Verifica se um dispositivo especificado está conectado ao sistema.
-    """
-    device_names = {
-        "Sony Computer Entertainment Inc BD Remote Control",
-        "Sony Computer Entertainment Game Controller",
-        "PLAYSTATION(R)3 Controller",
-    }
-    device_file = "/proc/bus/input/devices"
+    # Itera pelos processos em execução
+    for processo in psutil.process_iter(["name"]):
+        try:
+            nome_processo = processo.info["name"].lower()
+            if nome_processo in programas_para_verificar:
+                resultados[nome_processo] = True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
 
-    try:
-        with open(device_file, "r") as file:
-            current_device = ""
-            for line in file:
-                if line.startswith("N: Name="):  # Procura pelo nome do dispositivo
-                    current_device = line.split("=", 1)[1].strip().strip('"')
-                if current_device in device_names:
-                    return True
-    except FileNotFoundError:
-        print(f"Arquivo {device_file} não encontrado.")
-    except Exception as e:
-        print(f"Ocorreu um erro inesperado: {e}")
+    # Para os programas não encontrados, retorna False
+    for programa in programas_para_verificar:
+        if programa not in resultados:
+            resultados[programa] = False
 
-    return False
+    return resultados
