@@ -181,7 +181,6 @@ class KodiMainWindow(QMainWindow):
         self.device_monitor_worker.button_enter.connect(self.on_enter)
 
         self.device_monitor_worker.moveToThread(self.thread)
-        self.device_monitor_worker.finished.connect(self.exit)
 
         # ____ SET DEVICE MONITOR ____
 
