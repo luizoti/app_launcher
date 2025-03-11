@@ -3,7 +3,6 @@ import threading
 import time
 import traceback
 
-from evdev import InputDevice, list_devices
 from PyQt5.QtCore import (
     QObject,
     QSize,
@@ -20,6 +19,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from evdev import InputDevice, list_devices
 
 from src import ALLOWED_DEVICES, DEVICES_MAPPING
 from src.gui.tray_icon import TrayIcon, tray_icon_controller
@@ -258,7 +258,7 @@ class KodiMainWindow(QMainWindow):
 
     @staticmethod
     def create_button_style(
-        color="#333333", hover_color="#444444", text_color="#FFFFFF"
+            color="#333333", hover_color="#444444", text_color="#FFFFFF"
     ):
         return f"""
         QPushButton {{
@@ -286,13 +286,13 @@ class KodiMainWindow(QMainWindow):
         self.move(x, y)
 
     def open_emulationstation(self):
-        print("INFO - Abrindo EmulationStation...")
+        print("INFO - Abrindo EmulationStation em um terminal separado...")
         self.hide()
-        return subprocess.run(
-            ["emulationstation"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        ).stdout.decode("utf-8")
+        subprocess.Popen(
+            ["x-terminal-emulator", "-e", "emulationstation"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
     def open_kodi(self):
         print("INFO - Abrindo o Kodi...")
