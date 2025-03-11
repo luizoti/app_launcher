@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['main.py'],
+    ['/home/luiz/projetos/autostart_kodi/main.py'],
     pathex=[],
     binaries=[],
     datas=[],
