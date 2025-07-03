@@ -3,7 +3,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from src.gui.main import KodiMainWindow
+from src.gui import AppMainWindow
 
 os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
@@ -14,7 +14,6 @@ app = QApplication(sys.argv)
 # )  # Impede que o app feche quando a última janela for fechada
 
 if __name__ == "__main__":
-    window = KodiMainWindow(main_app=app)
-    window.hide()
+    app_window = AppMainWindow(main_app=app)
     print("INFO - App started")
     sys.exit(app.exec_())
