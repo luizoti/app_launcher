@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+import sys
+
 import os
 import shutil
 import subprocess
-import sys
 
 
 def backup_file(filepath):
@@ -32,12 +32,9 @@ def main():
     script_dir = os.path.abspath(os.path.dirname(__file__))
     main_py = os.path.join(script_dir, "main.py")
 
-    # Caminho absoluto para o executável do pyinstaller
-    pyinstaller_path = "/home/luiz/.asdf/installs/python/3.10.0/bin/pyinstaller"
-
     # Comando de compilação com pyinstaller usando caminhos absolutos
     command = [
-        pyinstaller_path,
+        "pyinstaller",
         "--onefile",
         "--hidden-import=requests",
         "--hidden-import=PyQt5.QtWidgets",
