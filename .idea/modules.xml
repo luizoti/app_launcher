@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/autostart_kodi.iml" filepath="$PROJECT_DIR$/.idea/autostart_kodi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/startup_ui.iml" filepath="$PROJECT_DIR$/.idea/startup_ui.iml" />
     </modules>
   </component>
 </project>

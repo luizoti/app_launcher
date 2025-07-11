@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="pathToExecutable" value="$USER_HOME$/.local/bin/black" />
-    <option name="sdkName" value="Python 3.13 (autostart_kodi)" />
+    <option name="sdkName" value="Python 3.13 virtualenv at /var/home/luiz/ExtFiles/projetos/python/startup_ui/.venv" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (autostart_kodi)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 virtualenv at /var/home/luiz/ExtFiles/projetos/python/startup_ui/.venv" project-jdk-type="Python SDK" />
 </project>

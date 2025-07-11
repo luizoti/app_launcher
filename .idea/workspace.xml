@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="ref: Renamed KodiMainWindow to AppMainWindow">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/ChatGPT Image 7 de jul. de 2025, 11_12_49.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/ChatGPT Image 7 de jul. de 2025, 11_43_53.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/ChatGPT Image 7 de jul. de 2025, 20_19_33.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/app.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/hide.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/settings.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/command_executor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/app.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/centralized_resolution.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/base/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/context_menu.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/custom_button.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/device_monitor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/grid.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/gui/components/tray_icon.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/autostart_kodi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/startup_ui.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/developer-tools.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ryecharm-overrides.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ryecharm.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/MR60X_V2.0_24030820240528031529.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/kodi.psd" beforeDir="false" afterPath="$PROJECT_DIR$/assets/kodi.psd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/retropie.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/retropie.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/tray_icon.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/kodi_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;luizoti&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:luizoti/autostart_kodi.git&quot;,
+    &quot;accountId&quot;: &quot;0a87d06a-0686-4ef6-be28-939dd773ecf4&quot;
+  }
+}</component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2zN3BXzniaTwZk2yH4LJalxD5QB" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="openDirectoriesWithSingleClick" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Run main.py.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/var/home/luiz/ExtFiles/projetos/python/startup_ui/assets",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.black.configuration.BlackFormatterConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
+      <recent name="$PROJECT_DIR$/src/gui/components" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/gui/components" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Run main.py" type="PythonConfigurationType" factoryName="Python">
+      <module name="startup_ui" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.13 virtualenv at $PROJECT_DIR$/.venv" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="" />
+      <created>1751557569207</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751557569207</updated>
+      <workItem from="1751557570431" duration="13150000" />
+      <workItem from="1751725709120" duration="4532000" />
+      <workItem from="1751891123667" duration="5000" />
+      <workItem from="1751893308984" duration="46652000" />
+      <workItem from="1752003610733" duration="7962000" />
+      <workItem from="1752155708791" duration="9134000" />
+      <workItem from="1752262819864" duration="6782000" />
+    </task>
+    <task id="LOCAL-00001" summary="fix: Included pyinstaller in requirements.txt">
+      <option name="closed" value="true" />
+      <created>1751557743140</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1751557743140</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat: Replace .autostart.py with settings.json">
+      <option name="closed" value="true" />
+      <created>1751557779029</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751557779029</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat: Rename build.py to make.py">
+      <option name="closed" value="true" />
+      <created>1751557833232</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1751557833232</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fix: Delete .autostart.py file">
+      <option name="closed" value="true" />
+      <created>1751557856993</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1751557856993</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ref: Renamed KodiMainWindow to AppMainWindow">
+      <option name="closed" value="true" />
+      <created>1751557955192</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1751557955192</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix: Included pyinstaller in requirements.txt" />
+    <MESSAGE value="feat: Replace .autostart.py with settings.json" />
+    <MESSAGE value="feat: Rename build.py to make.py" />
+    <MESSAGE value="fix: Delete .autostart.py file" />
+    <MESSAGE value="ref: Renamed KodiMainWindow to AppMainWindow" />
+    <option name="LAST_COMMIT_MESSAGE" value="ref: Renamed KodiMainWindow to AppMainWindow" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/startup_ui$Run_main_py.coverage" NAME="Run main.py Coverage Results" MODIFIED="1752271604571" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+</project>

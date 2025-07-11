@@ -4,4 +4,9 @@ psutil~=5.8.0
 
 evdev~=1.7.1
 
+# Formating
+black[d]
+
+# Build
 pyinstaller
+
