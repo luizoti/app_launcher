@@ -1,13 +1,13 @@
 import os
 import sys
 
+import os
 from PyQt5.QtWidgets import QApplication
 
-from src.gui import AppMainWindow
+from src.gui.app import AppMainWindow
 
 os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
-# Configuração do aplicativo
 app = QApplication(sys.argv)
 # app.setQuitOnLastWindowClosed(
 #     True
