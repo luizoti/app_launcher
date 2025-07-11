@@ -14,6 +14,7 @@ app = QApplication(sys.argv)
 # )  # Impede que o app feche quando a última janela for fechada
 
 if __name__ == "__main__":
-    app_window = AppMainWindow(main_app=app)
+    app_window = AppMainWindow()
+    app_window.show_ui()
     print("INFO - App started")
     sys.exit(app.exec_())
