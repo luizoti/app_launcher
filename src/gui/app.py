@@ -34,10 +34,6 @@ class AppMainWindow(QMainWindow):
     def _set_on_center(self):
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
 
-    def _from_config(self):
-        # TODO: Get mappings from settings here
-        pass
-
     def _get_apps_list(self):
         return self.settings.get("apps", {})
 
