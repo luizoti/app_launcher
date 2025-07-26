@@ -1,7 +1,7 @@
 import base64
-
 import psutil
 from PyQt5.QtGui import QIcon, QImage, QPixmap
+from typing import Generator
 
 
 def base64_to_icon(icon=None, connected=False) -> QIcon:
@@ -10,25 +10,9 @@ def base64_to_icon(icon=None, connected=False) -> QIcon:
     return QIcon(QPixmap.fromImage(image))
 
 
-def are_processes_running():
-    resultados = {}
-    programas_para_verificar = ["emulationstation", "retroarch", "kodi"]
+def check_running_processes(search_process=None) -> Generator[str]:
+    if not search_process:
+        raise ValueError("search_process cannot be None")
 
-    # Converte a lista de programas para minúsculas para garantir consistência
-    programas_para_verificar = [p.lower() for p in programas_para_verificar]
-
-    # Itera pelos processos em execução
-    for processo in psutil.process_iter(["name"]):
-        try:
-            nome_processo = processo.info["name"].lower()
-            if nome_processo in programas_para_verificar:
-                resultados[nome_processo] = True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            continue
-
-    # Para os programas não encontrados, retorna False
-    for programa in programas_para_verificar:
-        if programa not in resultados:
-            resultados[programa] = False
-
-    return resultados
+    return (x for x in [x.info["name"].lower() for x in psutil.process_iter(["name"])] if
+            x in [p.lower() for p in search_process])
