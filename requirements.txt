@@ -10,3 +10,4 @@ black[d]
 # Build
 pyinstaller
 
+setproctitle~=1.3.6
