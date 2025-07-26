@@ -1,24 +1,49 @@
 {
   "settings": {
     "mappings": {
+      "DualSense Wireless Controller": {
+        "tray": true,
+        "buttons": {
+          "enter": 302,
+          "toggle_view": 304
+        }
+      },
       "PLAYSTATION(R)3 Controller": {
         "tray": true,
-        "292": "button_up",
-        "294": "button_down",
-        "295": "button_left",
-        "293": "button_right",
-        "302": "button_enter",
-        "304": "pressed_hide_show"
+        "buttons": {
+          "enter": 302,
+          "toggle_view": 304
+        }
       },
       "Keyszer (virtual) Keyboard": {
         "tray": false,
-        "28": "button_enter",
-        "172": "pressed_hide_show"
+        "buttons": {
+          "enter": 28,
+          "toggle_view": 172
+        }
       },
       "Sony Computer Entertainment Game Controller": {
         "tray": true,
-        "28": "button_enter",
-        "172": "pressed_hide_show"
+        "buttons": {
+          "button_enter": 28,
+          "toggle_view": 172
+        }
+      },
+      "Microsoft X-Box 360 pad": {
+        "tray": true,
+        "buttons": {
+          "enter": 304,
+          "options": 307,
+          "toggle_view": 316
+        }
+      },
+      "Sony Interactive Entertainment DualSense Wireless Controller": {
+        "tray": true,
+        "buttons": {
+          "enter": 304,
+          "options": 307,
+          "toggle_view": 316
+        }
       }
     },
     "window": {
