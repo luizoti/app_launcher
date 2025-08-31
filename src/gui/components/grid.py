@@ -25,7 +25,7 @@ class AppGrid(QGridLayout):
             self.removeWidget(widget)
             widget.deleteLater()
         # self.__reorganize_grid()
-        self._plot_app_grid()
+        self.plot_app_grid()
 
     # def __reorganize_grid(self):
     #     widgets = []
@@ -69,7 +69,7 @@ class AppGrid(QGridLayout):
             enumerate(more_itertools.batched([self.__button_generator(*x) for x in apps.items()], self.row_limit))
         )
 
-    def _plot_app_grid(self, apps: dict = None):
+    def plot_app_grid(self, apps: dict = None):
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
         self.__rebuild_mapped_grid(apps=apps)
