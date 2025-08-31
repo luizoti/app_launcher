@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="feat: include some asset icons">
+    <list default="true" id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="ref: Revised devise monitor to use only one signal to handle actions like up, down left, right, etc...">
+      <change afterPath="$PROJECT_DIR$/src/enums.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/startup_ui.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/startup_ui.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/components/context_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/components/context_menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/components/device_monitor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/components/device_monitor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/components/tray_icon.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/components/tray_icon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/teste.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_check_running_process.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +45,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:luizoti/autostart_kodi.git&quot;,
-    &quot;accountId&quot;: &quot;0a87d06a-0686-4ef6-be28-939dd773ecf4&quot;
+    &quot;accountId&quot;: &quot;e4770315-1366-4b25-8101-f56825afff8c&quot;
   }
 }</component>
   <component name="OptimizeOnSaveOptions">
@@ -68,29 +65,30 @@
     <option name="openDirectoriesWithSingleClick" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_insensitive_search.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_sensitive_process.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_one_running_process.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_two_running_process.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Run main.py.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/var/home/luiz/ExtFiles/projetos/python/startup_ui/assets&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.executor": "Run",
+    "Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_insensitive_search.executor": "Run",
+    "Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_sensitive_process.executor": "Run",
+    "Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_one_running_process.executor": "Run",
+    "Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_two_running_process.executor": "Run",
+    "Python.Run main.py.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/luiz/projetos/outros/media-services-docker",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/assets" />
@@ -110,9 +108,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.13 virtualenv at $PROJECT_DIR$/.venv" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -218,8 +215,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-PY-251.26927.90" />
-        <option value="bundled-python-sdk-41e8cd69c857-64d779b69b7a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26927.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-PY-252.23892.515" />
+        <option value="bundled-python-sdk-7e47963ff851-f0eec537fc84-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.23892.515" />
       </set>
     </attachedChunks>
   </component>
@@ -247,7 +244,13 @@
       <workItem from="1753398021737" duration="12852000" />
       <workItem from="1753459535720" duration="1939000" />
       <workItem from="1753465420643" duration="1617000" />
-      <workItem from="1753479679080" duration="1833000" />
+      <workItem from="1753479679080" duration="5466000" />
+      <workItem from="1753571568302" duration="11833000" />
+      <workItem from="1754182303979" duration="6958000" />
+      <workItem from="1754234669919" duration="2788000" />
+      <workItem from="1756513278741" duration="336000" />
+      <workItem from="1756513647731" duration="11018000" />
+      <workItem from="1756591281152" duration="7546000" />
     </task>
     <task id="LOCAL-00001" summary="fix: Included pyinstaller in requirements.txt">
       <option name="closed" value="true" />
@@ -425,7 +428,111 @@
       <option name="project" value="LOCAL" />
       <updated>1752280437751</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="ref: Simplified version to work as generator">
+      <option name="closed" value="true" />
+      <created>1753497814319</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1753497814319</updated>
+    </task>
+    <task id="LOCAL-00024" summary="feat: Unitest to check_running_processes">
+      <option name="closed" value="true" />
+      <created>1753497838272</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1753497838272</updated>
+    </task>
+    <task id="LOCAL-00025" summary="chore: Updated .idea settings">
+      <option name="closed" value="true" />
+      <created>1753497888960</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1753497888960</updated>
+    </task>
+    <task id="LOCAL-00026" summary="ref: Simplified to work without dpad mappings">
+      <option name="closed" value="true" />
+      <created>1753497930648</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1753497930648</updated>
+    </task>
+    <task id="LOCAL-00027" summary="deps: Include setproctitle to support unittests">
+      <option name="closed" value="true" />
+      <created>1753497960083</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1753497960083</updated>
+    </task>
+    <task id="LOCAL-00028" summary="ref: Remove _from_config method">
+      <option name="closed" value="true" />
+      <created>1753501089224</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1753501089224</updated>
+    </task>
+    <task id="LOCAL-00029" summary="ref: Refactored to reduce signals and usage of parent">
+      <option name="closed" value="true" />
+      <created>1753586048484</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1753586048484</updated>
+    </task>
+    <task id="LOCAL-00030" summary="feat: Implement focus effect">
+      <option name="closed" value="true" />
+      <created>1756600619984</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1756600619984</updated>
+    </task>
+    <task id="LOCAL-00031" summary="feat: Method to change focus to selected app by name">
+      <option name="closed" value="true" />
+      <created>1756600692317</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1756600692317</updated>
+    </task>
+    <task id="LOCAL-00032" summary="ref: Simplified app grid calc">
+      <option name="closed" value="true" />
+      <created>1756600796660</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1756600796660</updated>
+    </task>
+    <task id="LOCAL-00033" summary="feat: add more_itertools to">
+      <option name="closed" value="true" />
+      <created>1756600828398</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1756600828398</updated>
+    </task>
+    <task id="LOCAL-00034" summary="fix: ValueError message">
+      <option name="closed" value="true" />
+      <created>1756600853691</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1756600853691</updated>
+    </task>
+    <task id="LOCAL-00035" summary="ref: Revised devise monitor to use only one signal to handle actions like up, down left, right, etc...">
+      <option name="closed" value="true" />
+      <created>1756602857610</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1756602857610</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -436,19 +543,25 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: Included pyinstaller in requirements.txt" />
-    <MESSAGE value="feat: Replace .autostart.py with settings.json" />
-    <MESSAGE value="feat: Rename build.py to make.py" />
-    <MESSAGE value="fix: Delete .autostart.py file" />
-    <MESSAGE value="ref: Renamed KodiMainWindow to AppMainWindow" />
-    <MESSAGE value="ref: parent or main_app argument" />
     <MESSAGE value="ref: package moved" />
     <MESSAGE value="ref: Removed import" />
     <MESSAGE value="deps: Include missing deps on requirements.txt" />
@@ -461,10 +574,30 @@
     <MESSAGE value="ref Qt app reworked in modules" />
     <MESSAGE value="ref Main app reworked to be simple and editable with settings.json" />
     <MESSAGE value="feat: include some asset icons" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: include some asset icons" />
+    <MESSAGE value="ref: Simplified version to work as generator" />
+    <MESSAGE value="feat: Unitest to check_running_processes" />
+    <MESSAGE value="chore: Updated .idea settings" />
+    <MESSAGE value="ref: Simplified to work without dpad mappings" />
+    <MESSAGE value="deps: Include setproctitle to support unittests" />
+    <MESSAGE value="ref: Remove _from_config method" />
+    <MESSAGE value="ref: Refactored to reduce signals and usage of parent" />
+    <MESSAGE value="feat: Implement focus effect" />
+    <MESSAGE value="feat: Method to change focus to selected app by name" />
+    <MESSAGE value="ref: Simplified app grid calc" />
+    <MESSAGE value="feat: add more_itertools to" />
+    <MESSAGE value="fix: ValueError message" />
+    <MESSAGE value="ref: Revised devise monitor to use only one signal to handle actions like up, down left, right, etc..." />
+    <option name="LAST_COMMIT_MESSAGE" value="ref: Revised devise monitor to use only one signal to handle actions like up, down left, right, etc..." />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="self.mapped_grid" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/startup_ui$Run_main_py.coverage" NAME="Run main.py Coverage Results" MODIFIED="1753496479207" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/startup_ui$Run_main_py.coverage" NAME="Run main.py Coverage Results" MODIFIED="1756600641621" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/startup_ui$.coverage" NAME=" Coverage Results" MODIFIED="1753217550794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
   </component>
 </project>
