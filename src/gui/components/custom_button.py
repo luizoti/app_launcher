@@ -34,6 +34,11 @@ class CustomButton(QPushButton):
 
     def _get_stylesheet(self, background_color: str):
         return f"""
+        QPushButton:focus {{
+            background-color: gray;
+            padding: none;
+            outline: none;
+        }}
         QPushButton {{
             font-size: 18px;
             background-color: {background_color};
