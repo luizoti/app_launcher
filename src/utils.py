@@ -12,7 +12,7 @@ def base64_to_icon(icon=None, connected=False) -> QIcon:
 
 def check_running_processes(search_process=None) -> Generator[str]:
     if not search_process:
-        raise ValueError("search_process cannot be None")
+        raise ValueError("Argument `search_process` cannot be None")
 
     return (x for x in [x.info["name"].lower() for x in psutil.process_iter(["name"])] if
             x in [p.lower() for p in search_process])
