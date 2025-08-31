@@ -67,3 +67,10 @@ class AppGrid(QGridLayout):
             self.addWidget(button, row, row_app_counter)
             row_app_counter += 1
         return self
+
+    def change_focus(self, app_name):
+        for index, button in enumerate([item for x in self.mapped_grid.values() for item in x]):
+            if button.name == app_name:
+                button.setFocus()
+                return None
+        return None
