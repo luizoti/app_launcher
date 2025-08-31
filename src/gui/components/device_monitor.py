@@ -1,106 +1,115 @@
-import time
-
 import threading
+import time
 import traceback
-from PyQt5.QtCore import QObject, pyqtSignal
-from evdev import InputDevice, list_devices
+from typing import Any, Generator
 
-from src.settings import DEVICES_MAPPING, ALLOWED_DEVICES
-from src.utils import are_processes_running
+from PyQt5.QtCore import QObject, pyqtSignal
+from evdev import InputDevice, ecodes, categorize
+from evdev import list_devices
+
+from src.enums import actions_map_reversed, actions_map
+from src.settings import SettingsManager
 
 
 class DeviceMonitor(QObject):
-    pressed_hide_show = pyqtSignal()
+    action = pyqtSignal(int)
 
-    button_up = pyqtSignal()
-    button_down = pyqtSignal()
-    button_left = pyqtSignal()
-    button_right = pyqtSignal()
-    button_enter = pyqtSignal()
-
-    connected = pyqtSignal()
-    disconnected = pyqtSignal()
-
-    finished = pyqtSignal()
-
-    def __init__(self):
+    def __init__(self, settings=SettingsManager().get_settings()):
         super().__init__()
-        self.monitored_devices = {}
         self.lock = threading.Lock()
-        self.buttons = {
-            x: {a: self.__getattribute__(b) for a, b in y.items() if isinstance(a, int)}
-            for x, y in DEVICES_MAPPING.items()
+        self.settings = settings
+
+        self.connected_devices = []
+        self.event_mapping = {
+            ecodes.EV_KEY: self._get_button_mapping,
+            ecodes.EV_ABS: {
+                ecodes.ABS_HAT0X:
+                    {-1: 3,
+                     1: 4},
+                ecodes.ABS_HAT0Y:
+                    {-1: 1,
+                     1: 2
+                     }
+            },
         }
 
-    def monitor_device(self, device_path):
-        device = InputDevice(device_path)
-        print(f"Monitorando eventos de: {device.name} ({device.path})")
+    def _get_button_mapping(self, device_name=None, event=None) -> Any | None:
+        if not device_name:
+            raise TypeError("Argument `device_name` cannot None")
+        if not event:
+            raise TypeError("Argument `event` code cannot None")
 
+        key_event = categorize(event)
+
+        if key_event.keystate == 1:
+            for action, event_code_int in self.settings.get("mappings").get(device_name).get("buttons").items():
+                if key_event.scancode == event_code_int:
+                    return actions_map_reversed.get(action)
+        return None
+
+    def _get_allowed_devices(self) -> Generator[InputDevice, Any, None]:
+        """
+        Ger Allowed devices based on devices listed on settings.json mapping.
+        """
+        return (dev for dev in [InputDevice(path) for path in list_devices()]
+                if dev.name in list(self.settings.get("mappings").keys()))
+
+    def _monitor_device(self, device: InputDevice):
+        print(f"INFO - Monitorando eventos de: {device.name} ({device.path})")
         try:
             for event in device.read_loop():
-                if any([x for x in are_processes_running().values()]):
-                    continue
-                if event.value == 1:
-                    try:
-                        action = self.buttons[device.name][event.code]
-                        action.emit()
-                        print(f"EVNT - {device.name} - {action}")
-                    except:  # noqa
-                        pass
+                try:
+                    if hasattr(self.event_mapping.get(event.type), "__call__"):
+                        command = self.event_mapping[event.type](device_name=device.name, event=event)
+                    else:
+                        command = self.event_mapping[event.type][event.code][event.value]
+                    if command:
+                        try:
+                            self.action.emit(command)
+                            print(
+                                f"EVNT - DEVICE: {device.name} | EV_CODE: {event.code} - ACTION: {actions_map.get(command)}")
+                        except Exception:  # noqa
+                            print(traceback.format_exc())
+                        except ValueError as NotMappedEvent:  # noqa
+                            print(NotMappedEvent)
+                        continue
+                    if event.type == 1 and event.value == 1:
+                        print(f"INFO - Event code not mapped {event.code}")
+                except (KeyError, AttributeError, TypeError):
+                    pass
         except OSError:
             pass
         except Exception:
-            print(f"Erro ao monitorar {device.name}: {traceback.format_exc()}")
+            print(f"ERROR - Erro ao monitorar {device.name}: {traceback.format_exc()}")
         finally:
             with self.lock:
-                if device_path in self.monitored_devices:
-                    del self.monitored_devices[device_path]
+                if device.path in self.connected_devices:
+                    self.connected_devices.remove(device.path)
                     print(
-                        f"Dispositivo removido do monitoramento: {device.name} ({device.path})"
+                        f"INFO - Dispositivo removido do monitoramento: {device.name} ({device.path})"
                     )
 
-    def refresh_devices(self):
+    def _refresh_devices(self):
         """
-        Verifica dispositivos permitidos conectados e atualiza a lista monitorada.
+        Verifica dispositivos permitidos conectados e atualiza a lista de dispositivos monitorados.
         """
-        allowed_devices = [
-            dev
-            for dev in [InputDevice(path) for path in list_devices()]
-            if dev.name in ALLOWED_DEVICES
-        ]
         with self.lock:
-            # Adicionar novos dispositivos
-            for device in allowed_devices:
-                if device.path not in self.monitored_devices:
-                    print(f"Novo dispositivo detectado: {device.name} ({device.path})")
-                    DEVICES_MAPPING[device.name]["connected"] = True
-                    DEVICES_MAPPING[device.name]["path"] = device.path
+            for device in self._get_allowed_devices():
+                if device.path not in self.connected_devices:
+                    print(f"INFO - Novo dispositivo detectado: {device.name} ({device.path})")
                     thread = threading.Thread(
-                        target=self.monitor_device, args=(device.path,), daemon=True
+                        target=self._monitor_device, args=(device,), daemon=True
                     )
-                    self.monitored_devices[device.path] = thread
+                    self.connected_devices.append(device.path)
                     thread.start()
-                    self.connected.emit()
 
-            # Remover dispositivos desconectados
-            monitored_paths = list(self.monitored_devices.keys())
-            for path in monitored_paths:
-                if path not in [device.path for device in allowed_devices]:
-                    for device in DEVICES_MAPPING.values():
-                        if DEVICES_MAPPING[device].get("path") == path:
-                            print(f"Dispositivo desconectado: {path}")
-                            DEVICES_MAPPING[InputDevice]["connected"] = False
-                            del self.monitored_devices[path]
-                            self.disconnected.emit()
-        self.finished.emit()
-
-    def start_monitoring(self):
+    def start_monitor(self):
         """
         Inicia o monitoramento contínuo para detectar dispositivos adicionados/removidos.
         """
         try:
             while True:
-                self.refresh_devices()
+                self._refresh_devices()
                 time.sleep(1)  # Atualiza a lista de dispositivos a cada segundo
         except KeyboardInterrupt:
             print("INFO - \nEncerrando monitoramento...")
