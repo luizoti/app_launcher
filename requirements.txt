@@ -11,3 +11,5 @@ black[d]
 pyinstaller
 
 setproctitle~=1.3.6
+
+more_itertools
