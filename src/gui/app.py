@@ -1,9 +1,12 @@
-from PyQt5.QtCore import Qt, QSize
+from PyQt5 import QtCore
+from PyQt5.QtCore import Qt, QSize, QThread
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 
 from src.command_executor import CommandExecutor
+from src.enums import actions_map
 from src.gui.centralized_resolution import CentralizedAppResolution
 from src.gui.components.custom_button import CustomButton
+from src.gui.components.device_monitor import DeviceMonitor
 from src.gui.components.grid import AppGrid
 from src.gui.components.tray_icon import TrayIcon
 from src.settings import SettingsManager
@@ -13,6 +16,7 @@ from src.utils import base64_to_icon
 class AppMainWindow(QMainWindow):
     def __init__(self, settings=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
+
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
@@ -23,13 +27,32 @@ class AppMainWindow(QMainWindow):
             self.settings.get("window").get("height"),
         )
         self._set_tray_icon()
+
+        self.thread = QThread()
+        # ____ SET DEVICE MONITOR ____
+        self.device_monitor_worker = DeviceMonitor()
+        self.device_monitor_worker.moveToThread(self.thread)
+
+        self._set_signals()
         self._init_ui()
         print("INFO - Iniciando interface gráfica...")
         self._set_on_center()
+        self.thread.start()
 
     def _set_tray_icon(self):
         self.tray_icon = TrayIcon(parent=self)
         self.tray_icon.show()
+
+    def _set_signals(self):
+        # # Conexões dos sinais
+        self.device_monitor_worker.action.connect(self.action_handler)
+
+        self.tray_icon.tray_action.connect(self.action_handler)
+
+        # ____ SET DEVICE MONITOR ____
+        # Sinais Worker e thread
+        self.thread.started.connect(self.device_monitor_worker.start_monitor)
+        self.thread.finished.connect(self.thread.deleteLater)
 
     def _set_on_center(self):
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
@@ -48,7 +71,7 @@ class AppMainWindow(QMainWindow):
     def _init_ui(self):
         central_widget = QWidget(self)
         main_layout = QVBoxLayout()
-        created_app_grid = self.app_grid.render_app_grid(apps=self._get_apps_list())
+        created_app_grid = self.app_grid.plot_app_grid(apps=self._get_apps_list())
         main_layout.addLayout(created_app_grid)
         main_layout.setAlignment(created_app_grid, Qt.AlignCenter)
 
@@ -74,21 +97,46 @@ class AppMainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-    def switch_icon(self):
-        # self.tray_icon.setIcon(base64_to_icon(connected=tray_icon_controller()))
-        pass
-
-    def hide(self):
-        if self.isVisible():
-            super(QMainWindow, self).hide()
-
-    def show(self):
-        if not self.isVisible():
-            super(QMainWindow, self).show()
-
     def show_ui(self) -> None:
         if self.settings.get("window").get("fullscreen"):
             self.showFullScreen()
+            return None
+        self.show()
+        return None
+
+    @QtCore.pyqtSlot(int, name="action_handler")
+    def action_handler(self, action: int = None):
+        if not action:
+            raise TypeError("Argument `action` cannot be None")
+        getattr(self, actions_map.get(action))()
+
+    def up(self):
+        # print("Up Pressed")
+        self.app_grid.change_focus(app_name="sublime7")
+        pass
+
+    def down(self):
+        # print("Down Pressed")
+        pass
+
+    def left(self):
+        # print("Left Pressed")
+        pass
+
+    def right(self):
+        # print("Right Pressed")
+        pass
+
+    def enter(self):
+        # print("Enter pressed")
+        pass
+
+    def options(self):
+        print("Options pressed")
+
+    def toggle_view(self):
+        if self.isVisible():
+            self.hide()
             return None
         self.show()
         return None
