@@ -1,7 +1,7 @@
 import base64
+
 import psutil
 from PyQt5.QtGui import QIcon, QImage, QPixmap
-from typing import Generator
 
 
 def base64_to_icon(icon=None, connected=False) -> QIcon:
@@ -10,7 +10,7 @@ def base64_to_icon(icon=None, connected=False) -> QIcon:
     return QIcon(QPixmap.fromImage(image))
 
 
-def check_running_processes(search_process=None) -> Generator[str]:
+def check_running_processes(search_process=None):
     if not search_process:
         raise ValueError("Argument `search_process` cannot be None")
 

@@ -1,7 +1,6 @@
 import threading
 import time
 import traceback
-from typing import Any, Generator
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from evdev import InputDevice, ecodes, categorize
@@ -47,7 +46,7 @@ class DeviceMonitor(QObject):
                     return actions_map_reversed.get(action)
         return None
 
-    def _get_allowed_devices(self) -> Generator[InputDevice, Any, None]:
+    def _get_allowed_devices(self):
         """
         Ger Allowed devices based on devices listed on settings.json mapping.
         """
