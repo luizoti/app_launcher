@@ -1,5 +1,4 @@
 import traceback
-import typing
 
 import more_itertools
 from PyQt5.QtWidgets import QGridLayout
@@ -93,7 +92,7 @@ class AppGrid(QGridLayout, ActionManager):
                 self.addWidget(app, row_index, app_index)
         return self
 
-    def __get_current_focus(self) -> typing.Tuple[int, int] | None:
+    def __get_current_focus(self) -> tuple[int, int] | None:
         button: CustomButton
         for row_index, apps in self.mapped_grid.items():
             for app_index, button in enumerate(apps):
