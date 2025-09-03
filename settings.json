@@ -33,7 +33,6 @@
         "tray": true,
         "buttons": {
           "enter": 304,
-          "options": 307,
           "toggle_view": 316
         }
       },
@@ -41,7 +40,6 @@
         "tray": true,
         "buttons": {
           "enter": 304,
-          "options": 307,
           "toggle_view": 316
         }
       }

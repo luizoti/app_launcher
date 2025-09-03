@@ -105,7 +105,3 @@ class AppMainWindow(QMainWindow, ActionManager):
             return None
         self.show()
         return None
-
-    def options(self):
-        # TODO
-        print("Options pressed")
