@@ -105,36 +105,6 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.show()
         return None
 
-    @QtCore.pyqtSlot(int, name="action_handler")
-    def action_handler(self, action: int = None):
-        if not action:
-            raise TypeError("Argument `action` cannot be None")
-        getattr(self, actions_map.get(action))()
-
-    def up(self):
-        # print("Up Pressed")
-        self.app_grid.change_focus(app_name="sublime7")
-        pass
-
-    def down(self):
-        # print("Down Pressed")
-        pass
-
-    def left(self):
-        # print("Left Pressed")
-        pass
-
-    def right(self):
-        # print("Right Pressed")
-        pass
-
-    def enter(self):
-        # print("Enter pressed")
-        pass
-
-    def options(self):
-        print("Options pressed")
-
     def toggle_view(self):
         if self.isVisible():
             self.hide()
