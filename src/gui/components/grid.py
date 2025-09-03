@@ -77,8 +77,11 @@ class AppGrid(QGridLayout, ActionManager):
         )
 
     def enter(self):
-        # TODO
-        print("Enter pressed")
+        """Emit clicked signal from CustomButton to opem app and hide AppMainWindow based on app row and app columns."""
+        row_index, app_index = self.__get_current_focus()
+        pressed_button: CustomButton = self.mapped_grid[row_index][app_index]
+        pressed_button.clicked.emit()
+        self.parentWidget().parentWidget().hide()
 
     def plot_app_grid(self, apps: dict = None):
         """Feed GridWidgets based on a list of apps."""
