@@ -17,7 +17,6 @@ class AppGrid(QGridLayout, ActionManager):
         self.mapped_grid = {}
 
         if not self.row_limit:
-            print("ERRO - No row limit")
             raise AttributeError
 
     def __remove_from_grid(self, app_name=None):
