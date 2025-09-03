@@ -20,6 +20,7 @@ class AppGrid(QGridLayout, ActionManager):
             raise AttributeError
 
     def __remove_from_grid(self, app_name=None):
+        # TODO: This cam be changed, maybe search on self.mapped_grid
         if not app_name:
             raise TypeError("Argument `app_name` cannot be null")
         index, app_widget = self.__search_app_on_grid(app_name=app_name)
@@ -30,6 +31,7 @@ class AppGrid(QGridLayout, ActionManager):
         # self.__reorganize_grid()
         self.plot_app_grid()
 
+    # TODO: __rebuild_mapped_grid probably replace this
     # def __reorganize_grid(self):
     #     widgets = []
     #     for i in reversed(range(self.count())):
@@ -47,6 +49,7 @@ class AppGrid(QGridLayout, ActionManager):
     #             row += 1
 
     def __search_app_on_grid(self, app_name):
+        # TODO: This range(0, 1000) is no more necessary
         for index in range(0, 1000):
             button = self.itemAt(index)
             try:
@@ -66,6 +69,7 @@ class AppGrid(QGridLayout, ActionManager):
         )
 
     def __rebuild_mapped_grid(self, apps: dict = None):
+        """Rebuild mapped grid dictionary based on settings app list."""
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
         self.mapped_grid = dict(
@@ -77,6 +81,7 @@ class AppGrid(QGridLayout, ActionManager):
         print("Enter pressed")
 
     def plot_app_grid(self, apps: dict = None):
+        """Feed GridWidgets based on a list of apps."""
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
         self.__rebuild_mapped_grid(apps=apps)
