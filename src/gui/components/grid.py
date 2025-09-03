@@ -2,10 +2,11 @@ import more_itertools
 from PyQt5.QtWidgets import QGridLayout
 
 from src.command_executor import CommandExecutor
+from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
 
 
-class AppGrid(QGridLayout):
+class AppGrid(QGridLayout, ActionManager):
     def __init__(self, row_limit: int = None):
         super(AppGrid, self).__init__()
         self.row_limit = row_limit

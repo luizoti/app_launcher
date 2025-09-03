@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QSize, QThread
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 
 from src.command_executor import CommandExecutor
-from src.enums import actions_map
+from src.gui.action_manager import ActionManager
 from src.gui.centralized_resolution import CentralizedAppResolution
 from src.gui.components.custom_button import CustomButton
 from src.gui.components.device_monitor import DeviceMonitor
@@ -13,7 +13,7 @@ from src.settings import SettingsManager
 from src.utils import base64_to_icon
 
 
-class AppMainWindow(QMainWindow):
+class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self, settings=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
 
@@ -48,6 +48,7 @@ class AppMainWindow(QMainWindow):
         self.device_monitor_worker.action.connect(self.action_handler)
 
         self.tray_icon.tray_action.connect(self.action_handler)
+        self.device_monitor_worker.action.connect(self.app_grid.action_handler)
 
         # ____ SET DEVICE MONITOR ____
         # Sinais Worker e thread
