@@ -1,8 +1,6 @@
-from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QSize, QThread
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 
-from src.command_executor import CommandExecutor
 from src.gui.action_manager import ActionManager
 from src.gui.centralized_resolution import CentralizedAppResolution
 from src.gui.components.custom_button import CustomButton
@@ -60,10 +58,6 @@ class AppMainWindow(QMainWindow, ActionManager):
 
     def _get_apps_list(self):
         return self.settings.get("apps", {})
-
-    def _launch_app(self, executor: CommandExecutor):
-        executor.execute()
-        self.hide()
 
     def _open_settings(self):
         # TODO: Open settings screen here
