@@ -73,6 +73,10 @@ class AppGrid(QGridLayout, ActionManager):
             enumerate(more_itertools.batched([self.__button_generator(*x) for x in apps.items()], self.row_limit))
         )
 
+    def enter(self):
+        # TODO
+        print("Enter pressed")
+
     def plot_app_grid(self, apps: dict = None):
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
