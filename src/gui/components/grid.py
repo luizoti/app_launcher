@@ -93,7 +93,7 @@ class AppGrid(QGridLayout, ActionManager):
                 self.addWidget(app, row_index, app_index)
         return self
 
-    def get_current_focus(self) -> typing.Tuple[int, int] | None:
+    def __get_current_focus(self) -> typing.Tuple[int, int] | None:
         button: CustomButton
         for row_index, apps in self.mapped_grid.items():
             for app_index, button in enumerate(apps):
@@ -101,7 +101,7 @@ class AppGrid(QGridLayout, ActionManager):
                     return row_index, app_index
         return -1, -1
 
-    def set_focus(self, row_index, app_index):
+    def __set_focus(self, row_index, app_index):
         try:
             list(self.mapped_grid.values())[row_index][app_index].setFocus()
         except IndexError:
@@ -110,58 +110,58 @@ class AppGrid(QGridLayout, ActionManager):
             print(traceback.format_exc())
 
     def up(self):
-        row_index, app_index = self.get_current_focus()
+        row_index, app_index = self.__get_current_focus()
         if row_index == 0:
             if app_index > len(list(self.mapped_grid.values())[-1]) - 1 and len(self.mapped_grid.values()) > 2:
-                self.set_focus(-2, app_index)
+                self.__set_focus(-2, app_index)
                 return
             if app_index > len(list(self.mapped_grid.values())[-1]) - 1:
                 print(app_index, len(list(self.mapped_grid.values())[-1]) - 1)
-                self.set_focus(-1, len(list(self.mapped_grid.values())[-1]) - 1)
+                self.__set_focus(-1, len(list(self.mapped_grid.values())[-1]) - 1)
                 return
 
             if app_index >= len(list(self.mapped_grid.values())[-1]) - 1:
-                self.set_focus(-1, app_index)
+                self.__set_focus(-1, app_index)
                 return
             else:
-                self.set_focus(-1, app_index)
+                self.__set_focus(-1, app_index)
                 return
-        self.set_focus(row_index - 1, app_index)
+        self.__set_focus(row_index - 1, app_index)
         return
 
     def down(self):
-        row_index, app_index = self.get_current_focus()
+        row_index, app_index = self.__get_current_focus()
 
         if app_index > len(list(self.mapped_grid.values())[-1]) - 1 and row_index >= 1:
-            self.set_focus(0, app_index)
+            self.__set_focus(0, app_index)
             return
         if app_index > len(list(self.mapped_grid.values())[-1]) - 1:
-            self.set_focus(row_index + 1, app_index)
+            self.__set_focus(row_index + 1, app_index)
             return
         if row_index == len(self.mapped_grid) - 1:
-            self.set_focus(0, app_index)
+            self.__set_focus(0, app_index)
             return
 
-        self.set_focus(row_index + 1, app_index)
+        self.__set_focus(row_index + 1, app_index)
         return
 
     def left(self):
-        row_index, app_index = self.get_current_focus()
+        row_index, app_index = self.__get_current_focus()
         if app_index == 0:
-            self.set_focus(row_index - 1, len(list(self.mapped_grid.values())[row_index - 1]) - 1)
+            self.__set_focus(row_index - 1, len(list(self.mapped_grid.values())[row_index - 1]) - 1)
             return
-        self.set_focus(row_index, app_index - 1)
+        self.__set_focus(row_index, app_index - 1)
         return
 
     def right(self):
-        row_index, app_index = self.get_current_focus()
+        row_index, app_index = self.__get_current_focus()
 
         if row_index == len(self.mapped_grid) - 1 and app_index == len(list(self.mapped_grid.values())[row_index]) - 1:
-            self.set_focus(0, 0)
+            self.__set_focus(0, 0)
             return
         if app_index == self.row_limit - 1:
-            self.set_focus(row_index + 1, 0)
+            self.__set_focus(row_index + 1, 0)
             return
 
-        self.set_focus(row_index, app_index + 1)
+        self.__set_focus(row_index, app_index + 1)
         return
