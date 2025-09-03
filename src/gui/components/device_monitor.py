@@ -32,7 +32,7 @@ class DeviceMonitor(QObject):
             },
         }
 
-    def _get_button_mapping(self, device_name=None, event=None) -> Any | None:
+    def _get_button_mapping(self, device_name=None, event=None):
         if not device_name:
             raise TypeError("Argument `device_name` cannot None")
         if not event:
