@@ -7,6 +7,7 @@ from src.gui.components.custom_button import CustomButton
 from src.gui.components.device_monitor import DeviceMonitor
 from src.gui.components.grid import AppGrid
 from src.gui.components.tray_icon import TrayIcon
+from src.insancie import destroy_pid_file
 from src.settings import SettingsManager
 from src.utils import base64_to_icon
 
@@ -105,3 +106,6 @@ class AppMainWindow(QMainWindow, ActionManager):
             return None
         self.show()
         return None
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        destroy_pid_file()
