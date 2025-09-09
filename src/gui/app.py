@@ -15,7 +15,7 @@ from src.utils import base64_to_icon
 class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self, settings=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
-
+        self.setWindowIcon(base64_to_icon(settings.get("tray").get("icons").get("disconnected")))
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
@@ -39,7 +39,8 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.thread.start()
 
     def _set_tray_icon(self):
-        self.tray_icon = TrayIcon(parent=self)
+        self.tray_icon = TrayIcon(parent=self, icon_base64=self.settings.get("tray").get("icons").get("disconnected"))
+
         self.tray_icon.show()
 
     def _set_signals(self):
