@@ -47,10 +47,10 @@ class SettingsManager:
                     config_file.close()
 
     def get(self, key, default=None):
-        return self._config_data.get(key, default)
+        return self._config_data["settings"].get(key, default)
 
     def set(self, key, value):
-        self._config_data[key] = value
+        self._config_data["settings"][key] = value
 
     def save(self, path="config.json"):
         with open(path, 'w', encoding='utf-8') as f:
