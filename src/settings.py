@@ -34,7 +34,7 @@ class SettingsManager:
     def _load_config(self, path):
         if not path:
             possible_config_files = [
-                os.path.join(os.path.expanduser("~"), ".config", CONFIG_FILE_NAME),
+                os.path.join(os.path.expanduser("~"), ".config", "app_launcher", CONFIG_FILE_NAME),
                 os.path.join(BASE_DIR, CONFIG_FILE_NAME),
             ]
         else:
