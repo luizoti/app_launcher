@@ -25,7 +25,7 @@ class AppMainWindow(QMainWindow, ActionManager):
             self.settings.get("window").get("width"),
             self.settings.get("window").get("height"),
         )
-        self._set_tray_icon()
+        self.tray_icon = TrayIcon(parent=self)
 
         self.thread = QThread()
         # ____ SET DEVICE MONITOR ____
@@ -33,15 +33,13 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.device_monitor_worker.moveToThread(self.thread)
 
         self._set_signals()
+
         self._init_ui()
         print("INFO - Iniciando interface gráfica...")
         self._set_on_center()
-        self.thread.start()
-
-    def _set_tray_icon(self):
-        self.tray_icon = TrayIcon(parent=self, icon_base64=self.settings.get("tray").get("icons").get("disconnected"))
-
         self.tray_icon.show()
+
+        self.thread.start()
 
     def _set_signals(self):
         # # Conexões dos sinais
