@@ -8,6 +8,8 @@ from src.settings import SettingsManager
 
 
 def build_icon(icon=None, settings=SettingsManager().get_settings()) -> QIcon | QIcon | None:
+    if icon is None:
+        raise TypeError("Variable `icon` is required, cannot be None")
     try:
         if Path(icon).exists():
             return QIcon(icon)
