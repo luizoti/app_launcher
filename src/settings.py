@@ -1,7 +1,7 @@
-import sys
-
 import json
 import os
+import sys
+from pathlib import Path
 
 CONFIG_FILE_NAME = "settings.json"
 ALLOWED_DEVICES = []
@@ -41,9 +41,15 @@ class SettingsManager:
             possible_config_files = [path]
         print("INFO - Looking for config file in:", possible_config_files)
         for file in possible_config_files:
+            ico_directory = Path(os.path.dirname(file)).joinpath("icons")
+            if not ico_directory.exists():
+                os.makedirs(ico_directory)
             if os.path.exists(file):
+                if not os.path.isfile(file):
+                    print("INFO - Found config file:", file)
                 with open(file, 'r', encoding='utf-8') as config_file:
                     self._config_data = json.load(config_file)
+                    self.set("icons_directory", ico_directory)
                     config_file.close()
 
     def get(self, key, default=None):
