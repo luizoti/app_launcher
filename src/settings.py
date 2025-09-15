@@ -48,6 +48,7 @@ class SettingsManager:
                 if not os.path.isfile(file):
                     print("INFO - Found config file:", file)
                 with open(file, 'r', encoding='utf-8') as config_file:
+                    print("INFO - Reading config file:", file)
                     self._config_data = json.load(config_file)
                     self.set("icons_directory", ico_directory)
                     config_file.close()
