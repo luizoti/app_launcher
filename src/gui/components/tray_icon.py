@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import QSystemTrayIcon
 
 from src.enums import actions_map_reversed
 from src.gui.components.context_menu import ContextMenu
-from src.utils import base64_to_icon
+from src.settings import SettingsManager
+from src.utils import build_icon
 
 
 # Classe para o ícone do tray
@@ -14,8 +15,7 @@ class TrayIcon(QSystemTrayIcon):
         super(TrayIcon, self).__init__(parent=parent)
         self.menu = ContextMenu()
 
-        if icon_base64:
-            self.setIcon(base64_to_icon(icon_base64))
+        self.setIcon(build_icon(self.settings.get("tray").get("icons").get("standby")))
 
         self._set_signals()
         self.setContextMenu(self.menu)

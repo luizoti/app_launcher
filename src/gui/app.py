@@ -9,13 +9,13 @@ from src.gui.components.grid import AppGrid
 from src.gui.components.tray_icon import TrayIcon
 from src.insancie import destroy_pid_file
 from src.settings import SettingsManager
-from src.utils import base64_to_icon
+from src.utils import build_icon
 
 
 class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self, settings=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
-        self.setWindowIcon(base64_to_icon(settings.get("tray").get("icons").get("disconnected")))
+        self.setWindowIcon(build_icon(settings.get("tray").get("icons").get("standby")))
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
@@ -76,13 +76,13 @@ class AppMainWindow(QMainWindow, ActionManager):
         config_layout.addStretch()
 
         config_button = CustomButton()
-        config_button.setIcon(base64_to_icon(self.settings.get("menu").get("settings")))
+        config_button.setIcon(build_icon(self.settings.get("menu").get("settings")))
         config_button.setFixedSize(48, 48)
         config_button.setIconSize(QSize(40, 40))
         config_button.clicked.connect(self._open_settings)
 
         hide_button = CustomButton()
-        hide_button.setIcon(base64_to_icon(self.settings.get("menu").get("hide")))
+        hide_button.setIcon(build_icon(self.settings.get("menu").get("hide")))
         hide_button.setFixedSize(48, 48)
         hide_button.setIconSize(QSize(40, 40))
         hide_button.clicked.connect(self.hide)

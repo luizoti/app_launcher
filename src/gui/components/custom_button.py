@@ -2,7 +2,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QEnterEvent, QDragLeaveEvent
 from PyQt5.QtWidgets import QPushButton
 
-from src.utils import base64_to_icon
+from src.utils import build_icon
 
 
 class CustomButton(QPushButton):
@@ -22,7 +22,7 @@ class CustomButton(QPushButton):
         self.setMaximumSize(120, 120)
 
         if icon_base64:
-            self.setIcon(base64_to_icon(icon_base64))
+            self.setIcon(build_icon(icon_base64))
 
         self.setStyleSheet(self._get_stylesheet(background_color=self.default_color))
 
