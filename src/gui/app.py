@@ -47,6 +47,7 @@ class AppMainWindow(QMainWindow, ActionManager):
 
         self.tray_icon.tray_action.connect(self.action_handler)
         self.device_monitor_worker.action.connect(self.app_grid.action_handler)
+        self.device_monitor_worker.tray_action.connect(self.tray_icon.handler_switch_icon)
 
         # ____ SET DEVICE MONITOR ____
         # Sinais Worker e thread

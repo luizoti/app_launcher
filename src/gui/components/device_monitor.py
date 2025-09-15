@@ -12,6 +12,7 @@ from src.settings import SettingsManager
 
 class DeviceMonitor(QObject):
     action = pyqtSignal(int)
+    tray_action = pyqtSignal(str)
 
     def __init__(self, settings=SettingsManager().get_settings()):
         super().__init__()
@@ -87,6 +88,7 @@ class DeviceMonitor(QObject):
                     print(
                         f"INFO - Dispositivo removido do monitoramento: {device.name} ({device.path})"
                     )
+                    self.tray_action.emit("disconnected")
 
     def _refresh_devices(self):
         """
@@ -96,6 +98,8 @@ class DeviceMonitor(QObject):
             for device in self._get_allowed_devices():
                 if device.path not in self.connected_devices:
                     print(f"INFO - Novo dispositivo detectado: {device.name} ({device.path})")
+                    if self.settings.get("mappings").get(device.name).get("tray"):
+                        self.tray_action.emit("connected")
                     thread = threading.Thread(
                         target=self._monitor_device, args=(device,), daemon=True
                     )

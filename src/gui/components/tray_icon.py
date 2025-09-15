@@ -11,8 +11,9 @@ from src.utils import build_icon
 class TrayIcon(QSystemTrayIcon):
     tray_action = pyqtSignal(int)
 
-    def __init__(self, parent=None, icon_base64: str = None):
+    def __init__(self, parent=None, settings=SettingsManager().get_settings()):
         super(TrayIcon, self).__init__(parent=parent)
+        self.settings = settings
         self.menu = ContextMenu()
 
         self.setIcon(build_icon(self.settings.get("tray").get("icons").get("standby")))
@@ -35,9 +36,6 @@ class TrayIcon(QSystemTrayIcon):
         if reason == self.Trigger:
             self.tray_action.emit(actions_map_reversed.get("toggle_view"))
 
-    # TODO: CHANGE COLOR IF DEVICE IS CONNECTED WITH INDIVIDUAL DEVICE CONTROL
-    # def tray_icon_controller():
-    #     for device in DEVICES_MAPPING.values():
-    #         if device.get("tray") and device.get("connected"):
-    #             return True
-    #     return False
+    def handler_switch_icon(self, reason):
+        self.setIcon(build_icon(self.settings.get("tray").get("icons").get(reason)))
+        return True
