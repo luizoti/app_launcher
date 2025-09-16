@@ -62,7 +62,7 @@ class AppGrid(QGridLayout, ActionManager):
     def __button_generator(app_name, app_data):
         """Create a button with command based on app name and app data."""
         return CustomButton(
-            icon_base64=app_data.get("icon"),
+            icon=app_data.get("icon"),
             on_click=CommandExecutor(command=app_data.get("cmd", [])).execute,
             name=app_name
         )

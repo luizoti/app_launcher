@@ -6,7 +6,7 @@ from src.utils import build_icon
 
 
 class CustomButton(QPushButton):
-    def __init__(self, label: str = None, icon_base64: str = None, on_click=None, name: str = None):
+    def __init__(self, label: str = None, icon: str = None, on_click=None, name: str = None):
         self.name = name
         if not label:
             label = ""
@@ -21,8 +21,8 @@ class CustomButton(QPushButton):
         self.setMinimumSize(120, 120)
         self.setMaximumSize(120, 120)
 
-        if icon_base64:
-            self.setIcon(build_icon(icon_base64))
+        if icon:
+            self.setIcon(build_icon(icon))
 
         self.setStyleSheet(self._get_stylesheet(background_color=self.default_color))
 
