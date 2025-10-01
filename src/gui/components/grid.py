@@ -9,11 +9,12 @@ from src.gui.components.custom_button import CustomButton
 
 
 class AppGrid(QGridLayout, ActionManager):
+
     def __init__(self, row_limit: int = None):
         super(AppGrid, self).__init__()
         self.row_limit = row_limit
 
-        self.mapped_grid = {}
+        self.mapped_grid: dict[int, list[CustomButton]] = {}
 
         if not self.row_limit:
             raise AttributeError
@@ -59,20 +60,24 @@ class AppGrid(QGridLayout, ActionManager):
         return None
 
     @staticmethod
-    def __button_generator(app_name, app_data):
+    def __button_generator(app_name, app_data, label_changer=None):
+        if not label_changer:
+            raise TypeError("Argument `label_changer` cannot be null")
         """Create a button with command based on app name and app data."""
         return CustomButton(
             icon=app_data.get("icon"),
-            on_click=CommandExecutor(command=app_data.get("cmd", [])).execute,
+            on_click=CommandExecutor(command=app_data.get("cmd", []), label_changer=label_changer).execute,
             name=app_name
         )
 
-    def __rebuild_mapped_grid(self, apps: dict = None):
+    def __rebuild_mapped_grid(self, apps: dict = None, label_changer=None):
         """Rebuild mapped grid dictionary based on settings app list."""
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
         self.mapped_grid = dict(
-            enumerate(more_itertools.batched([self.__button_generator(*x) for x in apps.items()], self.row_limit))
+            enumerate(
+                more_itertools.batched([self.__button_generator(*x, label_changer=label_changer) for x in apps.items()],
+                                       self.row_limit))
         )
 
     def enter(self):
@@ -82,13 +87,14 @@ class AppGrid(QGridLayout, ActionManager):
         pressed_button.clicked.emit()
         self.parentWidget().parentWidget().hide()
 
-    def plot_app_grid(self, apps: dict = None):
+    def plot_app_grid(self, apps: dict = None, label_changer=None):
         """Feed GridWidgets based on a list of apps."""
         if not apps:
             raise TypeError("Argument `apps` cannot be None")
-        self.__rebuild_mapped_grid(apps=apps)
+        self.__rebuild_mapped_grid(apps=apps, label_changer=label_changer)
         for row_index, apps in self.mapped_grid.items():
             for app_index, app in enumerate(apps):
+                app.focused.connect(label_changer)
                 self.addWidget(app, row_index, app_index)
         return self
 
@@ -118,7 +124,6 @@ class AppGrid(QGridLayout, ActionManager):
                 print(app_index, len(list(self.mapped_grid.values())[-1]) - 1)
                 self.__set_focus(-1, len(list(self.mapped_grid.values())[-1]) - 1)
                 return
-
             if app_index >= len(list(self.mapped_grid.values())[-1]) - 1:
                 self.__set_focus(-1, app_index)
                 return
@@ -130,7 +135,6 @@ class AppGrid(QGridLayout, ActionManager):
 
     def down(self):
         row_index, app_index = self.__get_current_focus()
-
         if app_index > len(list(self.mapped_grid.values())[-1]) - 1 and row_index >= 1:
             self.__set_focus(0, app_index)
             return
@@ -140,7 +144,6 @@ class AppGrid(QGridLayout, ActionManager):
         if row_index == len(self.mapped_grid) - 1:
             self.__set_focus(0, app_index)
             return
-
         self.__set_focus(row_index + 1, app_index)
         return
 
@@ -154,13 +157,11 @@ class AppGrid(QGridLayout, ActionManager):
 
     def right(self):
         row_index, app_index = self.__get_current_focus()
-
         if row_index == len(self.mapped_grid) - 1 and app_index == len(list(self.mapped_grid.values())[row_index]) - 1:
             self.__set_focus(0, 0)
             return
         if app_index == self.row_limit - 1:
             self.__set_focus(row_index + 1, 0)
             return
-
         self.__set_focus(row_index, app_index + 1)
         return

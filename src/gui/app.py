@@ -1,5 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, QThread
-from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QLabel, QWidget
 
 from src.gui.action_manager import ActionManager
 from src.gui.centralized_resolution import CentralizedAppResolution
@@ -19,6 +21,9 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
+
+        self.info_label = QLabel("Selecione um app")
+        self.info_label.setFont(QFont("Arial", 12, weight=QFont.Bold))
 
         self.setWindowTitle("Launcher de Aplicações")
         self.setFixedSize(
@@ -64,27 +69,36 @@ class AppMainWindow(QMainWindow, ActionManager):
         # TODO: Open settings screen here
         print("⚙️ Configurações clicadas (implementar UI futura)")
 
+    def _change_label_text(self, new_text: str):
+        self.info_label.setText(new_text.capitalize())
+
     def _init_ui(self):
         central_widget = QWidget(self)
         main_layout = QVBoxLayout()
-        created_app_grid = self.app_grid.plot_app_grid(apps=self._get_apps_list())
+        created_app_grid = self.app_grid.plot_app_grid(apps=self._get_apps_list(),
+                                                       label_changer=self._change_label_text)
         main_layout.addLayout(created_app_grid)
         main_layout.setAlignment(created_app_grid, Qt.AlignCenter)
 
         config_layout = QHBoxLayout()
-        config_layout.addStretch()
 
-        config_button = CustomButton()
+        config_button = CustomButton(name="Configuração")
+        config_button.focused.connect(self._change_label_text)
         config_button.setIcon(build_icon(self.settings.get("menu").get("settings")))
         config_button.setFixedSize(48, 48)
         config_button.setIconSize(QSize(40, 40))
         config_button.clicked.connect(self._open_settings)
 
-        hide_button = CustomButton()
+        hide_button = CustomButton(name="Esconder")
+        hide_button.focused.connect(self._change_label_text)
+
         hide_button.setIcon(build_icon(self.settings.get("menu").get("hide")))
         hide_button.setFixedSize(48, 48)
         hide_button.setIconSize(QSize(40, 40))
         hide_button.clicked.connect(self.hide)
+        self.info_label.setAlignment(Qt.AlignCenter)
+
+        config_layout.addWidget(self.info_label)
         config_layout.addWidget(hide_button)
         config_layout.addWidget(config_button)
 

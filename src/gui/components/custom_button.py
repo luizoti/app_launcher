@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, pyqtSignal, QEvent
 from PyQt5.QtGui import QEnterEvent, QDragLeaveEvent
 from PyQt5.QtWidgets import QPushButton
 
@@ -6,6 +6,8 @@ from src.utils import build_icon
 
 
 class CustomButton(QPushButton):
+    focused = pyqtSignal(str)
+
     def __init__(self, label: str = None, icon: str = None, on_click=None, name: str = None):
         self.name = name
         if not label:
@@ -50,8 +52,14 @@ class CustomButton(QPushButton):
         }}
         """
 
+    def event(self, e):
+        if e.type() == QEvent.KeyPress:
+            self.focused.emit(self.name)
+        return super(CustomButton, self).event(e)
+
     def enterEvent(self, event: QEnterEvent):
         self.setStyleSheet(self._get_stylesheet(self.hover_color))
+        self.focused.emit(self.name)
         super().enterEvent(event)
 
     def leaveEvent(self, event: QDragLeaveEvent):
