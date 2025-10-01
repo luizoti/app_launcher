@@ -39,17 +39,14 @@ def backup_if_exists(paths):
 
 
 def main():
-    # Obtém o diretório home do usuário de UID 1000
     user_home = get_user_home(1000)
     target_dir = os.path.join(user_home, ".local", "bin")
     os.makedirs(target_dir, exist_ok=True)
-    target_bin = os.path.join(target_dir, "startup_ui")
+    target_bin = os.path.join(target_dir, "app_launcher")
 
-    # Obtém o diretório absoluto do script (supondo que main.py esteja no mesmo diretório)
     script_dir = os.path.abspath(os.path.dirname(__file__))
     main_py = os.path.join(script_dir, "main.py")
 
-    # Comando de compilação com pyinstaller usando caminhos absolutos
     command = [
         "pyinstaller",
         "--onefile",
@@ -58,7 +55,7 @@ def main():
         "--hidden-import=PyQt5.QtGui",
         "--hidden-import=PyQt5.QtCore",
         "--hidden-import=systemd.journal",
-        "--name=startup_ui",  # já gera com nome certo
+        "--name=app_launcher",
         main_py
     ]
 
@@ -69,16 +66,13 @@ def main():
         print("Erro durante a compilação:", e)
         sys.exit(1)
 
-    # Caminho absoluto para o binário compilado
-    binary_path = os.path.join(script_dir, "dist", "startup_ui")
+    binary_path = os.path.join(script_dir, "dist", "app_launcher")
     if not os.path.exists(binary_path):
         print(f"Binário compilado não encontrado em {binary_path}")
         sys.exit(1)
 
-    # Faz backup do destino, se já existir
     backup_if_exists([target_bin])
 
-    # Copia o binário compilado para ~/.local/bin/startup_ui
     try:
         shutil.copy(binary_path, target_bin)
         os.chmod(target_bin, 0o755)
@@ -87,15 +81,12 @@ def main():
         print("Erro ao copiar binário para destino:", e)
         sys.exit(1)
 
-    # Prepara o destino final: /opt/retropie/configs/all/autostart
     final_dest = "/opt/retropie/configs/all/autostart"
     final_dir = os.path.dirname(final_dest)
     os.makedirs(final_dir, exist_ok=True)
 
-    # Se houver script existente no destino final, faz backup
     backup_if_exists([final_dest, final_dest + ".sh"])
 
-    # Cria um link simbólico de ~/.local/bin/startup_ui para o destino final
     try:
         if os.path.exists(final_dest) or os.path.islink(final_dest):
             os.remove(final_dest)

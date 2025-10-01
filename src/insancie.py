@@ -5,7 +5,7 @@ import psutil
 
 
 def create_pid_file_path():
-    return os.path.join(os.path.expanduser("~"), ".config", "startup_ui.pid")
+    return os.path.join(os.path.expanduser("~"), ".config", "app_launcher.pid")
 
 
 def get_current_pid():

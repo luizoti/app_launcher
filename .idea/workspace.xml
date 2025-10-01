@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="ref: update settings file">
+    <list default="true" id="908b175a-d014-4643-b084-e88940cc0ec2" name="Changes" comment="feat: Dynamic label that react based on focused app name">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,22 +76,25 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/luiz/ExtFiles/YOUTAN/filetransfer/filetransfer&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/luiz/ExtFiles/projetos/python/startup_ui/raw_icons&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/raw_icons" />
+      <recent name="$PROJECT_DIR$/icons" />
       <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$/src/gui/components" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/raw_icons" />
       <recent name="$PROJECT_DIR$/src/gui/components" />
     </key>
   </component>
@@ -200,11 +204,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess" />
-        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_insensitive_search" />
-        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_sensitive_process" />
         <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_two_running_process" />
         <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_one_running_process" />
+        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_sensitive_process" />
+        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess.test_get_case_insensitive_search" />
+        <item itemvalue="Python tests.Python tests for test_check_running_process.TestCheckRunningProcess" />
       </list>
     </recent_temporary>
   </component>
@@ -251,199 +255,29 @@
       <workItem from="1756774983274" duration="5409000" />
       <workItem from="1756813516055" duration="877000" />
       <workItem from="1756862744475" duration="7588000" />
-      <workItem from="1756901264734" duration="3473000" />
-    </task>
-    <task id="LOCAL-00006" summary="ref: parent or main_app argument">
-      <option name="closed" value="true" />
-      <created>1752271705103</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1752271705103</updated>
-    </task>
-    <task id="LOCAL-00007" summary="ref: package moved">
-      <option name="closed" value="true" />
-      <created>1752271737912</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1752271737912</updated>
-    </task>
-    <task id="LOCAL-00008" summary="ref: Removed import">
-      <option name="closed" value="true" />
-      <created>1752271754376</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1752271754376</updated>
-    </task>
-    <task id="LOCAL-00009" summary="deps: Include missing deps on requirements.txt">
-      <option name="closed" value="true" />
-      <created>1752271988263</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1752271988263</updated>
-    </task>
-    <task id="LOCAL-00010" summary="clean: removed old modules">
-      <option name="closed" value="true" />
-      <created>1752272013028</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272013028</updated>
-    </task>
-    <task id="LOCAL-00011" summary="ref: Reworked command executor">
-      <option name="closed" value="true" />
-      <created>1752272039777</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272039777</updated>
-    </task>
-    <task id="LOCAL-00012" summary="ref: Reworked settings leader to use .json">
-      <option name="closed" value="true" />
-      <created>1752272115975</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272115975</updated>
-    </task>
-    <task id="LOCAL-00013" summary="ref: Settings removed from __init__.py">
-      <option name="closed" value="true" />
-      <created>1752272140389</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272140389</updated>
-    </task>
-    <task id="LOCAL-00014" summary="cleanup: Remove deprecate BUTTONS_ARRAY">
-      <option name="closed" value="true" />
-      <created>1752272188050</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272188050</updated>
-    </task>
-    <task id="LOCAL-00015" summary="cleanup: Remove deprecate BUTTONS_ARRAY">
-      <option name="closed" value="true" />
-      <created>1752272315297</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272315297</updated>
-    </task>
-    <task id="LOCAL-00016" summary="cleanup: Remove deprecate BUTTONS_ARRAY">
-      <option name="closed" value="true" />
-      <created>1752272380431</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272380431</updated>
-    </task>
-    <task id="LOCAL-00017" summary="cleanup: Remove deprecate BUTTONS_ARRAY">
-      <option name="closed" value="true" />
-      <created>1752272452127</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272452127</updated>
-    </task>
-    <task id="LOCAL-00018" summary="ref: project renamed">
-      <option name="closed" value="true" />
-      <created>1752272490461</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1752272490461</updated>
-    </task>
-    <task id="LOCAL-00019" summary="ref Qt app reworked in modules">
-      <option name="closed" value="true" />
-      <created>1752275675718</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1752275675718</updated>
-    </task>
-    <task id="LOCAL-00020" summary="ref Main app reworked to be simple and editable with settings.json">
-      <option name="closed" value="true" />
-      <created>1752275757995</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1752275757995</updated>
-    </task>
-    <task id="LOCAL-00021" summary="ref Main app reworked to be simple and editable with settings.json">
-      <option name="closed" value="true" />
-      <created>1752277171447</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1752277171447</updated>
-    </task>
-    <task id="LOCAL-00022" summary="feat: include some asset icons">
-      <option name="closed" value="true" />
-      <created>1752280437751</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1752280437751</updated>
-    </task>
-    <task id="LOCAL-00023" summary="ref: Simplified version to work as generator">
-      <option name="closed" value="true" />
-      <created>1753497814319</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1753497814319</updated>
-    </task>
-    <task id="LOCAL-00024" summary="feat: Unitest to check_running_processes">
-      <option name="closed" value="true" />
-      <created>1753497838272</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1753497838272</updated>
-    </task>
-    <task id="LOCAL-00025" summary="chore: Updated .idea settings">
-      <option name="closed" value="true" />
-      <created>1753497888960</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1753497888960</updated>
-    </task>
-    <task id="LOCAL-00026" summary="ref: Simplified to work without dpad mappings">
-      <option name="closed" value="true" />
-      <created>1753497930648</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1753497930648</updated>
-    </task>
-    <task id="LOCAL-00027" summary="deps: Include setproctitle to support unittests">
-      <option name="closed" value="true" />
-      <created>1753497960083</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1753497960083</updated>
-    </task>
-    <task id="LOCAL-00028" summary="ref: Remove _from_config method">
-      <option name="closed" value="true" />
-      <created>1753501089224</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1753501089224</updated>
-    </task>
-    <task id="LOCAL-00029" summary="ref: Refactored to reduce signals and usage of parent">
-      <option name="closed" value="true" />
-      <created>1753586048484</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1753586048484</updated>
+      <workItem from="1756901264734" duration="16520000" />
+      <workItem from="1756945845215" duration="5547000" />
+      <workItem from="1756953013473" duration="676000" />
+      <workItem from="1756993812761" duration="1082000" />
+      <workItem from="1756995438522" duration="32000" />
+      <workItem from="1757295236034" duration="3182000" />
+      <workItem from="1757422441944" duration="284000" />
+      <workItem from="1757422754270" duration="7939000" />
+      <workItem from="1757605720122" duration="376000" />
+      <workItem from="1757623934588" duration="11453000" />
+      <workItem from="1757707168253" duration="10322000" />
+      <workItem from="1757808114298" duration="11315000" />
+      <workItem from="1757979686798" duration="2980000" />
+      <workItem from="1758106071884" duration="1318000" />
+      <workItem from="1758130407315" duration="2418000" />
+      <workItem from="1758236724963" duration="4109000" />
+      <workItem from="1758333216320" duration="65000" />
+      <workItem from="1758490865398" duration="2669000" />
+      <workItem from="1758712823177" duration="6000" />
+      <workItem from="1759265710459" duration="157000" />
+      <workItem from="1759265879376" duration="685000" />
+      <workItem from="1759277659198" duration="5589000" />
+      <workItem from="1759316027435" duration="976000" />
     </task>
     <task id="LOCAL-00030" summary="feat: Implement focus effect">
       <option name="closed" value="true" />
@@ -645,7 +479,199 @@
       <option name="project" value="LOCAL" />
       <updated>1756904738568</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="chore: update .idea settings">
+      <option name="closed" value="true" />
+      <created>1756904774331</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1756904774331</updated>
+    </task>
+    <task id="LOCAL-00056" summary="fix: remove typing notation">
+      <option name="closed" value="true" />
+      <created>1756915496156</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1756915496156</updated>
+    </task>
+    <task id="LOCAL-00057" summary="fix: change dest of executable script">
+      <option name="closed" value="true" />
+      <created>1756915538612</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1756915538612</updated>
+    </task>
+    <task id="LOCAL-00058" summary="fix: remove other typing imports">
+      <option name="closed" value="true" />
+      <created>1756916240626</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1756916240626</updated>
+    </task>
+    <task id="LOCAL-00059" summary="fix: remove typing Any from device_monitor.py">
+      <option name="closed" value="true" />
+      <created>1756918839701</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1756918839701</updated>
+    </task>
+    <task id="LOCAL-00060" summary="fix: check pid file on startup to avoid duble execution">
+      <option name="closed" value="true" />
+      <created>1757422600989</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1757422600989</updated>
+    </task>
+    <task id="LOCAL-00061" summary="fix: load app and tray icon from settings.json">
+      <option name="closed" value="true" />
+      <created>1757422661837</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1757422661837</updated>
+    </task>
+    <task id="LOCAL-00062" summary="ref: refactory base64_to_icon to build_icon to work with base64 strings and real file paths">
+      <option name="closed" value="true" />
+      <created>1757896565692</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1757896565692</updated>
+    </task>
+    <task id="LOCAL-00063" summary="fix: update get and set to access `settings` key on settings json">
+      <option name="closed" value="true" />
+      <created>1757896635058</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1757896635059</updated>
+    </task>
+    <task id="LOCAL-00064" summary="feat: _load_config now load config on `app_launcher` directory">
+      <option name="closed" value="true" />
+      <created>1757896680523</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1757896680523</updated>
+    </task>
+    <task id="LOCAL-00065" summary="feat: Now settings will create and use icons directory to load icons">
+      <option name="closed" value="true" />
+      <created>1757896722612</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1757896722612</updated>
+    </task>
+    <task id="LOCAL-00066" summary="feat: Use build_icon to deal with icon loading and convertion">
+      <option name="closed" value="true" />
+      <created>1757896845314</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1757896845315</updated>
+    </task>
+    <task id="LOCAL-00067" summary="ref: Move self.tray_icon to __init__">
+      <option name="closed" value="true" />
+      <created>1757897198954</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897198954</updated>
+    </task>
+    <task id="LOCAL-00068" summary="ref: Move self.tray_icon to __init__">
+      <option name="closed" value="true" />
+      <created>1757897228208</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897228208</updated>
+    </task>
+    <task id="LOCAL-00069" summary="feat: Dynamic auto switch tray icon based on connected devices">
+      <option name="closed" value="true" />
+      <created>1757897363443</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897363443</updated>
+    </task>
+    <task id="LOCAL-00070" summary="ref: deleted icon">
+      <option name="closed" value="true" />
+      <created>1757897408441</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897408441</updated>
+    </task>
+    <task id="LOCAL-00071" summary="feat include new .ico icons">
+      <option name="closed" value="true" />
+      <created>1757897427077</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897427077</updated>
+    </task>
+    <task id="LOCAL-00072" summary="feat: Include new .kra (krita) icons">
+      <option name="closed" value="true" />
+      <created>1757897448467</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897448467</updated>
+    </task>
+    <task id="LOCAL-00073" summary="fix: replace base64 icons with file name">
+      <option name="closed" value="true" />
+      <created>1757897511637</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1757897511637</updated>
+    </task>
+    <task id="LOCAL-00074" summary="feat: Show path of read config file">
+      <option name="closed" value="true" />
+      <created>1757898540075</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1757898540075</updated>
+    </task>
+    <task id="LOCAL-00075" summary="fix: check if icon is None on build_icon">
+      <option name="closed" value="true" />
+      <created>1757900549488</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1757900549488</updated>
+    </task>
+    <task id="LOCAL-00076" summary="feat: ignore .idea">
+      <option name="closed" value="true" />
+      <created>1757900579985</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1757900579986</updated>
+    </task>
+    <task id="LOCAL-00077" summary="fix: Renamed icon_base64 variable to icon">
+      <option name="closed" value="true" />
+      <created>1757981416023</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1757981416023</updated>
+    </task>
+    <task id="LOCAL-00078" summary="feat: Dynamic label that react based on focused app name">
+      <option name="closed" value="true" />
+      <created>1759316376321</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1759316376321</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -675,32 +701,32 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="ref: Remove _from_config method" />
-    <MESSAGE value="ref: Refactored to reduce signals and usage of parent" />
-    <MESSAGE value="feat: Implement focus effect" />
-    <MESSAGE value="feat: Method to change focus to selected app by name" />
-    <MESSAGE value="ref: Simplified app grid calc" />
-    <MESSAGE value="feat: add more_itertools to" />
-    <MESSAGE value="fix: ValueError message" />
-    <MESSAGE value="ref: Revised devise monitor to use only one signal to handle actions like up, down left, right, etc..." />
-    <MESSAGE value="ref: update .idea settings" />
-    <MESSAGE value="feat: add a mapping to actions" />
-    <MESSAGE value="ref: plot_app_grid renamed to be public" />
-    <MESSAGE value="ref: reworked to be simple and work with signals" />
-    <MESSAGE value="ref: Implement action manager on QT Classes" />
-    <MESSAGE value="feat: Implement ActionManager class to manage actions with pyqtSignal" />
-    <MESSAGE value="feat: Implement Up, Down, Left and Right commands and grid movements" />
-    <MESSAGE value="fix: Include typing and traceback" />
-    <MESSAGE value="ref: Include enter and options methods" />
-    <MESSAGE value="chore: Update .idea" />
-    <MESSAGE value="ref: Remove _launch_app method" />
-    <MESSAGE value="ref: Remove options method" />
-    <MESSAGE value="ref: Removed print" />
-    <MESSAGE value="ref: Added docstrings" />
-    <MESSAGE value="feat: Implement clicked emit based on app in app grid" />
-    <MESSAGE value="ref: turn many methods protected" />
-    <MESSAGE value="ref: update settings file" />
-    <option name="LAST_COMMIT_MESSAGE" value="ref: update settings file" />
+    <MESSAGE value="chore: update .idea settings" />
+    <MESSAGE value="fix: remove typing notation" />
+    <MESSAGE value="fix: change dest of executable script" />
+    <MESSAGE value="fix: remove other typing imports" />
+    <MESSAGE value="fix: remove typing Any from device_monitor.py" />
+    <MESSAGE value="feat: check pid file on startup to avoid duble execution" />
+    <MESSAGE value="feat: check pid file on startup to avoid duble execution" />
+    <MESSAGE value="fix: load app and tray icon from settings.json" />
+    <MESSAGE value="ref: refactory base64_to_icon to build_icon to work with base64 strings and real file paths" />
+    <MESSAGE value="fix: update get and set to access `settings` key on settings json" />
+    <MESSAGE value="feat: _load_config now load config on `app_launcher` directory" />
+    <MESSAGE value="feat: Now settings will create and use icons directory to load icons" />
+    <MESSAGE value="feat: Use build_icon to deal with icon loading and convertion" />
+    <MESSAGE value="ref: Move self.tray_icon to __init__" />
+    <MESSAGE value="feat: Dynamic auto switch tray icon based on connected devices" />
+    <MESSAGE value="ref: deleted icon" />
+    <MESSAGE value="feat: include new .ico icons" />
+    <MESSAGE value="feat: Include new .kra (krita) icons" />
+    <MESSAGE value="feat: include new .ico icons" />
+    <MESSAGE value="fix: replace base64 icons with file name" />
+    <MESSAGE value="feat: Show path of read config file" />
+    <MESSAGE value="fix: check if icon is None on build_icon" />
+    <MESSAGE value="feat: ignore .idea" />
+    <MESSAGE value="fix: Renamed icon_base64 variable to icon" />
+    <MESSAGE value="feat: Dynamic label that react based on focused app name" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Dynamic label that react based on focused app name" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -710,7 +736,7 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/startup_ui$Run_main_py.coverage" NAME="Run main.py Coverage Results" MODIFIED="1756901961540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/startup_ui$Run_main_py.coverage" NAME="Run main.py Coverage Results" MODIFIED="1759316191308" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/startup_ui$.coverage" NAME=" Coverage Results" MODIFIED="1753217550794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
   </component>
 </project>
