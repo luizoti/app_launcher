@@ -2,7 +2,6 @@ import traceback
 
 import more_itertools
 from PyQt5.QtWidgets import QGridLayout
-
 from src.command_executor import CommandExecutor
 from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
@@ -87,6 +86,12 @@ class AppGrid(QGridLayout, ActionManager):
         pressed_button.clicked.emit()
         self.parentWidget().parentWidget().hide()
 
+    def _change_focus_on_hover(self, focused_app):
+        for row_index, apps in self.mapped_grid.items():
+            for app_index, app in enumerate(apps):
+                if focused_app == app.name:
+                    self.__set_focus(row_index, app_index)
+
     def plot_app_grid(self, apps: dict = None, label_changer=None):
         """Feed GridWidgets based on a list of apps."""
         if not apps:
@@ -95,6 +100,7 @@ class AppGrid(QGridLayout, ActionManager):
         for row_index, apps in self.mapped_grid.items():
             for app_index, app in enumerate(apps):
                 app.focused.connect(label_changer)
+                app.focused.connect(self._change_focus_on_hover)
                 self.addWidget(app, row_index, app_index)
         return self
 
