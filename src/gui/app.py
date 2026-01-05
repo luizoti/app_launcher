@@ -47,15 +47,12 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.thread.start()
 
     def _set_signals(self):
-        # # Conexões dos sinais
         self.device_monitor_worker.action.connect(self.action_handler)
 
         self.tray_icon.tray_action.connect(self.action_handler)
         self.device_monitor_worker.action.connect(self.app_grid.action_handler)
         self.device_monitor_worker.tray_action.connect(self.tray_icon.handler_switch_icon)
 
-        # ____ SET DEVICE MONITOR ____
-        # Sinais Worker e thread
         self.thread.started.connect(self.device_monitor_worker.start_monitor)
         self.thread.finished.connect(self.thread.deleteLater)
 
@@ -75,26 +72,26 @@ class AppMainWindow(QMainWindow, ActionManager):
     def _init_ui(self):
         central_widget = QWidget(self)
         main_layout = QVBoxLayout()
-        created_app_grid = self.app_grid.plot_app_grid(apps=self._get_apps_list(),
-                                                       label_changer=self._change_label_text)
+        created_app_grid = self.app_grid.plot_app_grid(
+            apps=self._get_apps_list(),
+            label_changer=self._change_label_text
+        )
         main_layout.addLayout(created_app_grid)
         main_layout.setAlignment(created_app_grid, Qt.AlignCenter)
 
         config_layout = QHBoxLayout()
 
-        config_button = CustomButton(name="Configuração")
+        config_button = CustomButton(name="Configuração", size=(48, 48), icon_size=QSize(40, 40))
+        config_button.no_animation()
         config_button.focused.connect(self._change_label_text)
         config_button.setIcon(build_icon(self.settings.get("menu").get("settings")))
-        config_button.setFixedSize(48, 48)
-        config_button.setIconSize(QSize(40, 40))
         config_button.clicked.connect(self._open_settings)
+        config_button.focused.connect(self._change_label_text)
 
-        hide_button = CustomButton(name="Esconder")
-        hide_button.focused.connect(self._change_label_text)
+        hide_button = CustomButton(name="Esconder", size=(48, 48), icon_size=QSize(40, 40))
+        hide_button.no_animation()
 
         hide_button.setIcon(build_icon(self.settings.get("menu").get("hide")))
-        hide_button.setFixedSize(48, 48)
-        hide_button.setIconSize(QSize(40, 40))
         hide_button.clicked.connect(self.hide)
         self.info_label.setAlignment(Qt.AlignCenter)
 
