@@ -37,7 +37,12 @@ class AppMainWindow(QMainWindow, ActionManager):
         print("INFO - Iniciando interface gráfica...")
         self._set_on_center()
         self.tray_icon.show()
-        self.palette().setColor(QPalette.Window, QColor("#202326"))
+
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor("#202326"))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
+
         self.thread.start()
 
     def _set_signals(self):
