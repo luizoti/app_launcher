@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt, QSize, QThread
 from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QLabel, QWidget
-
 from src.gui.action_manager import ActionManager
 from src.gui.centralized_resolution import CentralizedAppResolution
 from src.gui.components.custom_button import CustomButton
