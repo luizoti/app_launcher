@@ -21,24 +21,18 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
-
         self.info_label = QLabel("Selecione um app")
         self.info_label.setFont(QFont("Arial", 12, weight=QFont.Bold))
-
         self.setWindowTitle("Launcher de Aplicações")
         self.setFixedSize(
             self.settings.get("window").get("width"),
             self.settings.get("window").get("height"),
         )
         self.tray_icon = TrayIcon(parent=self)
-
         self.thread = QThread()
-        # ____ SET DEVICE MONITOR ____
         self.device_monitor_worker = DeviceMonitor()
         self.device_monitor_worker.moveToThread(self.thread)
-
         self._set_signals()
-
         self._init_ui()
         print("INFO - Iniciando interface gráfica...")
         self._set_on_center()
