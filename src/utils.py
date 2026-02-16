@@ -10,7 +10,7 @@ from src.settings import SettingsManager, SettingsModel
 
 def build_icon(
     icon: typing.Optional[typing.Text] = None, settings: SettingsModel=SettingsManager().get_settings()
-) -> QIcon | QIcon | None:
+) -> QIcon:
     """
     Load ico from file or base64 and return a QIcon, loads absolute path, filename from icos directory or base64 string.
     
@@ -26,7 +26,6 @@ def build_icon(
         return QIcon(str(local_icon_directory.joinpath("missing.ico")))
     try:
         if local_icon_directory.joinpath(icon).exists():
-            print("teste", icon)
             return QIcon(str(local_icon_directory.joinpath(icon)))
     except (OSError, TypeError):
         pass
@@ -35,9 +34,12 @@ def build_icon(
     return QIcon(QPixmap.fromImage(image))
 
 
-def check_running_processes(search_process=None):
+def check_running_processes(search_process: typing.Text):
     if not search_process:
         raise ValueError("Argument `search_process` cannot be None")
 
-    return (x for x in [x.info["name"].lower() for x in psutil.process_iter(["name"])] if
-            x in [p.lower() for p in search_process])
+    return (
+        x
+        for x in [x.info["name"].lower() for x in psutil.process_iter(["name"])]
+        if x in [process.lower() for process in search_process]
+    )
