@@ -45,10 +45,11 @@ class TrayIcon(QSystemTrayIcon):
                self._on_exit
             )
 
-    def _handle_tray_click(self, reason):
-        if reason == self.Trigger:
+    @pyqtSlot(QSystemTrayIcon.ActivationReason)
+    def _handle_tray_click(self, reason: QSystemTrayIcon.ActivationReason):
+        if reason == self.ActivationReason.Trigger:
             self.tray_action.emit(actions_map_reversed.get("toggle_view"))
-
-    def handler_switch_icon(self, reason):
-        self.setIcon(build_icon(self.settings.get("tray").get("icons").get(reason)))
-        return True
+ 
+    @pyqtSlot(str)
+    def handler_switch_icon(self, reason: typing.Text):
+        self.setIcon(build_icon(getattr(self.settings.tray, reason)))
