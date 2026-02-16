@@ -3,3 +3,6 @@
 *.log
 /.idea
 /app_launcher.spec
+*.pyc
+*.kra~
+*.ico~
