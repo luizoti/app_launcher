@@ -56,7 +56,7 @@ def main():
         "--hidden-import=PyQt5.QtCore",
         "--hidden-import=systemd.journal",
         "--name=app_launcher",
-        main_py
+        main_py,
     ]
 
     print("Executando pyinstaller...")
