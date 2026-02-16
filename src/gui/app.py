@@ -29,9 +29,10 @@ class AppMainWindow(QMainWindow, ActionManager):
             self.settings.get("window").get("height"),
         )
         self.tray_icon = TrayIcon(parent=self)
-        self.thread = QThread()
+        self._thread = self.thread()
+
         self.device_monitor_worker = DeviceMonitor()
-        self.device_monitor_worker.moveToThread(self.thread)
+        self.device_monitor_worker.moveToThread(self._thread)
         self._set_signals()
         self._init_ui()
         print("INFO - Iniciando interface gráfica...")
@@ -42,18 +43,19 @@ class AppMainWindow(QMainWindow, ActionManager):
         palette.setColor(QPalette.Window, QColor("#202326"))
         self.setPalette(palette)
         self.setAutoFillBackground(True)
-
-        self.thread.start()
+        if not self._thread:
+            raise RuntimeError("Cannot start, problem to start thread.")
+        self._thread.start()
 
     def _set_signals(self):
         self.device_monitor_worker.action.connect(self.action_handler)
 
         self.tray_icon.tray_action.connect(self.action_handler)
         self.device_monitor_worker.action.connect(self.app_grid.action_handler)
-        self.device_monitor_worker.tray_action.connect(self.tray_icon.handler_switch_icon)
-
-        self.thread.started.connect(self.device_monitor_worker.start_monitor)
-        self.thread.finished.connect(self.thread.deleteLater)
+        if not self._thread:
+            raise RuntimeError("Cannot connect signals, problem to start thread.")
+        self._thread.started.connect(self.device_monitor_worker.start_monitor)
+        self._thread.finished.connect(self._thread.deleteLater)
 
     def _set_on_center(self):
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
