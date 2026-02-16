@@ -1,4 +1,5 @@
 import unittest
+
 from setproctitle import setproctitle
 
 from src.utils import check_running_processes
@@ -32,9 +33,11 @@ class TestCheckRunningProcess(unittest.TestCase):
     def test_get_case_insensitive_search(self):
         process_names = ["kodi", "emulationstation"]
         create_process(process_list=process_names)
-        current_process = check_running_processes(search_process=[x.capitalize() for x in process_names])
+        current_process = check_running_processes(
+            search_process=[x.capitalize() for x in process_names]
+        )
         self.assertEqual(process_names, current_process)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
