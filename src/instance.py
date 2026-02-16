@@ -1,18 +1,23 @@
 # os.path.join(BASE_DIR, CONFIG_FILE_NAME)
 import os
+from logging import getLogger
 
 import psutil
 
+logger = getLogger(__name__)
+
 
 def create_pid_file_path():
-    return os.path.join(os.path.expanduser("~"), ".config", "app_launcher.pid")
+    pid_file = os.path.join(os.path.expanduser("~"), ".config", "app_launcher.pid")
+    logger.debug(f"PID file created: {pid_file}")
+    return pid_file
 
 
 def get_current_pid():
     return os.getpid()
 
 
-def check_pid_exist(pid):
+def check_pid_exist(pid: int):
     for process in psutil.process_iter(["name"]):
         if process.pid == pid:
             return True
@@ -36,4 +41,4 @@ def write_pid_file():
 def destroy_pid_file():
     if os.path.exists(create_pid_file_path()):
         os.remove(create_pid_file_path())
-        print("INFO - PID file destroyed")
+        logger.info("PID file destroyed")
