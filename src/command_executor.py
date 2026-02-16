@@ -2,7 +2,7 @@ import logging
 import subprocess
 import traceback
 
-
+logger = logging.getLogger(__name__)
 class CommandExecutor:
     def __init__(self, command: list[str], label_changer=None):
         self.command = command
