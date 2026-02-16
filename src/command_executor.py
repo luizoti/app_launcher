@@ -11,7 +11,7 @@ class CommandExecutor:
     def execute(self):
         try:
             subprocess.Popen(
-                args=self.command,
+                args=self.__command_processor(self.command),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
@@ -21,3 +21,9 @@ class CommandExecutor:
             self.label_changer(f"Comando não encontrado: {file_not_found_error}")
         except Exception:
             logging.exception(traceback.format_exc())
+
+    @classmethod
+    def __command_processor(cls, command: typing.Union[list[str], str]) -> typing.List[typing.Text]:
+        if isinstance(command, str):
+            command = command.split(" ")
+        return command
