@@ -22,15 +22,28 @@ class TrayIcon(QSystemTrayIcon):
         self.setContextMenu(self.menu)
         self.setVisible(True)
 
+    def _on_toggle_visibility(self):
+        """Callback para alternar a visibilidade da interface."""
+        self.tray_action.emit(actions_map_reversed.get("toggle_view"))
+
+    def _on_exit(self):
+        """Callback para fechar a aplicação."""
+        self.tray_action.emit(actions_map_reversed.get("close"))
+
+
     def _set_signals(self):
         self.activated.connect(self._handle_tray_click)
+        self.menu.change_visibility_action
 
-        self.menu.change_visibility_action.triggered.connect(
-            lambda x: self.tray_action.emit(actions_map_reversed.get("toggle_view"))
-        )
-        self.menu.exit_action.triggered.connect(
-            lambda x: self.tray_action.emit(actions_map_reversed.get("close"))
-        )
+        if self.menu.change_visibility_action:
+            self.menu.change_visibility_action.triggered.connect(
+                self._on_toggle_visibility
+            )
+
+        if self.menu.exit_action: 
+            self.menu.exit_action.triggered.connect(
+               self._on_exit
+            )
 
     def _handle_tray_click(self, reason):
         if reason == self.Trigger:
