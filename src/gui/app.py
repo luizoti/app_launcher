@@ -18,11 +18,11 @@ class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self, settings=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
         self.setWindowIcon(build_icon(settings.get("tray").get("icons").get("standby")))
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowFlags(Qt.WindowType.FramelessWindowHint) | Qt.WindowFlags(Qt.WindowType.WindowStaysOnTopHint))
         self.settings = settings
         self.app_grid = AppGrid(row_limit=self.settings.get("window").get("apps_per_row"))
         self.info_label = QLabel("Selecione um app")
-        self.info_label.setFont(QFont("Arial", 12, weight=QFont.Bold))
+        self.info_label.setFont(QFont("Arial", 12, weight=QFont.Weight.Bold))
         self.setWindowTitle("Launcher de Aplicações")
         self.setFixedSize(
             self.settings.get("window").get("width"),
@@ -40,7 +40,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.tray_icon.show()
 
         palette = self.palette()
-        palette.setColor(QPalette.Window, QColor("#202326"))
+        palette.setColor(QPalette.ColorRole.Window, QColor("#202326"))
         self.setPalette(palette)
         self.setAutoFillBackground(True)
         if not self._thread:
@@ -78,7 +78,7 @@ class AppMainWindow(QMainWindow, ActionManager):
             label_changer=self._change_label_text
         )
         main_layout.addLayout(created_app_grid)
-        main_layout.setAlignment(created_app_grid, Qt.AlignCenter)
+        main_layout.setAlignment(created_app_grid, Qt.AlignmentFlag.AlignCenter)
 
         config_layout = QHBoxLayout()
 
@@ -94,7 +94,7 @@ class AppMainWindow(QMainWindow, ActionManager):
 
         hide_button.setIcon(build_icon(self.settings.get("menu").get("hide")))
         hide_button.clicked.connect(self.hide)
-        self.info_label.setAlignment(Qt.AlignCenter)
+        self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         config_layout.addWidget(self.info_label)
         config_layout.addWidget(hide_button)
