@@ -75,7 +75,8 @@ class AppGrid(QGridLayout, ActionManager):
         return CustomButton(
             icon=app_data.icon,
             on_click=CommandExecutor(
-                command=app_data.cmd, label_changer=label_changer
+                command=app_data.cmd, 
+                label_changer=label_changer
             ).execute,
             name=app_name,
         )

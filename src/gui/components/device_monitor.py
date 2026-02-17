@@ -1,20 +1,21 @@
 import threading
 import time
 import traceback
+import typing
 
+from evdev import InputDevice, categorize, ecodes, list_devices
 from PyQt5.QtCore import QObject, pyqtSignal
-from evdev import InputDevice, ecodes, categorize
-from evdev import list_devices
 
-from src.enums import actions_map_reversed, actions_map
-from src.settings import SettingsManager
+from src.enums import actions_map, actions_map_reversed
+from src.settings import SettingsManager, SettingsModel
+from src.settings_model import MappingsModel
 
 
 class DeviceMonitor(QObject):
     action = pyqtSignal(int)
     tray_action = pyqtSignal(str)
 
-    def __init__(self, settings=SettingsManager().get_settings()):
+    def __init__(self, settings: SettingsModel = SettingsManager().get_settings()):
         super().__init__()
         self.lock = threading.Lock()
         self.settings = settings
@@ -23,26 +24,25 @@ class DeviceMonitor(QObject):
         self.event_mapping = {
             ecodes.EV_KEY: self._get_button_mapping,
             ecodes.EV_ABS: {
-                ecodes.ABS_HAT0X:
-                    {-1: 3,
-                     1: 4},
-                ecodes.ABS_HAT0Y:
-                    {-1: 1,
-                     1: 2
-                     }
+                ecodes.ABS_HAT0X: {-1: 3, 1: 4},
+                ecodes.ABS_HAT0Y: {-1: 1, 1: 2},
             },
         }
 
-    def _get_button_mapping(self, device_name=None, event=None):
+    def _get_button_mapping(
+        self, device_name=None, event=None
+    ) -> typing.Optional[typing.Dict[typing.Text, int] | None]:
         if not device_name:
             raise TypeError("Argument `device_name` cannot None")
         if not event:
             raise TypeError("Argument `event` code cannot None")
 
         key_event = categorize(event)
-
+        mappings: MappingsModel = getattr(
+            getattr(self.settings.mappings, device_name), "buttons"
+        )
         if key_event.keystate == 1:
-            for action, event_code_int in self.settings.get("mappings").get(device_name).get("buttons").items():
+            for action, event_code_int in mappings.model_dump(mode="python").items():
                 if key_event.scancode == event_code_int:
                     return actions_map_reversed.get(action)
         return None
@@ -51,8 +51,11 @@ class DeviceMonitor(QObject):
         """
         Ger Allowed devices based on devices listed on settings.json mapping.
         """
-        return (dev for dev in [InputDevice(path) for path in list_devices()]
-                if dev.name in list(self.settings.get("mappings").keys()))
+        return (
+            dev
+            for dev in [InputDevice(path) for path in list_devices()]
+            if dev.name in list(self.settings.mappings.keys())
+        )
 
     def _monitor_device(self, device: InputDevice):
         print(f"INFO - Monitorando eventos de: {device.name} ({device.path})")
@@ -60,14 +63,19 @@ class DeviceMonitor(QObject):
             for event in device.read_loop():
                 try:
                     if hasattr(self.event_mapping.get(event.type), "__call__"):
-                        command = self.event_mapping[event.type](device_name=device.name, event=event)
+                        command = self.event_mapping[event.type](
+                            device_name=device.name, event=event
+                        )
                     else:
-                        command = self.event_mapping[event.type][event.code][event.value]
+                        command = self.event_mapping[event.type][event.code][
+                            event.value
+                        ]
                     if command:
                         try:
                             self.action.emit(command)
                             print(
-                                f"EVNT - DEVICE: {device.name} | EV_CODE: {event.code} - ACTION: {actions_map.get(command)}")
+                                f"EVNT - DEVICE: {device.name} | EV_CODE: {event.code} - ACTION: {actions_map.get(command)}"
+                            )
                         except Exception:  # noqa
                             print(traceback.format_exc())
                         except ValueError as NotMappedEvent:  # noqa
@@ -97,7 +105,9 @@ class DeviceMonitor(QObject):
         with self.lock:
             for device in self._get_allowed_devices():
                 if device.path not in self.connected_devices:
-                    print(f"INFO - Novo dispositivo detectado: {device.name} ({device.path})")
+                    print(
+                        f"INFO - Novo dispositivo detectado: {device.name} ({device.path})"
+                    )
                     if self.settings.get("mappings").get(device.name).get("tray"):
                         self.tray_action.emit("connected")
                     thread = threading.Thread(

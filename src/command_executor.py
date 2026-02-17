@@ -5,7 +5,7 @@ import typing
 
 logger = logging.getLogger(__name__)
 class CommandExecutor:
-    def __init__(self, command: typing.Union[list[str], str], label_changer=None):
+    def __init__(self, command: typing.Union[list[str], str], label_changer: typing.Optional[typing.Callable[[typing.Text], None]]=None):
         self.command = command
         self.label_changer = label_changer
 
@@ -18,8 +18,10 @@ class CommandExecutor:
             )
             logging.info(f"INFO - Executando {self.command}")
         except FileNotFoundError as file_not_found_error:
-            logging.error(f"INFO - Comando não encontrado: {file_not_found_error}")
-            self.label_changer(f"Comando não encontrado: {file_not_found_error}")
+            message = f"Comando não encontrado: {file_not_found_error}"
+            logging.error(message)
+            if self.label_changer:
+                self.label_changer(message)
         except Exception:
             logging.exception(traceback.format_exc())
 
