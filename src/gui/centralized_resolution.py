@@ -1,6 +1,6 @@
 
-from PyQt5.QtCore import QPoint, QRect
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PySide6.QtCore import QPoint, QRect
+from PySide6.QtWidgets import QApplication, QMainWindow
 
 
 class CentralizedAppResolution:

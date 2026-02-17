@@ -2,7 +2,7 @@
 
 ## 📌 Project Idea
 
-**App Launcher** is a desktop application developed in **Python using PyQt5** designed to be a **controller-friendly application launcher**.
+**App Launcher** is a desktop application developed in **Python using PySide6** designed to be a **controller-friendly application launcher**.
 
 The main idea of the project is to allow users to **use and map any joystick or keyboard** to fully control the launcher. This makes it especially useful for **HTPCs (Home Theater PCs)** or living‑room setups, where users interact directly with a graphical desktop environment such as **KDE, GNOME, or similar** using a game controller instead of a mouse and keyboard.
 
@@ -58,7 +58,7 @@ app_launcher/
 
 ## 🪟 Graphical Interface
 
-The interface is built with **PyQt5** and uses custom components such as:
+The interface is built with **PySide6** and uses custom components such as:
 
 * **Application grid**: visually organizes application shortcuts
 * **Custom buttons**: configurable actions with icons
@@ -111,9 +111,9 @@ You can generate a standalone executable using **PyInstaller**.
 pyinstaller \
   --onefile \
   --hidden-import=requests \
-  --hidden-import=PyQt5.QtWidgets \
-  --hidden-import=PyQt5.QtGui \
-  --hidden-import=PyQt5.QtCore \
+  --hidden-import=PySide6.QtWidgets \
+  --hidden-import=PySide6.QtGui \
+  --hidden-import=PySide6.QtCore \
   --hidden-import=systemd.journal \
   main.py
 ````

@@ -1,7 +1,7 @@
 
 import logging
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot  # type: ignore
+from PySide6.QtCore import Signal, Slot
 
 from src.enums import actions_map
 
@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class ActionManager:
-    actions = pyqtSignal(int)
+    actions = Signal(int)
 
-    @pyqtSlot(int, name="action_handler")
+    @Slot(int, name="action_handler")
     def action_handler(self, action_id: int) -> None:
         method_name = actions_map.get(action_id)
         if not method_name:

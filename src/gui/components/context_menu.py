@@ -1,6 +1,6 @@
 import typing
 
-from PyQt5.QtWidgets import QMenu, QWidget
+from PySide6.QtWidgets import QMenu, QWidget
 
 
 class ContextMenu(QMenu):

@@ -1,10 +1,10 @@
 import logging
 import typing
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QColor, QFont, QPalette
-from PyQt5.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QMainWindow, QVBoxLayout, QWidget)
-
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QColor, QFont, QPalette
+from PySide6.QtWidgets import (QGridLayout, QHBoxLayout, QLabel, QMainWindow,
+                               QVBoxLayout, QWidget)
 
 from src.gui.action_manager import ActionManager
 from src.gui.centralized_resolution import CentralizedAppResolution
@@ -24,7 +24,7 @@ class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self, settings: SettingsModel=SettingsManager().get_settings()):
         super(AppMainWindow, self).__init__()
         self.setWindowIcon(build_icon(settings.tray.standby))
-        self.setWindowFlags(Qt.WindowFlags(Qt.WindowType.FramelessWindowHint) | Qt.WindowFlags(Qt.WindowType.WindowStaysOnTopHint))
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.settings = settings
         self.app_grid = AppGrid(
             row_limit=self.settings.window.apps_per_row

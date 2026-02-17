@@ -3,8 +3,8 @@ import typing
 from typing import Dict, Text
 
 import more_itertools
-from PyQt5.QtCore import pyqtSlot  # type: ignore
-from PyQt5.QtWidgets import QGridLayout
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QGridLayout
 
 from src.command_executor import CommandExecutor
 from src.gui.action_manager import ActionManager
@@ -104,7 +104,7 @@ class AppGrid(QGridLayout, ActionManager):
             if sub_parent_widget:
                 sub_parent_widget.hide()
 
-    @pyqtSlot(str)
+    @Slot(str)
     def _change_focus_on_hover(self, focused_app: typing.Text) -> None:
         for row_index, apps in self.mapped_grid.items():
             for app_index, app in enumerate(apps):

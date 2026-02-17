@@ -3,7 +3,7 @@ import typing
 from pathlib import Path
 
 import psutil
-from PyQt5.QtGui import QIcon, QImage, QPixmap
+from PySide6.QtGui import QIcon, QImage, QPixmap
 
 from src.settings import SettingsManager, SettingsModel
 

@@ -2,7 +2,7 @@ import os
 import sys
 from logging import getLogger
 
-from PyQt5.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from src.gui.app import AppMainWindow
 from src.instance import (check_pid_exist, get_current_pid, read_pid_file,
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     write_pid_file()
     app_window = AppMainWindow()
     app_window.show_ui()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

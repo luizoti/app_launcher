@@ -1,8 +1,8 @@
 import typing
 
-from PyQt5.QtCore import QSize, Qt, pyqtSignal
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsColorizeEffect, QPushButton
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGraphicsColorizeEffect, QPushButton
 
 from src.utils import build_icon
 
@@ -10,7 +10,7 @@ ICO_PADDING = 16
 
 
 class CustomButton(QPushButton):
-    focused = pyqtSignal(str)
+    focused = Signal(str)
 
     def __init__(
         self,

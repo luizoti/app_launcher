@@ -1,7 +1,8 @@
 import typing
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot  # type: ignore
-from PyQt5.QtWidgets import QSystemTrayIcon
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal, Slot
+from PySide6.QtWidgets import QSystemTrayIcon
 
 from src.enums import actions_map_reversed
 from src.gui.components.context_menu import ContextMenu
@@ -11,7 +12,7 @@ from src.utils import build_icon
 
 # Classe para o ícone do tray
 class TrayIcon(QSystemTrayIcon):
-    tray_action = pyqtSignal(int)
+    tray_action = Signal(int)
 
     def __init__(self, parent: typing.Optional[QObject]=None, settings: SettingsModel = SettingsManager().get_settings()):
         super(TrayIcon, self).__init__(parent=parent)
@@ -47,11 +48,11 @@ class TrayIcon(QSystemTrayIcon):
                self._on_exit
             )
 
-    @pyqtSlot(QSystemTrayIcon.ActivationReason)
+    @Slot(QSystemTrayIcon.ActivationReason)
     def _handle_tray_click(self, reason: QSystemTrayIcon.ActivationReason):
         if reason == self.ActivationReason.Trigger:
             self.tray_action.emit(actions_map_reversed.get("toggle_view"))
  
-    @pyqtSlot(str)
+    @Slot(str)
     def handler_switch_icon(self, reason: typing.Text):
         self.setIcon(build_icon(getattr(self.settings.tray, reason)))

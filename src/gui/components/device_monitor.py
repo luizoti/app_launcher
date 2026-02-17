@@ -4,7 +4,7 @@ import traceback
 import typing
 
 from evdev import InputDevice, categorize, ecodes, list_devices
-from PyQt5.QtCore import QObject, pyqtSignal
+from PySide6.QtCore import QObject, Signal
 
 from src.enums import actions_map, actions_map_reversed
 from src.settings import SettingsManager, SettingsModel
@@ -12,8 +12,8 @@ from src.settings_model import MappingsModel
 
 
 class DeviceMonitor(QObject):
-    action = pyqtSignal(int)
-    tray_action = pyqtSignal(str)
+    action = Signal(int)
+    tray_action = Signal(str)
 
     def __init__(self, settings: SettingsModel = SettingsManager().get_settings()):
         super().__init__()
@@ -108,7 +108,10 @@ class DeviceMonitor(QObject):
                     print(
                         f"INFO - Novo dispositivo detectado: {device.name} ({device.path})"
                     )
-                    if self.settings.get("mappings").get(device.name).get("tray"):
+
+                    device_model: MappingsModel = getattr(self.settings.mappings, device.name)
+
+                    if device_model.tray:
                         self.tray_action.emit("connected")
                     thread = threading.Thread(
                         target=self._monitor_device, args=(device,), daemon=True
