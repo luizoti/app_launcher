@@ -1,64 +1,89 @@
+"""
+Settings module, implement a class to manage settings file.
+"""
+
 import json
-import os
+import logging
 import sys
+import typing
 from pathlib import Path
+from typing import ClassVar
+
+from src.settings_model import SettingsModel
+
 
 CONFIG_FILE_NAME = "settings.json"
 ALLOWED_DEVICES = []
 DEVICES_MAPPING = {}
 
-# determine if application is a script file or frozen exe
-if getattr(sys, "frozen", False):
-    BASE_DIR = os.path.dirname(sys.executable)
-elif __file__:
-    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+logger = logging.getLogger(__name__)
+
+
+BASE_DIR: Path = Path(
+    sys.executable if getattr(sys, "frozen", False) else __file__
+).parent.parent
 
 
 # if not ALLOWED_DEVICES:
 #     ALLOWED_DEVICES = [x for x in load_config().keys()]
 
 
+
 class SettingsManager:
-    _instance = None
-    _config_data = {}
+    _instance: ClassVar["SettingsManager | None"] = None
+    _config_data: typing.Optional[SettingsModel]
 
-    def get_settings(self):
-        return self._config_data.get("settings")
+    def get_settings(self) -> SettingsModel:
+        if not self._config_data:
+            raise RuntimeError("Cannot load settings")
+        return self._config_data
 
-    def __new__(cls, config_path=None):
+    def __new__(cls, config_path: typing.Optional[Path | None] = None):
         if cls._instance is None:
             cls._instance = super(SettingsManager, cls).__new__(cls)
             cls._instance._load_config(config_path)
         return cls._instance
 
-    def _load_config(self, path):
-        if not path:
+    def _load_config(self, config_path: typing.Optional[Path | None]) -> None:
+        if not config_path:
             possible_config_files = [
-                os.path.join(os.path.expanduser("~"), ".config", "app_launcher", CONFIG_FILE_NAME),
-                os.path.join(BASE_DIR, CONFIG_FILE_NAME),
+                Path("~")
+                .expanduser()
+                .joinpath(".config", "app_launcher", CONFIG_FILE_NAME),
+                Path(BASE_DIR).joinpath(CONFIG_FILE_NAME),
             ]
         else:
-            possible_config_files = [path]
-        print("INFO - Looking for config file in:", possible_config_files)
+            possible_config_files = [config_path]
+        logger.debug("Looking for config file in:", possible_config_files)
         for file in possible_config_files:
-            ico_directory = Path(os.path.dirname(file)).joinpath("icons")
-            if not ico_directory.exists():
-                os.makedirs(ico_directory)
-            if os.path.exists(file):
-                if not os.path.isfile(file):
-                    print("INFO - Found config file:", file)
-                with open(file, 'r', encoding='utf-8') as config_file:
-                    print("INFO - Reading config file:", file)
-                    self._config_data = json.load(config_file)
-                    self.set("icons_directory", ico_directory)
-                    config_file.close()
 
-    def get(self, key, default=None):
-        return self._config_data["settings"].get(key, default)
+            if not file.exists():
+                continue
+            icons_directory = Path(file).parent.joinpath("icons")
+            icons_directory.mkdir(parents=True, exist_ok=True)
 
-    def set(self, key, value):
-        self._config_data["settings"][key] = value
+            with open(file, "r", encoding="utf-8") as config_file:
+                logger.debug("Reading config file:", file)
+                raw_data = json.load(config_file)
 
-    def save(self, path="config.json"):
-        with open(path, 'w', encoding='utf-8') as f:
+                self._config_data = SettingsModel(
+                    **raw_data, icons_directory=str(icons_directory)
+                )
+            return
+
+    # def _get(self, key: Text, default: Any = None) -> typing.Optional[SettingsModel]:
+    #     return self._config_data.model_dump(mode="python").get(key, default)
+
+    # def _set(
+    #     self, key: Text, value: typing.Optional[Path | Text]
+    # ) -> typing.Optional[bool | None]:
+    #     try:
+    #         self._config_data[key] = value
+    #         return True
+    #     except KeyError:
+    #         pass
+    #     return None
+
+    def save(self, path: Path):
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(self._config_data, f, indent=4)
