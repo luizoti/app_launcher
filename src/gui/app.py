@@ -119,5 +119,5 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.show()
         return None
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self):
         destroy_pid_file()
