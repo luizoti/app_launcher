@@ -1,0 +1,20 @@
+[project]
+name = "app-launcher"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "black[d]>=26.1.0",
+    "evdev~=1.7.1",
+    "more-itertools>=10.8.0",
+    "psutil~=5.8.0",
+    "pydantic>=2.12.5",
+    "pyinstaller>=6.19.0",
+    "pyqt5~=5.15.11",
+    "requests~=2.32.3",
+    "setproctitle~=1.3.6",
+]
