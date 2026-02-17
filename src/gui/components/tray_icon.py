@@ -1,9 +1,11 @@
-from PyQt5.QtCore import pyqtSignal
+import typing
+
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot  # type: ignore
 from PyQt5.QtWidgets import QSystemTrayIcon
 
 from src.enums import actions_map_reversed
 from src.gui.components.context_menu import ContextMenu
-from src.settings import SettingsManager
+from src.settings import SettingsManager, SettingsModel
 from src.utils import build_icon
 
 
@@ -11,12 +13,12 @@ from src.utils import build_icon
 class TrayIcon(QSystemTrayIcon):
     tray_action = pyqtSignal(int)
 
-    def __init__(self, parent=None, settings=SettingsManager().get_settings()):
+    def __init__(self, parent: typing.Optional[QObject]=None, settings: SettingsModel = SettingsManager().get_settings()):
         super(TrayIcon, self).__init__(parent=parent)
         self.settings = settings
         self.menu = ContextMenu()
 
-        self.setIcon(build_icon(self.settings.get("tray").get("icons").get("standby")))
+        self.setIcon(build_icon(self.settings.tray.standby))
 
         self._set_signals()
         self.setContextMenu(self.menu)
