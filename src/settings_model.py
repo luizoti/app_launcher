@@ -1,22 +1,21 @@
-import typing
-from typing import Dict, List, Text, Union
-
 from pydantic import BaseModel
 
 
 class AppsModel(BaseModel):
-    cmd: Union[List[Text], typing.Text]
+    cmd: list[str] | str
     enabled: bool
-    icon: Text
+    icon: str
 
-class MappingsModel(BaseModel):
-    buttons: Dict[Text, int]
-    tray: bool
+
+class DeviceMappingsModel(BaseModel):
+    buttons: dict[int, str]
+    tray: bool = False
+
 
 class IconsModel(BaseModel):
-    connected: Text
-    disconnected: Text
-    standby: Text
+    connected: str
+    disconnected: str
+    standby: str
 
 
 class WindowModel(BaseModel):
@@ -28,14 +27,14 @@ class WindowModel(BaseModel):
 
 
 class MenuModel(BaseModel):
-    hide: Text
-    settings: Text
+    hide: str
+    settings: str
 
 
 class SettingsModel(BaseModel):
-    apps: Dict[Text, AppsModel]
-    mappings: Dict[Text, MappingsModel]
+    apps: dict[str, AppsModel]
+    mappings: dict[str, DeviceMappingsModel]
     menu: MenuModel
     tray: IconsModel
     window: WindowModel
-    icons_directory: Text
+    icons_directory: str
