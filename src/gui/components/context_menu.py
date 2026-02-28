@@ -1,5 +1,6 @@
 import typing
 
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QMenu, QWidget
 
 
