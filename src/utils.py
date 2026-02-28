@@ -1,9 +1,5 @@
-import base64
-import typing
-from pathlib import Path
 
 import psutil
-
 
 
 def check_running_processes(search_process: str):
