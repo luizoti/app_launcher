@@ -3,15 +3,35 @@ name = "app-launcher"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13.11"
+requires-python = "==3.10.8"
 dependencies = [
-    "black[d]>=26.1.0",
     "evdev~=1.7.1",
     "isort>=7.0.0",
+    "matplotlib>=3.10.8",
+    "memory-profiler>=0.61.0",
     "more-itertools>=10.8.0",
     "psutil~=5.8.0",
-    "pydantic>=2.12.5",
+    "pydantic==2.12.5",
     "pyinstaller>=6.19.0",
+    "pyright>=1.1.408",
     "pyside6~=6.10.2",
+    "pyudev>=0.24.4",
+    "ruff>=0.15.4",
     "setproctitle~=1.3.6",
 ]
+
+[tool.ruff]
+# Alinha com a versão de Python que já tens no Trunk
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+# "E" (Pycodestyle), "F" (Pyflakes), "I" (Isort), "UP" (Upgrade)
+select = ["E", "F", "I", "UP", "B"]
+fixable = ["ALL"]
+ignore = []
+
+[tool.ruff.format]
+# Ativa o modo de formatação compatível com o Black
+quote-style = "double"
+indent-style = "space"

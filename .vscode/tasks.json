@@ -1,14 +1,10 @@
 {
     "tasks": [
         {
-            "command": "${cwd}/.venv/bin/python ${cwd}/main.py",
-            "group": {
-                "isDefault": true,
-                "kind": "build"
-            },
-            "label": "Run P${cwd}",
-            "problemMatcher": [],
-            "type": "shell"
+            "command": "source ./.venv/bin/activate.fish && ./.venv/bin/python ./main.py",
+            "label": "Build AppLauncher",
+            "type": "shell",
+            "problemMatcher": []
         }
     ],
     // See https://go.microsoft.com/fwlink/?LinkId=733558

@@ -1,0 +1,21 @@
+{
+    // --- Configurações de Salvamento Automático ---
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000, // Salva após 1 segundo de inatividade
+
+    // --- Configurações de Python ---
+    "python.analysis.typeCheckingMode": "strict",
+    "black-formatter.showNotifications": "always",
+
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true, // Sobrescreve o 'false' da sua global
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.unusedImports": "explicit",
+            "source.sort.json": "explicit",
+            "source.convertImportStar": "explicit"
+        }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system"
+}
