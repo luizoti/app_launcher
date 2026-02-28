@@ -121,7 +121,7 @@ class AppGrid(QGridLayout, ActionManager):
                 if label_changer:
                     app.focused.connect(label_changer)
                 app.focused.connect(self._change_focus_on_hover)
-                self.addWidget(app, row_index, app_index)
+                self.addWidget(app, row_index, app_index, Qt.AlignmentFlag.AlignCenter)
         return self
 
     def __get_current_focus(self) -> tuple[int, int]:
