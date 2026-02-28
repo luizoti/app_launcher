@@ -25,8 +25,9 @@ class CommandExecutor:
         except Exception:
             logging.exception(traceback.format_exc())
 
-    @classmethod
-    def __command_processor(cls, command: typing.Union[list[str], str]) -> typing.List[typing.Text]:
-        if isinstance(command, str):
-            command = command.split(" ")
-        return command
+def __command_processor(
+    command: list[str] | str,
+) -> list[str]:
+    if isinstance(command, str):
+        command = command.split(" ")
+    return command
