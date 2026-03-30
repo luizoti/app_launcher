@@ -5,12 +5,10 @@ Settings module, implement a class to manage settings file.
 import json
 import logging
 import sys
-import typing
 from pathlib import Path
 from typing import ClassVar
 
 from src.settings_model import SettingsModel
-
 
 CONFIG_FILE_NAME = "settings.json"
 ALLOWED_DEVICES = []
@@ -28,41 +26,39 @@ BASE_DIR: Path = Path(
 #     ALLOWED_DEVICES = [x for x in load_config().keys()]
 
 
-
 class SettingsManager:
     _instance: ClassVar["SettingsManager | None"] = None
-    _config_data: typing.Optional[SettingsModel]
+    _config_data: None | SettingsModel = None
 
     def get_settings(self) -> SettingsModel:
         if not self._config_data:
             raise RuntimeError("Cannot load settings")
         return self._config_data
 
-    def __new__(cls, config_path: typing.Optional[Path | None] = None):
+    def __new__(cls, config_path: Path | None = None):
         if cls._instance is None:
-            cls._instance = super(SettingsManager, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             cls._instance._load_config(config_path)
         return cls._instance
 
-    def _load_config(self, config_path: typing.Optional[Path | None]) -> None:
+    def _load_config(self, config_path: Path | None | None) -> None:
         if not config_path:
-            possible_config_files = [
+            possible_config_files: list[Path] = [
                 Path("~")
                 .expanduser()
                 .joinpath(".config", "app_launcher", CONFIG_FILE_NAME),
                 Path(BASE_DIR).joinpath(CONFIG_FILE_NAME),
             ]
         else:
-            possible_config_files = [config_path]
+            possible_config_files: list[Path] = [config_path]
         logger.debug("Looking for config file in:", possible_config_files)
         for file in possible_config_files:
-
             if not file.exists():
                 continue
-            icons_directory = Path(file).parent.joinpath("icons")
+            icons_directory: Path = Path(file).parent.joinpath("icons")
             icons_directory.mkdir(parents=True, exist_ok=True)
 
-            with open(file, "r", encoding="utf-8") as config_file:
+            with open(file, encoding="utf-8") as config_file:
                 logger.debug("Reading config file:", file)
                 raw_data = json.load(config_file)
 
