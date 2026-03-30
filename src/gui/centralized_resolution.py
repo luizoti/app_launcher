@@ -1,11 +1,10 @@
-
 from PySide6.QtCore import QPoint, QRect
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 
 class CentralizedAppResolution:
     def __init__(self, app: QMainWindow):
-        super(CentralizedAppResolution, self).__init__()
+        super().__init__()
         application_primary_screen = QApplication.primaryScreen()
         if application_primary_screen:
             self.geometry: QRect = application_primary_screen.geometry()
