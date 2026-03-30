@@ -1,25 +1,28 @@
-import typing
-
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal, Slot
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QSystemTrayIcon
 
-from src.enums import actions_map_reversed
 from src.gui.components.context_menu import ContextMenu
+from src.gui.icons.cache_loader import get_icon
 from src.settings import SettingsManager, SettingsModel
-from src.utils import build_icon
 
 
 # Classe para o ícone do tray
 class TrayIcon(QSystemTrayIcon):
-    tray_action = Signal(int)
+    tray_action = Signal(str)
 
-    def __init__(self, parent: typing.Optional[QObject]=None, settings: SettingsModel = SettingsManager().get_settings()):
-        super(TrayIcon, self).__init__(parent=parent)
+    def __init__(
+        self,
+        parent: QObject | None = None,
+        settings: SettingsModel | None = None,
+    ):
+        super().__init__(parent=parent)
         self.settings = settings
         self.menu = ContextMenu()
 
-        self.setIcon(build_icon(self.settings.tray.standby))
+        self.settings: SettingsModel = (
+            settings if settings else SettingsManager().get_settings()
+        )
+        self.setIcon(get_icon(self.settings.tray.standby))
 
         self._set_signals()
         self.setContextMenu(self.menu)
@@ -27,32 +30,29 @@ class TrayIcon(QSystemTrayIcon):
 
     def _on_toggle_visibility(self):
         """Callback para alternar a visibilidade da interface."""
-        self.tray_action.emit(actions_map_reversed.get("toggle_view"))
+        self.tray_action.emit("toggle_view")
 
     def _on_exit(self):
         """Callback para fechar a aplicação."""
-        self.tray_action.emit(actions_map_reversed.get("close"))
-
+        self.tray_action.emit("close")
 
     def _set_signals(self):
         self.activated.connect(self._handle_tray_click)
-        self.menu.change_visibility_action
 
         if self.menu.change_visibility_action:
             self.menu.change_visibility_action.triggered.connect(
                 self._on_toggle_visibility
             )
 
-        if self.menu.exit_action: 
-            self.menu.exit_action.triggered.connect(
-               self._on_exit
-            )
+        if self.menu.exit_action:
+            self.menu.exit_action.triggered.connect(self._on_exit)
 
     @Slot(QSystemTrayIcon.ActivationReason)
     def _handle_tray_click(self, reason: QSystemTrayIcon.ActivationReason):
         if reason == self.ActivationReason.Trigger:
-            self.tray_action.emit(actions_map_reversed.get("toggle_view"))
- 
+            self.tray_action.emit("toggle_view")
+
     @Slot(str)
-    def handler_switch_icon(self, reason: typing.Text):
-        self.setIcon(build_icon(getattr(self.settings.tray, reason)))
+    def handler_switch_icon(self, reason: str):
+        if self.settings:
+            self.setIcon(get_icon(getattr(self.settings.tray, reason)))
