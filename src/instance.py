@@ -25,7 +25,7 @@ def check_pid_exist(pid: int) -> bool:
 
 def read_pid_file() -> bool | int:
     try:
-        with open(create_pid_file_path(), "r") as pid_file:
+        with open(create_pid_file_path()) as pid_file:
             return int(pid_file.read())
     except FileNotFoundError:
         return False
