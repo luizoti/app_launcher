@@ -16,6 +16,7 @@ def command_executor(
             args=__command_processor(command),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            shell=True,
         )
         logging.info(f"Command executed `{command}`")
     except FileNotFoundError as file_not_found_error:
@@ -25,6 +26,7 @@ def command_executor(
             label_changer(message)
     except Exception:
         logging.exception(traceback.format_exc())
+
 
 def __command_processor(
     command: list[str] | str,
