@@ -1,67 +1,64 @@
 {
   "apps": {
+    "a": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
+    },
+    "e": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
+    },
+    "f": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
+    },
+    "i": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
+    },
     "kodi": {
-      "cmd": "kodi",
+      "cmd": "subl",
       "enabled": true,
       "icon": "kodi.ico"
+    },
+    "l2WZ1": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
     },
     "Pegasus": {
       "cmd": "/usr/bin/moonlight-qt stream nitro app 'Pegasus'",
       "enabled": true,
       "icon": "pegasus.ico"
     },
-    "retropie": {
-      "cmd": [
-        "x-terminal-emulator",
-        "-e",
-        "emulationstation"
-      ],
+    "r": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
       "icon": "retropie.ico"
-    }
-  },
-  "mappings": {
-    "DualSense Wireless Controller": {
-      "buttons": {
-        "enter": 302,
-        "toggle_view": 316
-      },
-      "tray": true
     },
-    "Keyszer (virtual) Keyboard": {
-      "buttons": {
-        "enter": 28,
-        "toggle_view": 172
-      },
-      "tray": false
+    "t": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
     },
-    "Microsoft X-Box 360 pad": {
-      "buttons": {
-        "enter": 304,
-        "toggle_view": 316
-      },
-      "tray": true
+    "x": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
     },
-    "PLAYSTATION(R)3 Controller": {
-      "buttons": {
-        "enter": 302,
-        "toggle_view": 304
-      },
-      "tray": true
+    "y": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
     },
-    "Sony Computer Entertainment Game Controller": {
-      "buttons": {
-        "button_enter": 28,
-        "toggle_view": 172
-      },
-      "tray": true
-    },
-    "Sony Interactive Entertainment DualSense Wireless Controller": {
-      "buttons": {
-        "enter": 304,
-        "toggle_view": 316
-      },
-      "tray": true
+    "z": {
+      "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
+      "enabled": true,
+      "icon": "retropie.ico"
     }
   },
   "menu": {
@@ -76,7 +73,7 @@
   "window": {
     "apps_per_row": 6,
     "button_size": 256,
-    "fullscreen": false,
+    "fullScreen": false,
     "height": 500,
     "width": 1000
   }
