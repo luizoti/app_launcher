@@ -1,21 +1,62 @@
 {
-    // --- Configurações de Salvamento Automático ---
-    "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000, // Salva após 1 segundo de inatividade
-
-    // --- Configurações de Python ---
-    "python.analysis.typeCheckingMode": "strict",
-    "black-formatter.showNotifications": "always",
-
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnSave": true, // Sobrescreve o 'false' da sua global
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit",
-            "source.unusedImports": "explicit",
-            "source.sort.json": "explicit",
-            "source.convertImportStar": "explicit"
-        }
-    },
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "cSpell.language": "en,pt,pt-BR",
+  "editor.codeActionsOnSave": {
+    "*.db": "always",
+    "*.db3": "always",
+    "*.js": "always",
+    "*.jsx": "always",
+    "*.s3db": "always",
+    "*.sdb": "always",
+    "*.sqlite": "always",
+    "*.sqlite3": "always",
+    "*.ts": "always",
+    "*.tsx": "always",
+    "package.json": "always",
+    "source.convertImportStar": "explicit",
+    "source.organizeImports": "explicit",
+    "source.sort.json": "explicit",
+    "source.unusedImports": "explicit",
+    "tsconfig.json": "always"
+  },
+  // Trunk & Linter Configuration
+  "editor.formatOnSave": true, // Sobrescreve o 'false' da sua global
+  "files.autoSave": "onFocusChange", // Ajustado: essencial para disparar as CodeActions do Trunk
+  "files.exclude": {
+    "__pycache__": true,
+    ".pytest_cache": true,
+    ".ruff_cache": true,
+    ".trunk": true,
+    ".venv": true,
+    // ".vscode": true,
+    "**/.trunk/*actions/": true,
+    "**/.trunk/*logs/": true,
+    "**/.trunk/*notifications/": true,
+    "**/.trunk/*out/": true,
+    "**/.trunk/*plugins/": true,
+    "typings": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "__pycache__": true,
+    ".pytest_cache": true,
+    ".ruff_cache": true,
+    ".trunk": true,
+    ".venv": true,
+    ".vscode": true,
+    "**/.trunk/*actions/": true,
+    "**/.trunk/*logs/": true,
+    "**/.trunk/*notifications/": true,
+    "**/.trunk/*out/": true,
+    "**/.trunk/*plugins/": true,
+    "typings": true
+  },
+  // Python (Centralizado no Trunk/Ruff/Pyright)
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "workbench.secondarySideBar.defaultVisibility": "hidden"
 }
