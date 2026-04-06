@@ -19,29 +19,29 @@ from src.gui.components.grid import AppGrid
 from src.gui.components.tray_icon import TrayIcon
 from src.gui.icons.cache_loader import get_icon
 from src.instance import destroy_pid_file
-from src.settings import SettingsManager, SettingsModel
+from src.settings import Settings, get_settings
 from src.settings_model import AppsModel
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+settings: Settings = get_settings()
 
 
 class AppMainWindow(QMainWindow, ActionManager):
-    def __init__(self, settings: SettingsModel | None = None):
+    def __init__(self):
         super().__init__()
-        self.settings = settings if settings else SettingsManager().get_settings()
-        self.setWindowIcon(get_icon(self.settings.tray.standby))
+        self.setWindowIcon(get_icon(settings.tray.standby))
         # self.setWindowFlags(
         #     Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
         # )
         self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
-        self.app_grid = AppGrid(row_limit=self.settings.window.apps_per_row)
+        self.app_grid = AppGrid(row_limit=settings.window.apps_per_row)
         self.info_label = QLabel("Select an app")
         self.info_label.setFont(QFont("Arial", 12, weight=QFont.Weight.Bold))
 
         self.setWindowTitle("Application Launcher")
         self.setFixedSize(
-            self.settings.window.width,
-            self.settings.window.height,
+            settings.window.width,
+            settings.window.height,
         )
 
         self.tray_icon = TrayIcon(parent=self)
@@ -74,7 +74,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
 
     def _get_apps_list(self) -> dict[str, AppsModel]:
-        return self.settings.apps
+        return settings.apps
 
     def _open_settings(self):
         logger.info("⚙️ Settings clicked (implement future UI)")
@@ -100,12 +100,12 @@ class AppMainWindow(QMainWindow, ActionManager):
         )
         config_button.no_animation()
         config_button.focused_change_label.connect(self._change_label_text)
-        config_button.setIcon(get_icon(self.settings.menu.settings))
+        config_button.setIcon(get_icon(settings.menu.settings))
         config_button.clicked.connect(self._open_settings)
 
         hide_button = CustomButton(name="Hide", size=(48, 48), icon_size=QSize(40, 40))
         hide_button.no_animation()
-        hide_button.setIcon(get_icon(self.settings.menu.hide))
+        hide_button.setIcon(get_icon(settings.menu.hide))
         hide_button.clicked.connect(self.hide)
 
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -120,7 +120,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.setCentralWidget(central_widget)
 
     def show_ui(self) -> None:
-        if self.settings.window.fullscreen:
+        if settings.window.fullScreen:
             self.showFullScreen()
             return None
         self.setVisible(True)

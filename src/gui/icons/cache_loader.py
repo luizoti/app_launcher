@@ -5,19 +5,16 @@ from pathlib import Path
 
 from PySide6.QtGui import QIcon, QPixmap
 
-from src.settings import SettingsManager, SettingsModel
+from src.settings import Settings, get_settings
 
-logger = logging.getLogger(__name__)
-
-
-def _get_settings() -> SettingsModel:
-    """Resolve settings lazily (avoid default argument instantiation)."""
-    return SettingsManager().get_settings()
+logger: logging.Logger = logging.getLogger(__name__)
+settings: Settings = get_settings()
 
 
 def _get_icons_dir() -> Path:
-    settings = _get_settings()
-    return Path(settings.icons_directory)
+    if not settings.icons_directory:
+        raise ValueError("Icons directory is not set in settings")
+    return Path(settings.icons_directory).resolve()
 
 
 @lru_cache(maxsize=128)

@@ -71,7 +71,6 @@ class AppGrid(QGridLayout, ActionManager):
 
     @Slot()
     def _change_focus_on_hover(self) -> None:
-        print("focused_app", self.current_row, self.current_app)
         self.__set_focus(row_index=self.current_row, app_index=self.current_app)
 
     def plot_app_grid(

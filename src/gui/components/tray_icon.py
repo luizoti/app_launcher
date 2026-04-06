@@ -3,7 +3,9 @@ from PySide6.QtWidgets import QSystemTrayIcon
 
 from src.gui.components.context_menu import ContextMenu
 from src.gui.icons.cache_loader import get_icon
-from src.settings import SettingsManager, SettingsModel
+from src.settings import Settings, get_settings
+
+settings: Settings = get_settings()
 
 
 # Classe para o ícone do tray
@@ -13,16 +15,11 @@ class TrayIcon(QSystemTrayIcon):
     def __init__(
         self,
         parent: QObject | None = None,
-        settings: SettingsModel | None = None,
     ):
         super().__init__(parent=parent)
         self.settings = settings
         self.menu = ContextMenu()
-
-        self.settings: SettingsModel = (
-            settings if settings else SettingsManager().get_settings()
-        )
-        self.setIcon(get_icon(self.settings.tray.standby))
+        self.setIcon(get_icon(settings.tray.standby))
 
         self._set_signals()
         self.setContextMenu(self.menu)
@@ -55,4 +52,4 @@ class TrayIcon(QSystemTrayIcon):
     @Slot(str)
     def handler_switch_icon(self, reason: str):
         if self.settings:
-            self.setIcon(get_icon(getattr(self.settings.tray, reason)))
+            self.setIcon(get_icon(getattr(settings.tray, reason)))
