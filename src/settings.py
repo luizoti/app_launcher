@@ -68,7 +68,7 @@ class Settings(BaseSettings):
         """Carrega do JSON, merge com defaults."""
         json_data: dict[str, Any] = {}
 
-        if json_path.exists():
+        if json_path.exists() and json_path.is_file():
             with open(json_path) as f:
                 json_data = json.load(f)
 
