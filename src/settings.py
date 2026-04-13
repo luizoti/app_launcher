@@ -124,6 +124,7 @@ class Settings(BaseSettings):
     @classmethod
     def validate_icons_directory(cls, value: pathlib.Path | str | None) -> pathlib.Path:
         config_file = cls.model_config.get("env_prefix")
+        print("config_file", config_file)
         if not config_file:
             raise ValueError("Config file path must be provided in env_prefix")
         config_path: pathlib.Path = pathlib.Path(config_file).parent
