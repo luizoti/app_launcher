@@ -8,6 +8,7 @@ import pathlib
 import sys
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -48,10 +49,11 @@ def _select_config_file() -> str:
         if path.exists():
             print("Founded file:", path)
             return str(path.resolve())
-    raise FileNotFoundError(
-        "No config file found in possible locations: "
-        + ", ".join(map(str, possible_config_files))
+    no_config_file_founded = "No config file found in possible locations: " + ", ".join(
+        map(str, possible_config_files)
     )
+    logger.info(no_config_file_founded)
+    return ""
 
 
 # if not ALLOWED_DEVICES:
@@ -64,8 +66,11 @@ class Settings(BaseSettings):
     @classmethod
     def from_json(cls, json_path: Path) -> "Settings":
         """Carrega do JSON, merge com defaults."""
-        with open(json_path) as f:
-            json_data = json.load(f)
+        json_data: dict[str, Any] = {}
+
+        if json_path.exists():
+            with open(json_path) as f:
+                json_data = json.load(f)
 
         merged_data = {}
 
@@ -81,7 +86,7 @@ class Settings(BaseSettings):
             merged_data["apps"] = DEFAULT_APPS
 
         if "mappings" in json_data:
-            merged_mappings = dict(DEFAULT_MAPPINGS)
+            merged_mappings: dict[str, DeviceMappingsModel] = dict(DEFAULT_MAPPINGS)
             for k, v in json_data["mappings"].items():
                 if k in merged_mappings:
                     merged_mappings[k] = v
