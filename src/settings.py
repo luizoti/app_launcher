@@ -46,10 +46,10 @@ def _select_config_directory() -> Path:
     ]
     for path in possible_config_files:
         if path.exists():
-            logger.info("Config directory founded:", path)
+            logger.debug("Config directory founded:", path)
             return path
     joined_paths = ", ".join(map(str, possible_config_files))
-    logger.info(f"No config directory founded in possible locations: {joined_paths}")
+    logger.debug(f"No config directory founded in possible locations: {joined_paths}")
     return Path(BASE_DIR)
 
 
@@ -138,7 +138,7 @@ class Settings(BaseSettings):
         if not config_file:
             raise ValueError("Config file path must be provided in env_prefix")
         config_path: pathlib.Path = pathlib.Path(config_file).parent
-        logger.info(f"Config path: {config_path}")
+        logger.debug(f"Config path: {config_path}")
         return config_path.joinpath("icons")
 
 
