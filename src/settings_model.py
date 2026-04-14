@@ -1,4 +1,12 @@
+from enum import Enum
+
 from pydantic import BaseModel
+
+
+class WindowMode(str, Enum):
+    BORDERLESS = "borderless"
+    MAXIMIZED = "maximized"
+    FULLSCREEN = "fullscreen"
 
 
 class AppsModel(BaseModel):
@@ -24,6 +32,7 @@ class WindowModel(BaseModel):
     fullScreen: bool
     height: int
     width: int
+    window_mode: WindowMode = WindowMode.BORDERLESS
 
 
 class MenuModel(BaseModel):
