@@ -12,6 +12,7 @@ def get_user_home(uid=1000):
         print(f"Não foi possível encontrar usuário com UID {uid}")
         sys.exit(1)
 
+
 def backup_file(filepath):
     if os.path.exists(filepath) or os.path.islink(filepath):
         backup_path = filepath + ".bak"
@@ -25,9 +26,11 @@ def backup_file(filepath):
             print(f"Erro ao fazer backup de {filepath}: {e}")
             sys.exit(1)
 
+
 def backup_if_exists(paths):
     for path in paths:
         backup_file(path)
+
 
 def main():
     user_home = get_user_home(1000)
@@ -51,9 +54,11 @@ def main():
     # Comando usando 'uv run' garante que usamos o binário correto do PyInstaller
     # e as bibliotecas do nosso .venv sem precisar ativar o shell manualmente.
     command = [
-        "uv", "run", "pyinstaller",
+        "uv",
+        "run",
+        "pyinstaller",
         "--onefile",
-        "--clean", # Limpa o cache para evitar conflitos de build anterior
+        "--clean",  # Limpa o cache para evitar conflitos de build anterior
         "--name=app_launcher",
     ]
 
@@ -100,6 +105,7 @@ def main():
     except Exception as e:
         print("Erro ao criar link simbólico:", e)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
