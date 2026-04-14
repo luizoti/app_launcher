@@ -137,8 +137,10 @@ class AppGrid(QGridLayout, ActionManager):
             self.current_row += self.current_app // num_cols
             self.current_app = self.current_app % num_cols
         elif self.current_app < 0:
-            # LEFT no primeiro item → último item da última linha
-            self.current_row = num_rows - 1
+            if self.current_row > 0:
+                self.current_row -= 1
+            else:
+                self.current_row = num_rows - 1
             self.current_app = num_cols - 1
 
         # Normalizar row
