@@ -13,6 +13,11 @@ DEFAULT_APPS: dict[str, AppsModel] = {
         enabled=True,
         icon="pegasus.ico",
     ),
+    "Retropie": AppsModel(
+        cmd="x-terminal-emulator -e emulationstation",
+        enabled=True,
+        icon="retropie.ico",
+    ),
 }
 
 DEFAULT_MAPPINGS: dict[str, DeviceMappingsModel] = {
