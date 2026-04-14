@@ -95,14 +95,14 @@ class AppGrid(QGridLayout, ActionManager):
             self._last_position = (self.current_row, self.current_app)
         except IndexError:
             self.__set_focus(*self._last_position)
-            print("ERROR")
+            LOGGER.debug("IndexError on __set_focus - fallback to last position")
         except Exception:
             LOGGER.exception(
                 f"Error on __set_focus(row_index={row_index}, app_index={app_index})"
             )
 
     def up(self) -> None:
-        print("up")
+        LOGGER.debug("up")
         if self.current_row > 0:
             self.current_row -= 1
         else:
@@ -110,7 +110,7 @@ class AppGrid(QGridLayout, ActionManager):
         self.__set_focus(self.current_row, self.current_app)
 
     def down(self) -> None:
-        print("down")
+        LOGGER.debug("down")
         if self.current_row > 0:
             self.current_row -= 1
         else:
@@ -118,7 +118,7 @@ class AppGrid(QGridLayout, ActionManager):
         self.__set_focus(self.current_row, self.current_app)
 
     def left(self) -> None:
-        print("left")
+        LOGGER.debug("left")
         if self.current_app > 0:
             self.current_app -= 1
         else:
@@ -127,6 +127,6 @@ class AppGrid(QGridLayout, ActionManager):
         self.__set_focus(self.current_row, self.current_app)
 
     def right(self) -> None:
-        print("right")
+        LOGGER.debug("right")
         self.current_app += 1
         self.__set_focus(self.current_row, self.current_app)
