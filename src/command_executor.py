@@ -1,4 +1,5 @@
 import logging
+import os
 import shlex
 import subprocess
 import traceback
@@ -13,14 +14,33 @@ def command_executor(
     *_: typing.Any,
 ):
     try:
-        # Pega a lista processada corretamente
         args_list = __command_processor(command)
+
+        # 1. Copiamos o ambiente atual
+        clean_env = os.environ.copy()
+
+        # 2. Removemos os "poluidores" que causam o erro do Qt
+        # Essas variáveis forçam programas a carregar bibliotecas de lugares errados
+        bad_vars = [
+            "LD_LIBRARY_PATH",
+            "QT_PLUGIN_PATH",
+            "QT_QPA_PLATFORM_PLUGIN_PATH",
+            "PYTHONPATH",
+            "PYTHONHOME",
+        ]
+        for var in bad_vars:
+            clean_env.pop(var, None)
+
+        # 3. Garantimos que ele saiba onde renderizar o vídeo
+        if "DISPLAY" not in clean_env:
+            clean_env["DISPLAY"] = ":0"
 
         subprocess.Popen(
             args=args_list,
-            # stdout=subprocess.DEVNULL,
-            # stderr=subprocess.DEVNULL,
-            shell=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=False,  # Mantemos False para segurança
+            env=clean_env,  # <-- Passamos o ambiente "limpo" para o Moonlight
         )
         logging.info(f"Command executed `{command}`")
 
@@ -37,7 +57,5 @@ def __command_processor(
     command: list[str] | str,
 ) -> list[str]:
     if isinstance(command, str):
-        # shlex.split entende aspas!
-        # Ele transforma "app 'Pegasus'" em ['app', 'Pegasus'] (removendo as aspas inúteis)
         return shlex.split(command)
     return command
