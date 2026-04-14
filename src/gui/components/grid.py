@@ -105,7 +105,7 @@ class AppGrid(QGridLayout, ActionManager):
             self.mapped_grid[row_index][app_index].setFocus()
             self._last_position = (self.current_row, self.current_app)
         except IndexError:
-            LOGGER.debug(
+            LOGGER.info(
                 f"IndexError on __set_focus - invalid pos ({row_index}, {app_index})"
             )
         except Exception:
@@ -129,6 +129,7 @@ class AppGrid(QGridLayout, ActionManager):
 
     def _normalize_position(self) -> None:
         num_rows, num_cols = self._get_grid_size()
+        LOGGER.debug(f"_normalize: app={self.current_app}, cols={num_cols}")
         if num_rows == 0 or num_cols == 0:
             return
 
@@ -137,11 +138,16 @@ class AppGrid(QGridLayout, ActionManager):
             self.current_row += self.current_app // num_cols
             self.current_app = self.current_app % num_cols
         elif self.current_app < 0:
+            LOGGER.debug(f"_normalize: LEFT, row={self.current_row}")
             if self.current_row > 0:
                 self.current_row -= 1
             else:
                 self.current_row = num_rows - 1
-            self.current_app = num_cols - 1
+            self.current_app = self._find_last_valid_col(self.current_row)
+            LOGGER.debug(
+                f"_normalize: after LEFT, r={self.current_row}, a={self.current_app}"
+            )
+            return
 
         # Normalizar row
         self.current_row = self.current_row % num_rows
@@ -150,6 +156,12 @@ class AppGrid(QGridLayout, ActionManager):
         if not self._is_valid_position(self.current_row, self.current_app):
             self.current_row = 0
             self.current_app = 0
+
+    def _find_last_valid_col(self, row_index: int) -> int:
+        """Find the last valid column index for a given row."""
+        if row_index >= len(self.mapped_grid):
+            return 0
+        return len(self.mapped_grid[row_index]) - 1
 
     def up(self) -> None:
         if not self._is_app_visible():
