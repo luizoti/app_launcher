@@ -57,11 +57,22 @@ class AppGrid(QGridLayout, ActionManager):
         )
         del apps_iter
 
+    def _is_app_visible(self) -> bool:
+        parent_widget: QWidget = self.parentWidget()
+        if parent_widget:
+            sub_parent_widget: QWidget | None = parent_widget.parentWidget()
+            if sub_parent_widget:
+                return sub_parent_widget.isVisible()
+        return False
+
     def enter(self) -> None:
         """
         Emit clicked signal from CustomButton to opem app and hide AppMainWindow
         based on app row and app columns.
         """
+        if not self._is_app_visible():
+            return
+
         self.mapped_grid[self.current_row][self.current_app].clicked.emit()
         parent_widget: QWidget = self.parentWidget()
         if parent_widget:
@@ -94,39 +105,74 @@ class AppGrid(QGridLayout, ActionManager):
             self.mapped_grid[row_index][app_index].setFocus()
             self._last_position = (self.current_row, self.current_app)
         except IndexError:
-            self.__set_focus(*self._last_position)
-            LOGGER.debug("IndexError on __set_focus - fallback to last position")
+            LOGGER.debug(
+                f"IndexError on __set_focus - invalid pos ({row_index}, {app_index})"
+            )
         except Exception:
             LOGGER.exception(
                 f"Error on __set_focus(row_index={row_index}, app_index={app_index})"
             )
 
+    def _get_grid_size(self) -> tuple[int, int]:
+        if not self.mapped_grid:
+            return (0, 0)
+        num_rows = len(self.mapped_grid)
+        num_cols = len(self.mapped_grid[0]) if self.mapped_grid else 0
+        return (num_rows, num_cols)
+
+    def _is_valid_position(self, row_index: int, app_index: int) -> bool:
+        try:
+            self.mapped_grid[row_index][app_index]
+            return True
+        except IndexError:
+            return False
+
+    def _normalize_position(self) -> None:
+        num_rows, num_cols = self._get_grid_size()
+        if num_rows == 0 or num_cols == 0:
+            return
+
+        # Calcular novas posições com overflow
+        if self.current_app >= num_cols:
+            self.current_row += self.current_app // num_cols
+            self.current_app = self.current_app % num_cols
+        elif self.current_app < 0:
+            # LEFT no primeiro item → último item da última linha
+            self.current_row = num_rows - 1
+            self.current_app = num_cols - 1
+
+        # Normalizar row
+        self.current_row = self.current_row % num_rows
+
+        # Validar posição
+        if not self._is_valid_position(self.current_row, self.current_app):
+            self.current_row = 0
+            self.current_app = 0
+
     def up(self) -> None:
-        LOGGER.debug("up")
-        if self.current_row > 0:
-            self.current_row -= 1
-        else:
-            self.current_row += 1
+        if not self._is_app_visible():
+            return
+        self.current_row -= 1
+        self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def down(self) -> None:
-        LOGGER.debug("down")
-        if self.current_row > 0:
-            self.current_row -= 1
-        else:
-            self.current_row += 1
+        if not self._is_app_visible():
+            return
+        self.current_row += 1
+        self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def left(self) -> None:
-        LOGGER.debug("left")
-        if self.current_app > 0:
-            self.current_app -= 1
-        else:
-            self.current_app = self.row_limit - 1
-            self.current_row += 1
+        if not self._is_app_visible():
+            return
+        self.current_app -= 1
+        self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def right(self) -> None:
-        LOGGER.debug("right")
+        if not self._is_app_visible():
+            return
         self.current_app += 1
+        self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
