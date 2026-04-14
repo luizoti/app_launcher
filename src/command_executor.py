@@ -133,6 +133,7 @@ class CommandExecutor:
         self,
         command: list[str] | str,
         label_changer: typing.Callable[[str], None] | None = None,
+        on_success: typing.Callable[[], None] | None = None,
     ) -> None:
         try:
             self.validator.validate(command)
@@ -147,22 +148,33 @@ class CommandExecutor:
             )
 
             logger.debug(f"Command executed `{command}`")
+            if on_success:
+                on_success()
 
         except CommandError as e:
             logger.error(str(e))
             if label_changer:
                 label_changer(str(e))
-        except Exception:
+        except FileNotFoundError as e:
+            logger.error(str(e))
+            if label_changer:
+                label_changer(f"Command not found: {e.filename}")
+        except Exception as e:
             logger.exception(traceback.format_exc())
+            if label_changer:
+                label_changer(str(e))
 
 
 def command_executor(
     command: list[str] | str,
     label_changer: typing.Callable[[str], None] | None = None,
+    on_success: typing.Callable[[], None] | None = None,
     *_: typing.Any,
 ):
     executor = CommandExecutor()
-    executor.execute(command=command, label_changer=label_changer)
+    executor.execute(
+        command=command, label_changer=label_changer, on_success=on_success
+    )
 
 
 def _command_processor(

@@ -18,11 +18,15 @@ class CustomButton(QPushButton):
         label: str | None = None,
         icon: str | None = None,
         on_click: typing.Callable[[list[str] | str], None] | None = None,
+        on_success: typing.Callable[[], None] | None = None,
+        on_error: typing.Callable[[str], None] | None = None,
         name: str | None = None,
         size: tuple[int, ...] | None = None,
         icon_size: QSize | None = None,
     ):
         self.name = name or ""
+        self.on_success = on_success
+        self.on_error = on_error
         self.disable_animation = False
         super().__init__(label if label else "")
         self.normal_color = "#FFFFFF"
