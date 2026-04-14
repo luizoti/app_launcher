@@ -14,7 +14,7 @@ from src.settings_model import DeviceMappingsModel
 
 # https://chatgpt.com/c/699bcced-7804-8327-a800-f66b94183822
 
-logger: logging.Logger = logging.getLogger("__name__")
+logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
 
 
@@ -110,7 +110,7 @@ class DeviceEventWorker(QRunnable):
 
     @Slot()
     def run(self):
-        print(QThread.currentThread())
+        logger.debug(QThread.currentThread())
         self.signals.started.emit(self.input_device.path)
         emit_action = self.signals.action.emit
         get_mappings = self.get_device_settings
@@ -144,7 +144,7 @@ class DeviceMonitor(QObject):
         self.connected_devices: list[str] = []
 
         self._print_detected()
-        print("--------------------------------")
+        logger.debug("--------------------------------")
         self._print_allowed()
 
     @Slot()
@@ -160,18 +160,18 @@ class DeviceMonitor(QObject):
         logger.info("Monitoramento de dispositivos iniciado na Worker Thread")
 
     def _print_detected(self) -> None:
-        print("Detected devices:")
+        logger.debug("Detected devices:")
         devices = (
             cast(InputDeviceEvDevProtocol, InputDevice(path))
             for path in cast(list[str], list_devices())
         )
         for item in devices:  # type: ignore
-            print(f"    - {item.name} | {item.path}")
+            logger.debug(f"    - {item.name} | {item.path}")
 
     def _print_allowed(self) -> None:
-        print("Allowed devices: ")
+        logger.debug("Allowed devices: ")
         for item in settings.mappings:
-            print(f"    - {item}")
+            logger.debug(f"    - {item}")
 
     def _valid_device(self, device_path: str) -> InputDeviceEvDevProtocol | None:
         """
