@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-14
+
+### Added
+
+- **Navigation Improvements**:
+  - Fluid circular navigation (wraps at edges)
+  - LEFT on first item goes to last item of previous row
+  - RIGHT on last item goes to first item of next row
+  - KeyPressFilter to handle navigation when window is not focused
+  - FORCE_FOCUS_ON_NAVIGATE toggle to control window focus behavior
+
+- **Debug Mode**:
+  - DEBUG_MODE auto-detected based on PyInstaller (dev=True if not frozen)
+  - Detailed debug logging for device mapping (scancodes, actions)
+
+- **Error Handling**:
+  - Errors displayed in interface label
+  - on_success callback for hide-on-success behavior
+  - Window stays visible on error, hides on success
+
+- **Button Improvements**:
+  - Added on_success and on_error callbacks to CustomButton
+
+### Changed
+
+- Removed automatic hide after entering app (now controlled by on_success)
+- Changed button scancode lookup to try both string and int keys
+
 ## [1.1.0] - 2026-04-14
 
 ### Added
