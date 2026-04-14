@@ -1,8 +1,9 @@
 import logging
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QObject, QSize, Qt
 from PySide6.QtGui import QColor, QFont, QKeyEvent, QPalette
 from PySide6.QtWidgets import (
+    QApplication,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -24,6 +25,18 @@ from src.settings_model import AppsModel, WindowMode
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
+
+
+class KeyPressFilter(QObject):
+    def __init__(self, window):
+        super().__init__()
+        self.window = window
+
+    def eventFilter(self, obj, event):
+        if event.type() == event.Type.KeyPress:
+            self.window.keyPressEvent(event)
+            return True
+        return False
 
 
 class AppMainWindow(QMainWindow, ActionManager):
@@ -57,6 +70,9 @@ class AppMainWindow(QMainWindow, ActionManager):
         self._set_signals()
         self.device_monitor_worker.start_monitor()
 
+        self.key_filter = KeyPressFilter(self)
+        QApplication.instance().installEventFilter(self.key_filter)
+
     def _set_signals(self):
         self.tray_icon.tray_action.connect(self.action_handler)
 
@@ -88,7 +104,9 @@ class AppMainWindow(QMainWindow, ActionManager):
         main_layout = QVBoxLayout()
 
         created_app_grid: QGridLayout = self.app_grid.plot_app_grid(
-            apps=self._get_apps_list(), label_changer=self._change_label_text
+            apps=self._get_apps_list(),
+            label_changer=self._change_label_text,
+            hide_window=self.hide,
         )
 
         main_layout.addLayout(created_app_grid)
@@ -132,11 +150,13 @@ class AppMainWindow(QMainWindow, ActionManager):
         return None
 
     def action_handler(self, action_name: str) -> None:
+        logger.debug(f"action_handler called: {action_name}")
         if action_name == "toggle_view":
             self.toggle_view()
             return
 
         if not self.isVisible():
+            logger.debug(f"action_handler: app not visible, ignoring {action_name}")
             return
 
         method = getattr(self, action_name, None)

@@ -12,6 +12,8 @@ from src.settings_model import AppsModel
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
+FORCE_FOCUS_ON_NAVIGATE = False
+
 
 class AppGrid(QGridLayout, ActionManager):
     actions = Signal(int)
@@ -29,12 +31,20 @@ class AppGrid(QGridLayout, ActionManager):
         app_name: str,
         app_data: AppsModel,
         label_changer: typing.Callable[[str], None],
+        hide_window: typing.Callable[[], None] | None = None,
     ) -> CustomButton:
         """Create a button with command based on app name and app data."""
+
+        def on_success():
+            if hide_window:
+                hide_window()
+
         return CustomButton(
             icon=app_data.icon,
             on_click=lambda _: command_executor.command_executor(
-                command=app_data.cmd, label_changer=label_changer
+                command=app_data.cmd,
+                label_changer=label_changer,
+                on_success=on_success,
             ),
             name=app_name,
         )
@@ -43,10 +53,13 @@ class AppGrid(QGridLayout, ActionManager):
         self,
         apps: dict[str, AppsModel],
         label_changer: typing.Callable[[str], None],
+        hide_window: typing.Callable[[], None] | None = None,
     ) -> None:
         """Rebuild mapped grid dictionary based on settings app list."""
         apps_iter: typing.Generator[CustomButton] = (
-            self.__button_generator(*x, label_changer=label_changer)
+            self.__button_generator(
+                *x, label_changer=label_changer, hide_window=hide_window
+            )
             for x in apps.items()
         )
         self.mapped_grid: list[tuple[CustomButton, ...]] = list(
@@ -67,18 +80,12 @@ class AppGrid(QGridLayout, ActionManager):
 
     def enter(self) -> None:
         """
-        Emit clicked signal from CustomButton to opem app and hide AppMainWindow
-        based on app row and app columns.
+        Emit clicked signal from CustomButton to open app.
         """
         if not self._is_app_visible():
             return
 
         self.mapped_grid[self.current_row][self.current_app].clicked.emit()
-        parent_widget: QWidget = self.parentWidget()
-        if parent_widget:
-            sub_parent_widget: QWidget | None = parent_widget.parentWidget()
-            if sub_parent_widget:
-                sub_parent_widget.hide()
 
     @Slot()
     def _change_focus_on_hover(self) -> None:
@@ -88,9 +95,12 @@ class AppGrid(QGridLayout, ActionManager):
         self,
         apps: dict[str, AppsModel],
         label_changer: typing.Callable[[str], None],
+        hide_window: typing.Callable[[], None] | None = None,
     ) -> "AppGrid":
         """Feed GridWidgets based on a list of apps."""
-        self.__rebuild_mapped_grid(apps=apps, label_changer=label_changer)
+        self.__rebuild_mapped_grid(
+            apps=apps, label_changer=label_changer, hide_window=hide_window
+        )
         for row_index, apps_tuple in enumerate(iterable=self.mapped_grid):
             for app_index, app in enumerate(iterable=apps_tuple):
                 app.focused_change_label.connect(label_changer)
@@ -102,6 +112,13 @@ class AppGrid(QGridLayout, ActionManager):
 
     def __set_focus(self, row_index: int, app_index: int) -> None:
         try:
+            if FORCE_FOCUS_ON_NAVIGATE:
+                parent = self.parentWidget()
+                if parent:
+                    window = parent.window()
+                    if window:
+                        window.raise_()
+                        window.activateWindow()
             self.mapped_grid[row_index][app_index].setFocus()
             self._last_position = (self.current_row, self.current_app)
         except IndexError:
@@ -164,29 +181,25 @@ class AppGrid(QGridLayout, ActionManager):
         return len(self.mapped_grid[row_index]) - 1
 
     def up(self) -> None:
-        if not self._is_app_visible():
-            return
+        LOGGER.debug("up() called")
         self.current_row -= 1
         self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def down(self) -> None:
-        if not self._is_app_visible():
-            return
+        LOGGER.debug("down() called")
         self.current_row += 1
         self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def left(self) -> None:
-        if not self._is_app_visible():
-            return
+        LOGGER.debug("left() called")
         self.current_app -= 1
         self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
 
     def right(self) -> None:
-        if not self._is_app_visible():
-            return
+        LOGGER.debug("right() called")
         self.current_app += 1
         self._normalize_position()
         self.__set_focus(self.current_row, self.current_app)
