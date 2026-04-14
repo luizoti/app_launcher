@@ -40,37 +40,48 @@ BASE_DIR: Path = Path(
 ).parent.parent
 
 
-def _select_config_file() -> str:
+def _select_config_directory() -> Path:
     possible_config_files: list[Path] = [
-        Path("~").expanduser().joinpath(".config", "app_launcher", CONFIG_FILE_NAME),
-        Path(BASE_DIR).joinpath(CONFIG_FILE_NAME),
+        Path("~").expanduser().joinpath(".config", "app_launcher"),
     ]
     for path in possible_config_files:
         if path.exists():
-            print("Founded file:", path)
-            return str(path.resolve())
-    no_config_file_founded = "No config file found in possible locations: " + ", ".join(
-        map(str, possible_config_files)
-    )
-    logger.info(no_config_file_founded)
-    return ""
+            logger.info("Config directory founded:", path)
+            return path
+    joined_paths = ", ".join(map(str, possible_config_files))
+    logger.info(f"No config directory founded in possible locations: {joined_paths}")
+    return Path(BASE_DIR)
 
+
+def _get_config_file() -> None | Path:
+    config_file = CONFIG_DIRECTORY.joinpath(CONFIG_FILE_NAME)
+    if config_file.exists() and config_file.is_file():
+        return config_file.resolve()
+    return None
+
+
+CONFIG_DIRECTORY = _select_config_directory()
 
 # if not ALLOWED_DEVICES:
 #     ALLOWED_DEVICES = [x for x in load_config().keys()]
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix=_select_config_file(), extra="allow")
+    model_config = SettingsConfigDict(
+        env_prefix=str(_get_config_file()),
+        extra="allow",
+    )
 
     @classmethod
-    def from_json(cls, json_path: Path) -> "Settings":
+    def from_json(cls) -> "Settings":
         """Carrega do JSON, merge com defaults."""
-        json_data: dict[str, Any] = {}
+        json_path: Path | None = _get_config_file()
 
-        if json_path.exists() and json_path.is_file():
-            with open(json_path) as f:
-                json_data = json.load(f)
+        json_data: dict[str, Any] = {}
+        if json_path:
+            if json_path.exists() and json_path.is_file():
+                with open(json_path) as f:
+                    json_data = json.load(f)
 
         merged_data = {}
 
@@ -124,21 +135,13 @@ class Settings(BaseSettings):
     @classmethod
     def validate_icons_directory(cls, value: pathlib.Path | str | None) -> pathlib.Path:
         config_file = cls.model_config.get("env_prefix")
-        print("config_file", config_file)
         if not config_file:
             raise ValueError("Config file path must be provided in env_prefix")
         config_path: pathlib.Path = pathlib.Path(config_file).parent
-        print(f"Config path: {config_path}")
+        logger.info(f"Config path: {config_path}")
         return config_path.joinpath("icons")
-
-    # @field_validator("apps", mode="before")
-    # @classmethod
-    # def validate_apps(cls, value: dict | None) -> dict:
-    #     print(f"XXXXXXXXXXXXX: {value}")
-    #     return value or DEFAULT_APPS
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    config_path = _select_config_file()
-    return Settings.from_json(Path(config_path))
+    return Settings.from_json()
