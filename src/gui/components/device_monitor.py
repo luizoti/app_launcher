@@ -48,6 +48,7 @@ class Signals(QObject):
 
     action = Signal(str)
     tray_action = Signal(str)
+    connection_status = Signal(str)
 
 
 class DeviceEventWorker(QRunnable):
@@ -101,7 +102,7 @@ class DeviceEventWorker(QRunnable):
             logger.error(f"Cannot find mappings for {self.input_device.name}")
             return None
         try:
-            if key_event.keystate != 1:  # type: ignore
+            if key_event.keystate != 1:
                 return None
             return device_mappings.buttons.get(key_event.scancode)  # type: ignore
         except AttributeError:
@@ -114,6 +115,7 @@ class DeviceEventWorker(QRunnable):
         self.signals.started.emit(self.input_device.path)
         emit_action = self.signals.action.emit
         get_mappings = self.get_device_settings
+        logger.info(f"[DeviceEventWorker] Started for: {self.input_device.name}")
         try:
             event: InputEventProtocol
             for event in self.input_device.read_loop():
@@ -127,8 +129,8 @@ class DeviceEventWorker(QRunnable):
                             direction = dpad.get(event.value)
                             if direction is not None:
                                 emit_action(direction)
-                        continue
-                    emit_action(mapping)
+                    else:
+                        emit_action(mapping)
         except OSError:
             pass
         self.signals.completed.emit(self.input_device.path)
@@ -137,6 +139,7 @@ class DeviceEventWorker(QRunnable):
 class DeviceMonitor(QObject):
     action = Signal(str)
     tray_action = Signal(str)
+    connection_status = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -146,6 +149,7 @@ class DeviceMonitor(QObject):
         self._print_detected()
         logger.debug("--------------------------------")
         self._print_allowed()
+        self._check_connection_status()
 
     @Slot()
     def start_monitor(self):
@@ -160,18 +164,35 @@ class DeviceMonitor(QObject):
         logger.info("Monitoramento de dispositivos iniciado na Worker Thread")
 
     def _print_detected(self) -> None:
-        logger.debug("Detected devices:")
+        logger.info("=== DETECTED DEVICES ===")
         devices = (
             cast(InputDeviceEvDevProtocol, InputDevice(path))
             for path in cast(list[str], list_devices())
         )
         for item in devices:  # type: ignore
-            logger.debug(f"    - {item.name} | {item.path}")
+            logger.info(f"  - {item.name} | {item.path}")
+        logger.info("=========================")
 
     def _print_allowed(self) -> None:
-        logger.debug("Allowed devices: ")
+        logger.info("=== ALLOWED DEVICES (mappings) ===")
         for item in settings.mappings:
-            logger.debug(f"    - {item}")
+            logger.info(f"  - {item}")
+        logger.info("==================================")
+
+    def _check_connection_status(self) -> None:
+        has_connected = False
+        for device_name in settings.mappings:
+            mappings = settings.mappings[device_name]
+            if mappings.tray and device_name in self._get_connected_device_names():
+                has_connected = True
+                break
+
+        status = "connected" if has_connected else "disconnected"
+        self.connection_status.emit(status)
+        logger.debug(f"Connection status: {status}")
+
+    def _get_connected_device_names(self) -> set[str]:
+        return {InputDevice(path).name for path in self.connected_devices}
 
     def _valid_device(self, device_path: str) -> InputDeviceEvDevProtocol | None:
         """
@@ -224,9 +245,11 @@ class DeviceMonitor(QObject):
                 self.connected_devices.append(input_device.path)
                 self.create_new_treaded_device(input_device)
                 logger.info(f"Device connected: {input_device}")
+                self._check_connection_status()
         elif device_action == "remove":
             if device_path in self.connected_devices:
                 self.connected_devices.remove(device_path)
                 logger.info(f"Device removed: {device_name} ({device_path})")
+                self._check_connection_status()
         else:
             pass
