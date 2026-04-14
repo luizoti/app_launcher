@@ -77,7 +77,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         return settings.apps
 
     def _open_settings(self):
-        logger.info("⚙️ Settings clicked (implement future UI)")
+        logger.debug("Settings clicked (implement future UI)")
 
     def _change_label_text(self, new_text: str) -> None:
         self.info_label.setText(new_text.capitalize())
