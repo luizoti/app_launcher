@@ -99,12 +99,27 @@ class DeviceEventWorker(QRunnable):
             self.input_device.name
         )
         if not device_mappings:
-            logger.error(f"Cannot find mappings for {self.input_device.name}")
+            logger.warning(f"No mapping found for device: {self.input_device.name}")
             return None
         try:
             if key_event.keystate != 1:
                 return None
-            return device_mappings.buttons.get(key_event.scancode)  # type: ignore
+            key_scancode = key_event.scancode
+            event_code = str(event.code)
+
+            # Try both string and integer keys
+            action = device_mappings.buttons.get(event_code)
+            if action is None:
+                try:
+                    action = device_mappings.buttons.get(int(event_code))
+                except (ValueError, TypeError):
+                    pass
+
+            logger.debug(
+                f"event_code={event_code}, key_scancode={key_scancode}, "
+                f"action={action}, device={self.input_device.name}"
+            )
+            return action
         except AttributeError:
             pass
         return None
@@ -128,8 +143,10 @@ class DeviceEventWorker(QRunnable):
                         if dpad:
                             direction = dpad.get(event.value)
                             if direction is not None:
+                                logger.debug(f"[ACTION] {direction} emitted")
                                 emit_action(direction)
                     else:
+                        logger.debug(f"[ACTION] {mapping} emitted")
                         emit_action(mapping)
         except OSError:
             pass
