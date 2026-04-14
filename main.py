@@ -8,7 +8,8 @@ from src.gui.app import AppMainWindow
 from src.instance import check_pid_exist, get_current_pid, read_pid_file, write_pid_file
 from src.log import setup_logging
 
-setup_logging()
+DEBUG_MODE = not getattr(sys, "frozen", False)
+setup_logging(debug=DEBUG_MODE)
 logger: Logger = getLogger(__name__)
 
 os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
