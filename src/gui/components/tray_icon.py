@@ -53,3 +53,11 @@ class TrayIcon(QSystemTrayIcon):
     def handler_switch_icon(self, reason: str):
         if self.settings:
             self.setIcon(get_icon(getattr(settings.tray, reason)))
+
+    @Slot(str)
+    def handle_connection_status(self, status: str):
+        if self.settings:
+            if status == "connected":
+                self.setIcon(get_icon(self.settings.tray.connected))
+            else:
+                self.setIcon(get_icon(self.settings.tray.disconnected))
