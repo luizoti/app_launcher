@@ -3,6 +3,7 @@ from src.settings_model import (
     DeviceMappingsModel,
     IconsModel,
     MenuModel,
+    WindowMode,
     WindowModel,
 )
 
@@ -41,6 +42,10 @@ DEFAULT_MAPPINGS: dict[str, DeviceMappingsModel] = {
         buttons={"172": "toggle_view", "28": "button_enter"},
         tray=True,
     ),
+    "Wireless Controller": DeviceMappingsModel(
+        buttons={"304": "enter", "316": "toggle_view"},
+        tray=True,
+    ),
     "Sony Computer Entertainment Wireless Controller": DeviceMappingsModel(
         buttons={"304": "enter", "316": "toggle_view"},
         tray=True,
@@ -68,6 +73,7 @@ DEFAULT_WINDOW = WindowModel(
     fullScreen=False,
     height=500,
     width=1000,
+    window_mode=WindowMode.BORDERLESS,
 )
 
 DEFAULT_MENU = MenuModel(

@@ -1,7 +1,7 @@
 import logging
 
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QColor, QFont, QPalette
+from PySide6.QtGui import QColor, QFont, QKeyEvent, QPalette
 from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
@@ -20,7 +20,7 @@ from src.gui.components.tray_icon import TrayIcon
 from src.gui.icons.cache_loader import get_icon
 from src.instance import destroy_pid_file
 from src.settings import Settings, get_settings
-from src.settings_model import AppsModel
+from src.settings_model import AppsModel, WindowMode
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
@@ -30,10 +30,7 @@ class AppMainWindow(QMainWindow, ActionManager):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(get_icon(settings.tray.standby))
-        # self.setWindowFlags(
-        #     Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
-        # )
-        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
+        self._apply_window_mode(settings.window.window_mode)
         self.app_grid = AppGrid(row_limit=settings.window.apps_per_row)
         self.info_label = QLabel("Select an app")
         self.info_label.setFont(QFont("Arial", 12, weight=QFont.Weight.Bold))
@@ -65,6 +62,10 @@ class AppMainWindow(QMainWindow, ActionManager):
 
         self.device_monitor_worker.tray_action.connect(
             self.tray_icon.handler_switch_icon
+        )
+
+        self.device_monitor_worker.connection_status.connect(
+            self.tray_icon.handle_connection_status
         )
 
         self.device_monitor_worker.action.connect(self.app_grid.action_handler)
@@ -120,9 +121,6 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.setCentralWidget(central_widget)
 
     def show_ui(self) -> None:
-        if settings.window.fullScreen:
-            self.showFullScreen()
-            return None
         self.setVisible(True)
         return None
 
@@ -132,6 +130,52 @@ class AppMainWindow(QMainWindow, ActionManager):
             return None
         self.setVisible(True)
         return None
+
+    def action_handler(self, action_name: str) -> None:
+        if action_name == "toggle_view":
+            self.toggle_view()
+            return
+
+        if not self.isVisible():
+            return
+
+        method = getattr(self, action_name, None)
+        if callable(method):
+            method()
+
+    def _apply_window_mode(self, mode: WindowMode | None = None) -> None:
+        mode = mode or settings.window.window_mode
+
+        if mode == WindowMode.BORDERLESS:
+            self.setWindowFlags(
+                Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
+            )
+            self.setFixedSize(settings.window.width, settings.window.height)
+        elif mode == WindowMode.MAXIMIZED:
+            self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
+            self.showMaximized()
+        elif mode == WindowMode.FULLSCREEN:
+            self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
+            self.showFullScreen()
+
+        self.show()
+
+    def _cycle_window_mode(self) -> None:
+        if not self.isVisible():
+            return
+
+        modes = list(WindowMode)
+        current = modes.index(settings.window.window_mode)
+        next_mode = modes[(current + 1) % len(modes)]
+        settings.window.window_mode = next_mode
+        self._apply_window_mode(next_mode)
+        logger.info(f"Window mode changed to: {next_mode.value}")
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key.Key_Tab:
+            self._cycle_window_mode()
+        else:
+            super().keyPressEvent(event)
 
     def __exit__(self):
         destroy_pid_file()
