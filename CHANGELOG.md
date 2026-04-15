@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-04-15
+
+### Added
+
+- **Hotplug Device Monitoring**:
+  - Automatic tray icon update on device connect/disconnect
+  - Improved device name detection with fallback chain
+  - Enhanced logging for hotplug events
+  - Monitor.start() with error handling for udev netlink
+
+- **Installation Permissions**:
+  - New `permissions` command in install.py
+  - Automatic group setup (input, plugdev)
+  - Udev rules for input device access
+  - Auto-reload of udev rules
+  - Auto-run full install flow when executed with sudo
+
+### Changed
+
+- **Code Organization**:
+  - Extracted types to dedicated `src/types/` package
+  - Protocols in `src/types/protocols/` (device.py, command.py)
+  - Schemas in `src/types/schemas/` (settings.py)
+  - Consistent import paths across codebase
+
+- **Code Cleanup**:
+  - Removed dead code and unused QThread
+  - Improved type hints in protocols
+  - Better logging for diagnostics
+
 ## [1.2.0] - 2026-04-14
 
 ### Added
