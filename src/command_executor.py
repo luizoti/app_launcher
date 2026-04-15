@@ -5,6 +5,12 @@ import subprocess
 import traceback
 import typing
 
+from src.types.protocols.command import (
+    CommandValidatorProtocol,
+    EnvironmentCleanerProtocol,
+    ProcessRunnerProtocol,
+)
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_TIMEOUT_SECONDS = 3
@@ -37,23 +43,6 @@ class RootExecutionError(CommandError):
 
 class InvalidArgumentError(CommandError):
     pass
-
-
-class CommandValidatorProtocol(typing.Protocol):
-    def validate(self, command: list[str] | str) -> None: ...
-
-
-class ProcessRunnerProtocol(typing.Protocol):
-    def run(
-        self,
-        args: list[str],
-        env: dict[str, str],
-        timeout: int | None,
-    ) -> subprocess.Popen: ...
-
-
-class EnvironmentCleanerProtocol(typing.Protocol):
-    def clean(self, env: dict[str, str]) -> dict[str, str]: ...
 
 
 class CommandValidator:

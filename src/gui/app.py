@@ -21,7 +21,7 @@ from src.gui.components.tray_icon import TrayIcon
 from src.gui.icons.cache_loader import get_icon
 from src.instance import destroy_pid_file
 from src.settings import Settings, get_settings
-from src.settings_model import AppsModel, WindowMode
+from src.types.schemas import AppsModel, WindowMode
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()

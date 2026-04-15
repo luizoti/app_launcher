@@ -1,4 +1,4 @@
-from src.settings_model import (
+from src.types.schemas import (
     AppsModel,
     DeviceMappingsModel,
     IconsModel,

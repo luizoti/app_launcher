@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QGridLayout, QWidget
 from src import command_executor
 from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
-from src.settings_model import AppsModel
+from src.types.schemas import AppsModel
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 

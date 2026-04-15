@@ -20,7 +20,7 @@ from src.default_settings import (
     DEFAULT_TRAY,
     DEFAULT_WINDOW,
 )
-from src.settings_model import (
+from src.types.schemas import (
     AppsModel,
     DeviceMappingsModel,
     IconsModel,
