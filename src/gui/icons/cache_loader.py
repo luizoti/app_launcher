@@ -12,9 +12,24 @@ settings: Settings = get_settings()
 
 
 def _get_icons_dir() -> Path:
-    if not settings.icons_directory:
+    icons_dir = settings.icons_directory
+
+    if not icons_dir:
+        script_dir = Path(__file__).parent.parent.parent.resolve()
+        fallback = script_dir / "icons"
+        if fallback.exists():
+            return fallback
         raise ValueError("Icons directory is not set in settings")
-    return Path(settings.icons_directory).resolve()
+
+    icons_path = Path(icons_dir).resolve()
+    if not icons_path.exists():
+        script_dir = Path(__file__).parent.parent.parent.resolve()
+        fallback = script_dir / "icons"
+        if fallback.exists():
+            return fallback
+        raise FileNotFoundError(f"Icons directory not found: {icons_path}")
+
+    return icons_path
 
 
 @lru_cache(maxsize=128)
