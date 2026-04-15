@@ -1,12 +1,14 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource prefix="/">
-        <file>icons/missing.ico</file>
-        <file>icons/connected.ico</file>
-        <file>icons/disconnected.ico</file>
-        <file>icons/standby.ico</file>
-        <file>icons/kodi.ico</file>
-        <file>icons/pegasus.ico</file>
-        <file>icons/retropie.ico</file>
+        <file>../../../icons/missing.ico</file>
+        <file>../../../icons/connected.ico</file>
+        <file>../../../icons/disconnected.ico</file>
+        <file>../../../icons/standby.ico</file>
+        <file>../../../icons/kodi.ico</file>
+        <file>../../../icons/pegasus.ico</file>
+        <file>../../../icons/retropie.ico</file>
+        <file>../../../icons/menu_hide.ico</file>
+        <file>../../../icons/menu_settings.ico</file>
     </qresource>
 </RCC>
