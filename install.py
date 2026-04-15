@@ -9,6 +9,36 @@ import subprocess
 import sys
 
 
+def compile_resources():
+    """Compila icons.qrc para rc_icons.py se necessário."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    qrc_path = os.path.join(script_dir, "src", "gui", "icons", "icons.qrc")
+    output_path = os.path.join(script_dir, "src", "gui", "icons", "rc_icons.py")
+
+    if not os.path.exists(qrc_path):
+        print(f"QRC não encontrado em {qrc_path}, pulando compilação de recursos.")
+        return
+
+    needs_compile = not os.path.exists(output_path) or os.path.getmtime(
+        qrc_path
+    ) > os.path.getmtime(output_path)
+
+    if needs_compile:
+        print("Compilando recursos Qt (.qrc -> .py)...")
+        try:
+            subprocess.run(
+                ["pyside6-rcc", "-o", output_path, qrc_path],
+                check=True,
+                cwd=script_dir,
+            )
+            print("Recursos compilados com sucesso.")
+        except subprocess.CalledProcessError as e:
+            print(f"Erro ao compilar recursos: {e}")
+            sys.exit(1)
+    else:
+        print("Recursos já estão atualizados, pulando.")
+
+
 def get_user_home(uid=1000):
     try:
         return pwd.getpwuid(uid).pw_dir
@@ -35,6 +65,8 @@ def build():
     """Compila o app com PyInstaller via uv."""
     print("=== Build do AppLauncher ===\n")
 
+    compile_resources()
+
     script_dir = os.path.abspath(os.path.dirname(__file__))
     main_py = os.path.join(script_dir, "main.py")
 
@@ -49,7 +81,17 @@ def build():
         "PySide6.QtCore",
         "PySide6.QtOpenGL",
         "systemd.journal",
+        "src.gui.icons.rc_icons",
     ]
+
+    icons_dir = os.path.join(script_dir, "icons")
+    rc_icons = os.path.join(script_dir, "src", "gui", "icons", "rc_icons.py")
+
+    datas = []
+    if os.path.exists(icons_dir):
+        datas.append((icons_dir, "icons"))
+    if os.path.exists(rc_icons):
+        datas.append((rc_icons, "src/gui/icons/rc_icons.py"))
 
     command = [
         "uv",
@@ -62,6 +104,9 @@ def build():
 
     for imp in hidden_imports:
         command.extend(["--hidden-import", imp])
+
+    for data in datas:
+        command.extend(["--add-data", f"{data[0]}:{data[1]}"])
 
     command.append(main_py)
 
