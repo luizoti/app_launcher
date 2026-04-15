@@ -10,36 +10,16 @@ from PySide6.QtCore import QObject, QRunnable, QThread, QThreadPool, Signal, Slo
 from pyudev.pyside6 import MonitorObserver  # type: ignore
 
 from src.settings import Settings, get_settings
-from src.settings_model import DeviceMappingsModel
-
-# https://chatgpt.com/c/699bcced-7804-8327-a800-f66b94183822
+from src.types.protocols.device import (
+    InputDeviceEvDevProtocol,
+    InputDevicePyDevProtocol,
+    InputEventProtocol,
+    KeyEventProtocol,
+)
+from src.types.schemas import DeviceMappingsModel
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
-
-
-class InputEventProtocol(typing.Protocol):
-    def __init__(self) -> None:
-        super().__init__()
-        self.keystate: str
-        self.scancode: str
-
-
-class KeyEventProtocol(InputEventProtocol):
-    pass
-
-
-class InputDeviceEvDevProtocol(typing.Protocol):
-    def __init__(self) -> None:
-        super().__init__()
-        self.name: str
-        self.path: str
-
-
-class InputDevicePyDevProtocol(typing.Protocol):
-    def __init__(self) -> None:
-        super().__init__()
-        self.device_node: str
 
 
 class Signals(QObject):
@@ -59,27 +39,6 @@ class DeviceEventWorker(QRunnable):
         super().__init__()
         self.input_device: InputDeviceEvDevProtocol = input_device
         self.signals = Signals()
-
-    #     self._tray: bool | None = None
-    #     self._mappings: dict[typing.Any, typing.Any] | None = None
-
-    # @property
-    # def tray(self):
-    #     if self._tray is None:
-    #         self._tray = True
-
-    # @property
-    # def mappings(self):
-    #     if self._mappings is None:
-    #         self._mappings = {
-    #             ecodes.EV_KEY: self._get_device_mapping(
-    # self.input_device.name,
-    #  event=event),
-    #             ecodes.EV_ABS: {  # type: ignore
-    #                 ecodes.ABS_HAT0X: {-1: "right", 1: "left"},  # type: ignore
-    #                 ecodes.ABS_HAT0Y: {-1: "up", 1: "down"},  # type: ignore
-    #             },  # type: ignore
-    #         }
 
     def get_device_settings(self, event: InputEventProtocol) -> dict[
         int,
@@ -126,7 +85,7 @@ class DeviceEventWorker(QRunnable):
 
     @Slot()
     def run(self):
-        logger.debug(QThread.currentThread())
+        logger.debug(f"Worker thread: {QThread.currentThread()}")
         self.signals.started.emit(self.input_device.path)
         emit_action = self.signals.action.emit
         get_mappings = self.get_device_settings
@@ -149,7 +108,7 @@ class DeviceEventWorker(QRunnable):
                         logger.debug(f"[ACTION] {mapping} emitted")
                         emit_action(mapping)
         except OSError:
-            pass
+            logger.warning(f"Device disconnected: {self.input_device.path}")
         self.signals.completed.emit(self.input_device.path)
 
 
@@ -170,15 +129,18 @@ class DeviceMonitor(QObject):
 
     @Slot()
     def start_monitor(self):
-        # Tudo criado aqui dentro pertencerá à QThread correta!
         self.context = pyudev.Context()
-        self.monitor = pyudev.Monitor.from_netlink(self.context)  # type: ignore
-        self.monitor.filter_by(subsystem="input")  # type: ignore
-        self.worker_thread = QThread()
+        self.monitor = pyudev.Monitor.from_netlink(self.context)
+        self.monitor.filter_by(subsystem="input")
         self.observer = MonitorObserver(self.monitor)
-        self.observer.deviceEvent.connect(self._refresh_devices)  # type: ignore
+        self.observer.deviceEvent.connect(self._refresh_devices)
+        logger.info("Device monitor started")
+        try:
+            self.monitor.start()
+            logger.info("udev netlink monitor started successfully")
+        except Exception as e:
+            logger.error(f"Failed to start udev monitor: {e}")
         self._get_devices_on_start()
-        logger.info("Monitoramento de dispositivos iniciado na Worker Thread")
 
     def _print_detected(self) -> None:
         logger.info("=== DETECTED DEVICES ===")
@@ -241,32 +203,49 @@ class DeviceMonitor(QObject):
         self.thread_pool.start(worker)
 
     def _refresh_devices(self, device: InputDevicePyDevProtocol) -> None:
-        """
-        Checks which allowed devices are connected and
-        updates the list of monitored devices.
-        """
-
-        device_action = device.action  # type: ignore
-        device_name = device.get("ID_MODEL", None)  # type: ignore
-
+        device_action = device.action
+        device_name = (
+            device.get("ID_MODEL")
+            or device.get("NAME")
+            or device.get("PHYS")
+            or "Unknown Device"
+        )
         device_path: str | None = device.device_node
 
+        logger.debug(
+            f"Hotplug event: action={device_action}, device={device_name}, "
+            f"path={device_path}"
+        )
+
         if not device_path:
+            logger.warning(f"Hotplug event received but no device_node: {device}")
             return
 
         if device_action == "add":
-            input_device: InputDeviceEvDevProtocol = self._valid_device(device_path)
+            if device_path in self.connected_devices:
+                logger.debug(f"Device already tracked: {device_path}")
+                return
+            try:
+                input_device: InputDeviceEvDevProtocol = self._valid_device(device_path)
+            except Exception as e:
+                logger.error(f"Failed to open device {device_path}: {e}")
+                return
             if not input_device:
+                logger.debug(f"Device not in mappings: {device_path} ({device_name})")
                 return
             if input_device.name in settings.mappings:
                 self.connected_devices.append(input_device.path)
                 self.create_new_treaded_device(input_device)
-                logger.info(f"Device connected: {input_device}")
+                logger.info(f"Device connected: {input_device.name} ({device_path})")
+                self.tray_action.emit("connected")
                 self._check_connection_status()
+            else:
+                logger.debug(f"Device not in settings.mappings: {input_device.name}")
         elif device_action == "remove":
             if device_path in self.connected_devices:
                 self.connected_devices.remove(device_path)
                 logger.info(f"Device removed: {device_name} ({device_path})")
+                self.tray_action.emit("disconnected")
                 self._check_connection_status()
-        else:
-            pass
+            else:
+                logger.debug(f"Device not in tracked list: {device_path}")
