@@ -198,6 +198,122 @@ X-GNOME-Autostart-enabled=true
     print("Autostart configurado com XDG (sem sudo)")
 
 
+def permissions():
+    """Configura permissões para acesso a dispositivos de input (hotplug)."""
+    import grp
+
+    print("=== Configuração de Permissões para Hotplug ===\n")
+
+    running_as_root = is_running_as_root()
+    sudo = "sudo " if not running_as_root else ""
+
+    user = os.getenv("SUDO_USER") if running_as_root else os.getenv("USER")
+    if not user:
+        print("Erro: Não foi possível determinar o usuário atual.")
+        sys.exit(1)
+
+    print(f"Usuário: {user}")
+
+    groups_needed = ["input", "plugdev"]
+    current_groups = [g.gr_name for g in grp.getgrall() if user in g.gr_mem]
+    try:
+        current_groups.append(grp.getgrgid(os.getgid()).gr_name)
+    except KeyError:
+        pass
+
+    for group in groups_needed:
+        if group in current_groups:
+            print(f"  [OK] Já no grupo: {group}")
+            continue
+
+        print(f"  [+] Adicionando ao grupo: {group}")
+        try:
+            subprocess.run(
+                (
+                    ["sudo", "usermod", "-aG", group, user]
+                    if not running_as_root
+                    else ["usermod", "-aG", group, user]
+                ),
+                check=True,
+            )
+            print(f"  [OK] Adicionado ao grupo {group}")
+            print("       Você precisará reiniciar a sessão para aplicar.")
+        except subprocess.CalledProcessError as e:
+            print(f"  [ERRO] Falha ao adicionar ao grupo {group}: {e}")
+            cmd = f"{sudo}usermod -aG {group} {user}"
+            print(f"         Execute manualmente: {cmd}")
+
+    print("\n--- Configurando regras udev ---")
+    udev_rule = (
+        'SUBSYSTEM=="input", MODE="0660", GROUP="input", '
+        'OPTIONS+="static_node=\\S*", TAG+="uaccess"\n'
+    )
+    udev_rule += (
+        'SUBSYSTEM=="input", ENV{ID_INPUT_JOYSTICK}=="1", MODE="0660", GROUP="input"\n'
+    )
+    udev_rules_path = "/etc/udev/rules.d/99-input-permissions.rules"
+
+    if os.path.exists(udev_rules_path):
+        with open(udev_rules_path) as f:
+            existing = f.read()
+        if udev_rule.strip() in existing:
+            print(f"  [OK] Regra udev já existe: {udev_rules_path}")
+        else:
+            print("  [+] Adicionando regra udev...")
+            try:
+                cmd = f"sh -c 'echo \\\"{udev_rule.strip()}\\\" >> {udev_rules_path}'"
+                subprocess.run(
+                    ["sudo", *cmd.split()] if not running_as_root else cmd.split(),
+                    check=True,
+                )
+                print("  [OK] Regra udev adicionada")
+            except subprocess.CalledProcessError:
+                print("  [ERRO] Falha ao criar regra udev")
+                cmd = f"{sudo}sh -c 'echo \"{udev_rule.strip()}\" >> {udev_rules_path}'"
+                print(f"         Execute manualmente: {cmd}")
+    else:
+        print(f"  [+] Criando regra udev: {udev_rules_path}")
+        try:
+            cmd = f"sh -c 'echo \\\"{udev_rule.strip()}\\\" > {udev_rules_path}'"
+            subprocess.run(
+                ["sudo", *cmd.split()] if not running_as_root else cmd.split(),
+                check=True,
+            )
+            print("  [OK] Regra udev criada")
+        except subprocess.CalledProcessError:
+            print("  [ERRO] Falha ao criar regra udev")
+            cmd = f"{sudo}sh -c 'echo \\\"{udev_rule.strip()}\\\" > {udev_rules_path}'"
+            print(f"         Execute manualmente: {cmd}")
+
+    print("\n--- Recarregando regras udev ---")
+    try:
+        subprocess.run(
+            (
+                ["sudo", "udevadm", "control", "--reload-rules"]
+                if not running_as_root
+                else ["udevadm", "control", "--reload-rules"]
+            ),
+            check=True,
+        )
+        subprocess.run(
+            (
+                ["sudo", "udevadm", "trigger"]
+                if not running_as_root
+                else ["udevadm", "trigger"]
+            ),
+            check=True,
+        )
+        print("  [OK] Regras udev recarregadas")
+    except subprocess.CalledProcessError:
+        print("  [!] Não foi possível recarregar regras (pode precisar reiniciar)")
+
+    print("\n=== Configuração de permissões concluída ===")
+    print("\nIMPORTANTE: Você precisa:")
+    print("  1. Fazer logout e login novamente (ou reiniciar)")
+    print("  2. Reconectar os dispositivos de input")
+    print("\nPara verificar: groups $USER")
+
+
 def remove():
     """Remove binário e configuração de autostart."""
     print("=== Remoção do AppLauncher ===\n")
@@ -237,6 +353,10 @@ def remove():
     print("\n=== Remoção concluída ===")
 
 
+def is_running_as_root() -> bool:
+    return os.geteuid() == 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Script de instalação e build para o AppLauncher"
@@ -244,27 +364,39 @@ def main():
     parser.add_argument(
         "command",
         nargs="?",
-        default="all",
-        choices=["build", "install", "autostart", "remove", "all"],
-        help="Comando a executar (padrão: all)",
+        default=None,
+        choices=["build", "install", "autostart", "permissions", "remove", "all"],
+        help="Comando a executar (padrão: all, ou 'all' se executado com sudo)",
     )
     args = parser.parse_args()
 
-    if args.command == "all":
+    command = args.command
+    if command is None:
+        if is_running_as_root():
+            command = "all"
+            print("[sudo] Executando fluxo completo automaticamente...\n")
+        else:
+            command = "all"
+
+    if command == "all":
         print("=== Instalação completa do AppLauncher ===\n")
         build()
         print()
         install()
         print()
         autostart()
+        print()
+        permissions()
         print("\n=== Instalação concluída ===")
-    elif args.command == "build":
+    elif command == "build":
         build()
-    elif args.command == "install":
+    elif command == "install":
         install()
-    elif args.command == "autostart":
+    elif command == "autostart":
         autostart()
-    elif args.command == "remove":
+    elif command == "permissions":
+        permissions()
+    elif command == "remove":
         remove()
 
 
