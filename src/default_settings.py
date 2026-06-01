@@ -10,7 +10,7 @@ from src.types.schemas import (
 DEFAULT_APPS: dict[str, AppsModel] = {
     "Kodi": AppsModel(cmd="kodi", enabled=True, icon="kodi.ico"),
     "Pegasus": AppsModel(
-        cmd="/usr/bin/moonlight-qt stream nitro app 'Pegasus'",
+        cmd="/usr/bin/moonlight-qt stream nitro 'Pegasus'",
         enabled=True,
         icon="pegasus.ico",
     ),
