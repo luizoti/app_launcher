@@ -1,42 +1,54 @@
 import unittest
-
-from setproctitle import setproctitle
+from unittest.mock import MagicMock, patch
 
 from src.utils import check_running_processes
 
 
-def create_process(process_list: list[str]):
-    for process in process_list:
-        setproctitle(process)
-
-
 class TestCheckRunningProcess(unittest.TestCase):
-    def setUp(self):
-        self.process_list: list[str] = ["kodi", "emulationstation"]
+    def _make_process(self, name: str) -> MagicMock:
+        proc = MagicMock()
+        proc.info = {"name": name}
+        return proc
 
-    def test_one_running_process(self):
-        create_process(process_list=self.process_list)
-        current_process = check_running_processes(search_process=self.process_list)
-        self.assertIn(self.process_list[0], current_process)
-
-    def test_two_running_process(self):
-        create_process(process_list=self.process_list)
-        current_process = check_running_processes(search_process=self.process_list)
-        self.assertEqual(self.process_list, current_process)
-
-    def test_get_case_insensitive_process(self):
-        process_names = ["kodi", "emulationstation"]
-        create_process(process_list=[x.capitalize() for x in process_names])
-        current_process = check_running_processes(search_process=process_names)
-        self.assertEqual(process_names, current_process)
-
-    def test_get_case_insensitive_search(self):
-        process_names = ["kodi", "emulationstation"]
-        create_process(process_list=process_names)
-        current_process = check_running_processes(
-            search_process=[x.capitalize() for x in process_names]
+    @patch("src.utils.psutil.process_iter")
+    def test_returns_matching_processes(self, mock_process_iter):
+        mock_process_iter.return_value = [
+            self._make_process("kodi"),
+            self._make_process("emulationstation"),
+            self._make_process("python"),
+        ]
+        result = list(
+            check_running_processes(search_process=["kodi", "emulationstation"])
         )
-        self.assertEqual(process_names, current_process)
+        self.assertEqual(result, ["kodi", "emulationstation"])
+
+    @patch("src.utils.psutil.process_iter")
+    def test_returns_empty_when_none_match(self, mock_process_iter):
+        mock_process_iter.return_value = [
+            self._make_process("firefox"),
+            self._make_process("python"),
+        ]
+        result = list(check_running_processes(search_process=["kodi"]))
+        self.assertEqual(result, [])
+
+    @patch("src.utils.psutil.process_iter")
+    def test_case_insensitive_process_name(self, mock_process_iter):
+        mock_process_iter.return_value = [
+            self._make_process("Kodi"),
+            self._make_process("EMULATIONSTATION"),
+        ]
+        result = list(
+            check_running_processes(search_process=["kodi", "emulationstation"])
+        )
+        self.assertEqual(result, ["kodi", "emulationstation"])
+
+    @patch("src.utils.psutil.process_iter")
+    def test_case_insensitive_search(self, mock_process_iter):
+        mock_process_iter.return_value = [
+            self._make_process("kodi"),
+        ]
+        result = list(check_running_processes(search_process=["Kodi"]))
+        self.assertEqual(result, ["kodi"])
 
 
 if __name__ == "__main__":

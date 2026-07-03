@@ -1,15 +1,23 @@
+import logging
+
 import psutil
 
+logger = logging.getLogger(__name__)
 
-def check_running_processes(
-    search_process: list[str],
-):
-    """TODO: Revise this function, this is not used, and the utility is not clear
-    anymore i don't if this is useful, but it can be used to check if a
-    process is running, and avoid opening the app if the process is already running.
-    """
-    return (
-        x
-        for x in [x.info["name"].lower() for x in psutil.process_iter(["name"])]
-        if x in [process.lower() for process in search_process]
-    )
+
+def check_running_processes(search_process: list[str]) -> list[str]:
+    if not search_process:
+        return []
+
+    search_lower = [p.lower() for p in search_process]
+    running: list[str] = []
+
+    for proc in psutil.process_iter(["name"]):
+        try:
+            name = proc.info["name"]
+            if name and name.lower() in search_lower:
+                running.append(name.lower())
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+
+    return running
