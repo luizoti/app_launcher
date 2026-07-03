@@ -45,11 +45,10 @@ class AppGrid(QGridLayout, ActionManager):
                     label_changer(f"Blocked by: {', '.join(running)}")
                     return
 
-            if app_data.singleton:
-                target = _extract_process_name(app_data.cmd)
-                if _focus_process(target):
-                    label_changer(f"Focused {target}")
-                    return
+            target = _extract_process_name(app_data.cmd)
+            if _focus_process(target):
+                label_changer(f"Focused {target}")
+                return
 
             def on_success():
                 if hide_window:

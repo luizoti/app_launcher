@@ -19,7 +19,6 @@ class AppsModel(BaseModel):
     cmd: list[str] | str
     enabled: bool
     icon: str
-    singleton: bool = False
 
 
 class DeviceMappingsModel(BaseModel):
