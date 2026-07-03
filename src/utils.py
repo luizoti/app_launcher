@@ -16,10 +16,10 @@ def check_running_processes(search_process: list[str]) -> list[str]:
 
     for proc in psutil.process_iter(["name", "cmdline"]):
         try:
-            name = (proc.info["name"] or "").lower()
+            name = (proc.info.get("name") or "").lower()
             cmdline = " ".join(proc.info.get("cmdline") or []).lower()
             for term_lower, term_orig in zip(search_lower, search_process):
-                if term_lower in name or term_lower in cmdline:
+                if term_lower in name or name in term_lower or term_lower in cmdline:
                     matched.add(term_orig)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
@@ -45,7 +45,8 @@ def _extract_process_name(cmd: list[str] | str) -> str:
 def _focus_process(search: str) -> bool:
     """Find a running process matching *search* and bring its window to front.
 
-    Returns ``True`` if found and focused, ``False`` otherwise.
+    Returns ``True`` if the process was found (even if focusing failed),
+    ``False`` if no matching process exists.
     """
     search_lower = search.lower()
     pid: int | None = None
@@ -54,7 +55,7 @@ def _focus_process(search: str) -> bool:
         try:
             name = (proc.info.get("name") or "").lower()
             cmdline = " ".join(proc.info.get("cmdline") or []).lower()
-            if search_lower in name or search_lower in cmdline:
+            if search_lower in name or name in search_lower or search_lower in cmdline:
                 pid = proc.info["pid"]
                 break
         except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -69,24 +70,21 @@ def _focus_process(search: str) -> bool:
             capture_output=True,
             timeout=2,
         )
-        return True
     except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
+        try:
+            result = subprocess.run(
+                ["wmctrl", "-l", "-p"], capture_output=True, text=True, timeout=2
+            )
+            for line in result.stdout.splitlines():
+                parts = line.split(None, 2)
+                if len(parts) >= 2 and parts[1] == str(pid):
+                    subprocess.run(
+                        ["wmctrl", "-i", "-a", parts[0]],
+                        capture_output=True,
+                        timeout=2,
+                    )
+                    break
+        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+            pass
 
-    try:
-        result = subprocess.run(
-            ["wmctrl", "-l", "-p"], capture_output=True, text=True, timeout=2
-        )
-        for line in result.stdout.splitlines():
-            parts = line.split(None, 2)
-            if len(parts) >= 2 and parts[1] == str(pid):
-                subprocess.run(
-                    ["wmctrl", "-i", "-a", parts[0]],
-                    capture_output=True,
-                    timeout=2,
-                )
-                return True
-    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
-        pass
-
-    return False
+    return True
