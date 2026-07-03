@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Debug script — testa check_running_processes e _focus_process."""
+
+import os
+import sys
+
+# Garante que o src/ seja encontrado
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import psutil
+
+from src.utils import _extract_process_name, _focus_process, check_running_processes
+
+BLOCK_LIST = ["emulationstation", "kodi", "moonlight", "pegasus", "retroarch"]
+
+
+def _dump_candidates(search_terms: list[str]) -> None:
+    """Varre todos os processos e mostra quais bateriam com os termos."""
+    termos = [t.lower() for t in search_terms]
+
+    print(f"\n{'='*70}")
+    print(f"VARRENDO TODOS OS PROCESSOS — busca por: {search_terms}")
+    print(f"{'='*70}")
+
+    encontrados = 0
+    erros = 0
+    total = 0
+
+    for proc in psutil.process_iter(["name", "cmdline", "pid"]):
+        total += 1
+        try:
+            raw_name = proc.info.get("name")
+            name = (raw_name or "").lower()
+            raw_cmdline = proc.info.get("cmdline")
+            cmdline = " ".join(raw_cmdline or []).lower()
+            pid = proc.info.get("pid", "?")
+
+            match_info = []
+            for term, orig in zip(termos, search_terms):
+                reasons = []
+                if term in name:
+                    reasons.append("name contem termo")
+                if name in term:
+                    reasons.append("termo contem name (trunc?)")
+                if term in cmdline:
+                    reasons.append("cmdline contem termo")
+                if reasons:
+                    match_info.append(f"  >> {orig} -> {', '.join(reasons)}")
+
+            if match_info:
+                encontrados += 1
+                nome_exib = raw_name or "(None)"
+                cmd_exib = " ".join(raw_cmdline or ["(None)"])
+                print(f"\n[OK] PID={pid}  name={nome_exib!r}")
+                print(f"     cmdline={cmd_exib!r}")
+                for m in match_info:
+                    print(m)
+        except psutil.NoSuchProcess:
+            erros += 1
+        except psutil.AccessDenied:
+            erros += 1
+        except KeyError as e:
+            erros += 1
+            print(f"[KEYERROR] proc={proc} — {e}")
+        except Exception as e:
+            erros += 1
+            print(f"[ERRO] proc={proc} — {type(e).__name__}: {e}")
+
+    print(f"\n{'='*40}")
+    print(f"Total varridos: {total}")
+    print(f"Match encontrados: {encontrados}")
+    print(f"Erros ignorados: {erros}")
+    print(f"{'='*40}")
+
+
+def _test_check_running_processes(search_terms: list[str]) -> None:
+    print(f"\n{'='*70}")
+    print(f"check_running_processes({search_terms})")
+    print(f"{'='*70}")
+    result = check_running_processes(search_terms)
+    print(f"Resultado: {result}")
+    if not result:
+        print(">>> ATENCAO: lista vazia — nenhum processo detectado!")
+    return result
+
+
+def _test_focus_process(name: str) -> None:
+    print(f"\n_focus_process({name!r})")
+    result = _focus_process(name)
+    print(f"Resultado: {result}")
+
+
+def _test_extract_process_name() -> None:
+    cmds = [
+        ["x-terminal-emulator", "-e", "emulationstation"],
+        ["/usr/bin/moonlight-qt", "stream", "nitro", "app", "Pegasus"],
+        "subl",
+        "/usr/bin/firefox https://x.com",
+    ]
+    for cmd in cmds:
+        print(f"_extract_process_name({cmd!r}) = {_extract_process_name(cmd)!r}")
+
+
+if __name__ == "__main__":
+    _dump_candidates(BLOCK_LIST)
+    _test_check_running_processes(BLOCK_LIST)
+    for name in BLOCK_LIST:
+        _test_focus_process(name)
+    print(f"\n--- _extract_process_name ---")
+    _test_extract_process_name()
