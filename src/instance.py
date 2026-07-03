@@ -23,12 +23,12 @@ def check_pid_exist(pid: int) -> bool:
     return False
 
 
-def read_pid_file() -> bool | int:
+def read_pid_file() -> int:
     try:
         with open(create_pid_file_path()) as pid_file:
             return int(pid_file.read())
     except FileNotFoundError:
-        return False
+        return 0
 
 
 def write_pid_file() -> None:
