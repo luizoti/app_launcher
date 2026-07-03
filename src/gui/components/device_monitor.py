@@ -1,5 +1,4 @@
 import logging
-import typing
 from typing import cast
 
 import pyudev  # type: ignore
@@ -35,81 +34,70 @@ class DeviceEventWorker(QRunnable):
     def __init__(
         self,
         input_device: InputDeviceEvDevProtocol,
+        mapping_key: str,
     ) -> None:
         super().__init__()
         self.input_device: InputDeviceEvDevProtocol = input_device
         self.signals = Signals()
-
-    def get_device_settings(self, event: InputEventProtocol) -> dict[
-        int,
-        typing.Callable[[typing.Any], None] | typing.Any | dict[int, int],
-    ]:
-        return {
-            ecodes.EV_KEY: self._get_device_mapping(event=event),  # type: ignore
-            ecodes.EV_ABS: {  # type: ignore
-                ecodes.ABS_HAT0X: {-1: "left", 1: "right"},  # type: ignore
-                ecodes.ABS_HAT0Y: {-1: "up", 1: "down"},  # type: ignore
-            },
+        self._stopped = False
+        self._device_mappings: DeviceMappingsModel | None = settings.mappings.get(
+            mapping_key
+        )
+        self._ev_abs_mapping: dict[int, dict[int, str]] = {
+            ecodes.ABS_HAT0X: {-1: "left", 1: "right"},  # type: ignore
+            ecodes.ABS_HAT0Y: {-1: "up", 1: "down"},  # type: ignore
         }
 
-    def _get_device_mapping(self, event: InputEventProtocol) -> int | None:
-        key_event = cast(InputEventProtocol | KeyEventProtocol, categorize(event))
-        device_mappings: DeviceMappingsModel | None = settings.mappings.get(
-            self.input_device.name
-        )
-        if not device_mappings:
-            logger.warning(f"No mapping found for device: {self.input_device.name}")
+    def _get_action(self, event: InputEventProtocol) -> str | None:
+        if not self._device_mappings:
             return None
         try:
+            key_event = cast(KeyEventProtocol, categorize(event))
             if key_event.keystate != 1:
                 return None
-            key_scancode = key_event.scancode
             event_code = str(event.code)
-
-            # Try both string and integer keys
-            action = device_mappings.buttons.get(event_code)
+            action = self._device_mappings.buttons.get(event_code)
             if action is None:
                 try:
-                    action = device_mappings.buttons.get(int(event_code))
+                    action = self._device_mappings.buttons.get(int(event_code))
                 except (ValueError, TypeError):
                     pass
-
-            logger.debug(
-                f"event_code={event_code}, key_scancode={key_scancode}, "
-                f"action={action}, device={self.input_device.name}"
-            )
+            if action is None:
+                logger.debug(
+                    f"No mapping for code {event_code} on {self.input_device.name}"
+                )
             return action
         except AttributeError:
-            pass
-        return None
+            return None
 
     @Slot()
     def run(self):
         logger.debug(f"Worker thread: {QThread.currentThread()}")
         self.signals.started.emit(self.input_device.path)
         emit_action = self.signals.action.emit
-        get_mappings = self.get_device_settings
         logger.info(f"[DeviceEventWorker] Started for: {self.input_device.name}")
         try:
             event: InputEventProtocol
             for event in self.input_device.read_loop():
-                if event.type not in [ecodes.EV_KEY, ecodes.EV_ABS]:
-                    continue
-                mapping = get_mappings(event=event).get(event.type)
-                if mapping is not None:
-                    if isinstance(mapping, dict):
-                        dpad = mapping.get(event.code)
-                        if dpad:
-                            direction = dpad.get(event.value)
-                            if direction is not None:
-                                logger.debug(f"[ACTION] {direction} emitted")
-                                emit_action(direction)
-                    else:
-                        logger.debug(f"[ACTION] {mapping} emitted")
-                        emit_action(mapping)
+                if event.type == ecodes.EV_KEY:
+                    action = self._get_action(event)
+                    if action:
+                        logger.debug(f"[ACTION] {action} emitted")
+                        emit_action(action)
+                elif event.type == ecodes.EV_ABS:
+                    dpad = self._ev_abs_mapping.get(event.code)
+                    if dpad:
+                        direction = dpad.get(event.value)
+                        if direction:
+                            logger.debug(f"[ACTION] {direction} emitted")
+                            emit_action(direction)
         except OSError:
             logger.warning(f"Device disconnected: {self.input_device.path}")
-        self.signals.completed.emit(self.input_device.path)
+        if not self._stopped:
+            try:
+                self.signals.completed.emit(self.input_device.path)
+            except RuntimeError:
+                pass
 
 
 class DeviceMonitor(QObject):
@@ -121,11 +109,11 @@ class DeviceMonitor(QObject):
         super().__init__()
         self.thread_pool = QThreadPool().globalInstance()
         self.connected_devices: list[str] = []
+        self._workers: dict[str, DeviceEventWorker] = {}
 
         self._print_detected()
         logger.debug("--------------------------------")
         self._print_allowed()
-        self._check_connection_status()
 
     @Slot()
     def start_monitor(self):
@@ -160,9 +148,13 @@ class DeviceMonitor(QObject):
 
     def _check_connection_status(self) -> None:
         has_connected = False
-        for device_name in settings.mappings:
-            mappings = settings.mappings[device_name]
-            if mappings.tray and device_name in self._get_connected_device_names():
+        for device_path in self.connected_devices:
+            try:
+                name = InputDevice(device_path).name
+            except OSError:
+                continue
+            key = self._find_mapping_key(name)
+            if key and settings.mappings[key].tray:
                 has_connected = True
                 break
 
@@ -173,33 +165,43 @@ class DeviceMonitor(QObject):
     def _get_connected_device_names(self) -> set[str]:
         return {InputDevice(path).name for path in self.connected_devices}
 
+    @staticmethod
+    def _find_mapping_key(device_name: str) -> str | None:
+        device_lower = device_name.lower()
+        for key in settings.mappings:
+            if key.lower() == device_lower or key.lower() in device_lower:
+                return key
+        return None
+
     def _valid_device(self, device_path: str) -> InputDeviceEvDevProtocol | None:
         """
-
         Check if device is valid, filtering by /dev/input/event and
-        verifying existence on settings.mappings.
+        matching partial name in settings.mappings.
         """
         if not device_path.startswith("/dev/input/event"):
             return None
         input_device = cast(InputDeviceEvDevProtocol, InputDevice(device_path))
-        if input_device.name in settings.mappings:
+        if self._find_mapping_key(input_device.name):
             return input_device
-
-    def _get_device_mappings(self, device_name: str) -> DeviceMappingsModel | None:
-        return settings.mappings.get(device_name, None)
 
     def _get_devices_on_start(self) -> None:
         for device_path in list_devices():  # type: ignore
             valid_device = self._valid_device(device_path=device_path)  # type: ignore
             if not valid_device:
                 continue
+            self.connected_devices.append(valid_device.path)
             self.create_new_treaded_device(valid_device)
             logger.info(f"Device connected: {(valid_device,)}")
+        self._check_connection_status()
         return None
 
     def create_new_treaded_device(self, input_device: InputDeviceEvDevProtocol):
-        worker = DeviceEventWorker(input_device)
+        mapping_key = self._find_mapping_key(input_device.name)
+        if not mapping_key:
+            return
+        worker = DeviceEventWorker(input_device, mapping_key)
         worker.signals.action.connect(self.action.emit)
+        self._workers[input_device.path] = worker
         self.thread_pool.start(worker)
 
     def _refresh_devices(self, device: InputDevicePyDevProtocol) -> None:
@@ -233,17 +235,17 @@ class DeviceMonitor(QObject):
             if not input_device:
                 logger.debug(f"Device not in mappings: {device_path} ({device_name})")
                 return
-            if input_device.name in settings.mappings:
-                self.connected_devices.append(input_device.path)
-                self.create_new_treaded_device(input_device)
-                logger.info(f"Device connected: {input_device.name} ({device_path})")
-                self.tray_action.emit("connected")
-                self._check_connection_status()
-            else:
-                logger.debug(f"Device not in settings.mappings: {input_device.name}")
+            self.connected_devices.append(input_device.path)
+            self.create_new_treaded_device(input_device)
+            logger.info(f"Device connected: {input_device.name} ({device_path})")
+            self.tray_action.emit("connected")
+            self._check_connection_status()
         elif device_action == "remove":
             if device_path in self.connected_devices:
                 self.connected_devices.remove(device_path)
+                worker = self._workers.pop(device_path, None)
+                if worker:
+                    worker._stopped = True
                 logger.info(f"Device removed: {device_name} ({device_path})")
                 self.tray_action.emit("disconnected")
                 self._check_connection_status()
