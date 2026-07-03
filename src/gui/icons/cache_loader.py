@@ -5,7 +5,7 @@ from pathlib import Path
 from PySide6.QtGui import QColor, QIcon, QPixmap
 
 from src.gui.icons.rc_icons import qInitResources
-from src.settings import CONFIG_DIRECTORY, Settings, get_settings
+from src.settings import Settings, get_config_directory, get_settings
 
 qInitResources()
 
@@ -14,7 +14,7 @@ settings: Settings = get_settings()
 
 
 def _get_icons_dir() -> Path:
-    return CONFIG_DIRECTORY / "icons"
+    return get_config_directory() / "icons"
 
 
 def _generate_missing_icon() -> QIcon:

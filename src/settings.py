@@ -15,6 +15,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.default_settings import (
     DEFAULT_APPS,
+    DEFAULT_BLOCK_IF_RUNNING,
     DEFAULT_MAPPINGS,
     DEFAULT_MENU,
     DEFAULT_TRAY,
@@ -29,8 +30,6 @@ from src.types.schemas import (
 )
 
 CONFIG_FILE_NAME = "settings.json"
-ALLOWED_DEVICES = []
-DEVICES_MAPPING = {}
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -53,17 +52,16 @@ def _select_config_directory() -> Path:
     return Path(BASE_DIR)
 
 
+@lru_cache(maxsize=1)
+def get_config_directory() -> Path:
+    return _select_config_directory()
+
+
 def _get_config_file() -> None | Path:
-    config_file = CONFIG_DIRECTORY.joinpath(CONFIG_FILE_NAME)
+    config_file = get_config_directory().joinpath(CONFIG_FILE_NAME)
     if config_file.exists() and config_file.is_file():
         return config_file.resolve()
     return None
-
-
-CONFIG_DIRECTORY = _select_config_directory()
-
-# if not ALLOWED_DEVICES:
-#     ALLOWED_DEVICES = [x for x in load_config().keys()]
 
 
 class Settings(BaseSettings):
@@ -73,62 +71,53 @@ class Settings(BaseSettings):
     )
 
     @classmethod
+    def _load_json(cls) -> dict[str, Any]:
+        path = _get_config_file()
+        if path and path.exists():
+            with open(path) as f:
+                return json.load(f)
+        return {}
+
+    @classmethod
+    def _merge_apps(cls, json_apps: Any) -> dict[str, AppsModel]:
+        if not json_apps:
+            return DEFAULT_APPS
+        defaults = {k.lower(): v for k, v in DEFAULT_APPS.items()}
+        overrides = {k.lower(): v for k, v in json_apps.items()}
+        return {**defaults, **overrides}
+
+    @classmethod
+    def _merge_mappings(cls, json_mappings: Any) -> dict[str, DeviceMappingsModel]:
+        if not json_mappings:
+            return DEFAULT_MAPPINGS
+        merged = dict(DEFAULT_MAPPINGS)
+        merged.update(json_mappings)
+        return merged
+
+    @classmethod
     def from_json(cls) -> "Settings":
-        """Carrega do JSON, merge com defaults."""
-        json_path: Path | None = _get_config_file()
+        """Load from JSON, merge with defaults."""
+        json_data = cls._load_json()
 
-        json_data: dict[str, Any] = {}
-        if json_path:
-            if json_path.exists() and json_path.is_file():
-                with open(json_path) as f:
-                    json_data = json.load(f)
+        merged = {
+            "apps": cls._merge_apps(json_data.get("apps")),
+            "mappings": cls._merge_mappings(json_data.get("mappings")),
+            "menu": json_data.get("menu", DEFAULT_MENU.model_dump()),
+            "tray": json_data.get("tray", DEFAULT_TRAY.model_dump()),
+            "window": json_data.get("window", DEFAULT_WINDOW.model_dump()),
+            "block_if_running": json_data.get(
+                "block_if_running", DEFAULT_BLOCK_IF_RUNNING
+            ),
+        }
 
-        merged_data = {}
-
-        if "apps" in json_data:
-            defaults: dict[str, AppsModel] = {
-                x.lower(): y for x, y in DEFAULT_APPS.items()
-            }
-            json_apps: dict[str, str] = {
-                x.lower(): y for x, y in json_data["apps"].items()
-            }
-            merged_data["apps"] = {**defaults, **json_apps}
-        else:
-            merged_data["apps"] = DEFAULT_APPS
-
-        if "mappings" in json_data:
-            merged_mappings: dict[str, DeviceMappingsModel] = dict(DEFAULT_MAPPINGS)
-            for k, v in json_data["mappings"].items():
-                if k in merged_mappings:
-                    merged_mappings[k] = v
-                else:
-                    merged_mappings[k] = v
-            merged_data["mappings"] = merged_mappings
-        else:
-            merged_data["mappings"] = DEFAULT_MAPPINGS
-
-        if "menu" in json_data:
-            merged_data["menu"] = json_data["menu"]
-        else:
-            merged_data["menu"] = DEFAULT_MENU.model_dump()
-
-        if "tray" in json_data:
-            merged_data["tray"] = json_data["tray"]
-        else:
-            merged_data["tray"] = DEFAULT_TRAY.model_dump()
-
-        if "window" in json_data:
-            merged_data["window"] = json_data["window"]
-        else:
-            merged_data["window"] = DEFAULT_WINDOW.model_dump()
-
-        return cls(**merged_data)
+        return cls(**merged)
 
     apps: dict[str, AppsModel] = Field(default=DEFAULT_APPS)
     mappings: dict[str, DeviceMappingsModel] = Field(default=DEFAULT_MAPPINGS)
     menu: MenuModel = Field(default=DEFAULT_MENU)
     tray: IconsModel = Field(default=DEFAULT_TRAY)
     window: WindowModel = Field(default=DEFAULT_WINDOW)
+    block_if_running: list[str] = Field(default=DEFAULT_BLOCK_IF_RUNNING)
     icons_directory: pathlib.Path | str | None = Field(default=None)
 
     @field_validator("icons_directory", mode="before")
