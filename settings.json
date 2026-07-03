@@ -1,5 +1,11 @@
 {
-  "block_if_running": ["emulationstation", "kodi", "pegasus", "retroarch"],
+  "block_if_running": [
+    "emulationstation",
+    "kodi",
+    "moonlight",
+    "pegasus",
+    "retroarch"
+  ],
   "apps": {
     "a": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],

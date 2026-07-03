@@ -10,14 +10,16 @@ def check_running_processes(search_process: list[str]) -> list[str]:
         return []
 
     search_lower = [p.lower() for p in search_process]
-    running: list[str] = []
+    matched: set[str] = set()
 
-    for proc in psutil.process_iter(["name"]):
+    for proc in psutil.process_iter(["name", "cmdline"]):
         try:
-            name = proc.info["name"]
-            if name and name.lower() in search_lower:
-                running.append(name.lower())
+            name = (proc.info["name"] or "").lower()
+            cmdline = " ".join(proc.info.get("cmdline") or []).lower()
+            for term_lower, term_orig in zip(search_lower, search_process):
+                if term_lower in name or term_lower in cmdline:
+                    matched.add(term_orig)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 
-    return running
+    return list(matched)

@@ -5,9 +5,9 @@ from src.utils import check_running_processes
 
 
 class TestCheckRunningProcess(unittest.TestCase):
-    def _make_process(self, name: str) -> MagicMock:
+    def _make_process(self, name: str, cmdline: list[str] | None = None) -> MagicMock:
         proc = MagicMock()
-        proc.info = {"name": name}
+        proc.info = {"name": name, "cmdline": cmdline or [name]}
         return proc
 
     @patch("src.utils.psutil.process_iter")
@@ -48,7 +48,7 @@ class TestCheckRunningProcess(unittest.TestCase):
             self._make_process("kodi"),
         ]
         result = list(check_running_processes(search_process=["Kodi"]))
-        self.assertEqual(result, ["kodi"])
+        self.assertEqual(result, ["Kodi"])
 
 
 if __name__ == "__main__":
