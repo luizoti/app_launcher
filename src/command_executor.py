@@ -68,13 +68,9 @@ class CommandValidator:
             raise CommandBlockedError(f"Shell command '{first_arg}' is not allowed")
 
         if first_arg in ELEVATION_COMMANDS:
-            logger.warning(f"Elevation command blocked: {first_arg}")
-            raise CommandBlockedError(f"Elevation command '{first_arg}' is not allowed")
-
-        if first_arg in ELEVATION_COMMANDS:
-            combined = " ".join(args_list[:2])
-            logger.warning(f"Elevation command blocked: {combined}")
-            raise CommandBlockedError(f"Command '{combined}' is not allowed")
+            display = " ".join(args_list[:2])
+            logger.warning(f"Elevation command blocked: {display}")
+            raise CommandBlockedError(f"Elevation command '{display}' is not allowed")
 
 
 class EnvironmentCleaner:
@@ -152,18 +148,6 @@ class CommandExecutor:
             logger.exception(traceback.format_exc())
             if label_changer:
                 label_changer(str(e))
-
-
-def command_executor(
-    command: list[str] | str,
-    label_changer: typing.Callable[[str], None] | None = None,
-    on_success: typing.Callable[[], None] | None = None,
-    *_: typing.Any,
-):
-    executor = CommandExecutor()
-    executor.execute(
-        command=command, label_changer=label_changer, on_success=on_success
-    )
 
 
 def _command_processor(

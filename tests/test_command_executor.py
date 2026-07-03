@@ -153,14 +153,3 @@ class TestCommandExecutor:
 
         assert any("sudo" in record.message.lower() for record in caplog.records)
         assert any(record.levelname == "ERROR" for record in caplog.records)
-
-
-class TestBackwardCompatibility:
-    @patch("src.command_executor.os.getuid")
-    def test_command_executor_function_exists(self, mock_getuid):
-        mock_getuid.return_value = 1000
-
-        from src import command_executor
-
-        assert hasattr(command_executor, "command_executor")
-        command_executor.command_executor("echo test")
