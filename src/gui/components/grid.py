@@ -38,17 +38,17 @@ class AppGrid(QGridLayout, ActionManager):
         """Create a button with command based on app name and app data."""
 
         def on_click(*_: typing.Any) -> None:
+            target = _extract_process_name(app_data.cmd)
+            if _focus_process(target):
+                label_changer(f"Focused {target}")
+                return
+
             block_list = get_settings().block_if_running
             if block_list:
                 running = check_running_processes(block_list)
                 if running:
                     label_changer(f"Blocked by: {', '.join(running)}")
                     return
-
-            target = _extract_process_name(app_data.cmd)
-            if _focus_process(target):
-                label_changer(f"Focused {target}")
-                return
 
             def on_success():
                 if hide_window:
