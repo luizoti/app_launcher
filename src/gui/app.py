@@ -1,9 +1,8 @@
 import logging
 
-from PySide6.QtCore import QObject, QSize, Qt
-from PySide6.QtGui import QColor, QFont, QKeyEvent, QPalette
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QColor, QFont, QKeySequence, QPalette, QShortcut
 from PySide6.QtWidgets import (
-    QApplication,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -25,18 +24,6 @@ from src.types.schemas import AppsModel, WindowMode
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
-
-
-class KeyPressFilter(QObject):
-    def __init__(self, window):
-        super().__init__()
-        self.window = window
-
-    def eventFilter(self, obj, event):
-        if event.type() == event.Type.KeyPress:
-            self.window.keyPressEvent(event)
-            return True
-        return False
 
 
 class AppMainWindow(QMainWindow, ActionManager):
@@ -70,8 +57,11 @@ class AppMainWindow(QMainWindow, ActionManager):
         self._set_signals()
         self.device_monitor_worker.start_monitor()
 
-        self.key_filter = KeyPressFilter(self)
-        QApplication.instance().installEventFilter(self.key_filter)
+        self._setup_tab_shortcut()
+
+    def _setup_tab_shortcut(self) -> None:
+        shortcut = QShortcut(QKeySequence(Qt.Key.Key_Tab), self)
+        shortcut.activated.connect(self._cycle_window_mode)
 
     def _set_signals(self):
         self.tray_icon.tray_action.connect(self.action_handler)
@@ -190,12 +180,6 @@ class AppMainWindow(QMainWindow, ActionManager):
         settings.window.window_mode = next_mode
         self._apply_window_mode(next_mode)
         logger.info(f"Window mode changed to: {next_mode.value}")
-
-    def keyPressEvent(self, event: QKeyEvent) -> None:
-        if event.key() == Qt.Key.Key_Tab:
-            self._cycle_window_mode()
-        else:
-            super().keyPressEvent(event)
 
     def __exit__(self):
         destroy_pid_file()
