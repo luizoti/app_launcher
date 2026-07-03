@@ -1,4 +1,5 @@
 {
+  "block_if_running": ["emulationstation", "kodi", "pegasus", "retroarch"],
   "apps": {
     "a": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
@@ -73,7 +74,6 @@
   "window": {
     "apps_per_row": 6,
     "button_size": 256,
-    "fullScreen": false,
     "height": 500,
     "width": 1000
   }

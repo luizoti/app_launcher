@@ -41,7 +41,6 @@ class WindowModel(BaseModel):
 
     apps_per_row: int
     button_size: int
-    fullScreen: bool
     height: int
     width: int
     window_mode: WindowMode = WindowMode.BORDERLESS

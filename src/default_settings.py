@@ -58,6 +58,10 @@ DEFAULT_MAPPINGS: dict[str, DeviceMappingsModel] = {
         buttons={"304": "enter", "316": "toggle_view"},
         tray=True,
     ),
+    "8Bitdo": DeviceMappingsModel(
+        buttons={"304": "enter", "316": "toggle_view"},
+        tray=True,
+    ),
 }
 
 DEFAULT_TRAY = IconsModel(
@@ -70,7 +74,6 @@ DEFAULT_TRAY = IconsModel(
 DEFAULT_WINDOW = WindowModel(
     apps_per_row=6,
     button_size=256,
-    fullScreen=False,
     height=500,
     width=1000,
     window_mode=WindowMode.BORDERLESS,
@@ -80,3 +83,5 @@ DEFAULT_MENU = MenuModel(
     hide="menu_hide.ico",
     settings="menu_settings.ico",
 )
+
+DEFAULT_BLOCK_IF_RUNNING: list[str] = []
