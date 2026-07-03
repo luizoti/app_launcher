@@ -10,57 +10,68 @@
     "a": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "e": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "f": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "i": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "kodi": {
       "cmd": "subl",
       "enabled": true,
-      "icon": "kodi.ico"
+      "icon": "kodi.ico",
+      "singleton": true
     },
     "l2WZ1": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "Pegasus": {
       "cmd": "/usr/bin/moonlight-qt stream nitro app 'Pegasus'",
       "enabled": true,
-      "icon": "pegasus.ico"
+      "icon": "pegasus.ico",
+      "singleton": true
     },
     "r": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "t": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "x": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "y": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],
       "enabled": true,
-      "icon": "retropie.ico"
+      "icon": "retropie.ico",
+      "singleton": true
     },
     "z": {
       "cmd": ["x-terminal-emulator", "-e", "emulationstation"],

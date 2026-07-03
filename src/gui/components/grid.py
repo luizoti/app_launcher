@@ -10,7 +10,7 @@ from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
 from src.settings import get_settings
 from src.types.schemas import AppsModel
-from src.utils import check_running_processes
+from src.utils import _extract_process_name, _focus_process, check_running_processes
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -43,6 +43,12 @@ class AppGrid(QGridLayout, ActionManager):
                 running = check_running_processes(block_list)
                 if running:
                     label_changer(f"Blocked by: {', '.join(running)}")
+                    return
+
+            if app_data.singleton:
+                target = _extract_process_name(app_data.cmd)
+                if _focus_process(target):
+                    label_changer(f"Focused {target}")
                     return
 
             def on_success():

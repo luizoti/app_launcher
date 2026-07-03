@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from src.utils import check_running_processes
+from src.utils import _extract_process_name, check_running_processes
 
 
 class TestCheckRunningProcess(unittest.TestCase):
@@ -85,6 +85,27 @@ class TestCheckRunningProcess(unittest.TestCase):
         ]
         result = check_running_processes(search_process=["kodi", "emulationstation"])
         self.assertEqual(result, [])
+
+
+class TestExtractProcessName(unittest.TestCase):
+    def test_wrapper_with_e_flag(self):
+        cmd = ["x-terminal-emulator", "-e", "emulationstation"]
+        self.assertEqual(_extract_process_name(cmd), "emulationstation")
+
+    def test_plain_executable_string(self):
+        self.assertEqual(
+            _extract_process_name("/usr/bin/moonlight-qt stream nitro app 'Pegasus'"),
+            "moonlight-qt",
+        )
+
+    def test_plain_executable_list(self):
+        self.assertEqual(
+            _extract_process_name(["/usr/bin/firefox", "https://x.com"]),
+            "firefox",
+        )
+
+    def test_simple_string(self):
+        self.assertEqual(_extract_process_name("subl"), "subl")
 
 
 if __name__ == "__main__":
