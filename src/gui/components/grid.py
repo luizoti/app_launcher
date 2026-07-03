@@ -5,10 +5,12 @@ import more_itertools
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QGridLayout, QWidget
 
-from src import command_executor
+from src.command_executor import CommandExecutor
 from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
+from src.settings import get_settings
 from src.types.schemas import AppsModel
+from src.utils import check_running_processes
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -35,17 +37,27 @@ class AppGrid(QGridLayout, ActionManager):
     ) -> CustomButton:
         """Create a button with command based on app name and app data."""
 
-        def on_success():
-            if hide_window:
-                hide_window()
+        def on_click(*_: typing.Any) -> None:
+            block_list = get_settings().block_if_running
+            if block_list:
+                running = check_running_processes(block_list)
+                if running:
+                    label_changer(f"Blocked by: {', '.join(running)}")
+                    return
 
-        return CustomButton(
-            icon=app_data.icon,
-            on_click=lambda _: command_executor.command_executor(
+            def on_success():
+                if hide_window:
+                    hide_window()
+
+            CommandExecutor().execute(
                 command=app_data.cmd,
                 label_changer=label_changer,
                 on_success=on_success,
-            ),
+            )
+
+        return CustomButton(
+            icon=app_data.icon,
+            on_click=on_click,
             name=app_name,
         )
 
