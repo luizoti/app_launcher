@@ -111,6 +111,13 @@ class DeviceMonitor(QObject):
         self.connected_devices: list[str] = []
         self._workers: dict[str, DeviceEventWorker] = {}
 
+    def stop_all(self) -> None:
+        for worker in self._workers.values():
+            worker._stopped = True
+        self.thread_pool.waitForDone(3000)
+        self._workers.clear()
+        self.connected_devices.clear()
+
         self._print_detected()
         logger.debug("--------------------------------")
         self._print_allowed()
@@ -201,6 +208,11 @@ class DeviceMonitor(QObject):
             return
         worker = DeviceEventWorker(input_device, mapping_key)
         worker.signals.action.connect(self.action.emit)
+        worker.signals.completed.connect(
+            lambda path, w=worker: (
+                self._workers.pop(path, None) if self._workers.get(path) is w else None
+            )
+        )
         self._workers[input_device.path] = worker
         self.thread_pool.start(worker)
 
@@ -243,7 +255,7 @@ class DeviceMonitor(QObject):
         elif device_action == "remove":
             if device_path in self.connected_devices:
                 self.connected_devices.remove(device_path)
-                worker = self._workers.pop(device_path, None)
+                worker = self._workers.get(device_path)
                 if worker:
                     worker._stopped = True
                 logger.info(f"Device removed: {device_name} ({device_path})")

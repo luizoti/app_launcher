@@ -3,12 +3,12 @@ import signal
 import sys
 from logging import Logger, getLogger
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from src.gui.app import AppMainWindow
 from src.instance import (
     check_pid_exist,
-    destroy_pid_file,
     get_current_pid,
     read_pid_file,
     write_pid_file,
@@ -24,16 +24,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 app = QApplication(sys.argv)
 
 
-def signal_handler(signum, frame):
-    """Handle Ctrl+C to gracefully shutdown the app."""
-    logger.info("Received interrupt signal, shutting down...")
-    destroy_pid_file()
+def sigterm_handler(signum, frame):
     app.quit()
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGTERM, sigterm_handler)
+
+    timer = QTimer()
+    timer.start(500)
+    timer.timeout.connect(lambda: None)
 
     loaded_pid: int = read_pid_file()
     if loaded_pid:

@@ -3,6 +3,7 @@ import logging
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QColor, QFont, QKeySequence, QPalette, QShortcut
 from PySide6.QtWidgets import (
+    QApplication,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -58,6 +59,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.device_monitor_worker.start_monitor()
 
         self._setup_tab_shortcut()
+        QApplication.instance().aboutToQuit.connect(self._on_about_to_quit)
 
     def _setup_tab_shortcut(self) -> None:
         shortcut = QShortcut(QKeySequence(Qt.Key.Key_Tab), self)
@@ -181,5 +183,6 @@ class AppMainWindow(QMainWindow, ActionManager):
         self._apply_window_mode(next_mode)
         logger.info(f"Window mode changed to: {next_mode.value}")
 
-    def __exit__(self):
+    def _on_about_to_quit(self) -> None:
+        self.device_monitor_worker.stop_all()
         destroy_pid_file()
