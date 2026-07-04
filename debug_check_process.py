@@ -15,11 +15,30 @@ BLOCK_LIST = ["emulationstation", "kodi", "moonlight", "pegasus", "retroarch"]
 LOG_FILE = "debug_process.log"
 
 
-def _dump_candidates(search_terms: list[str]) -> list[str]:
-    termos = [t.lower() for t in search_terms]
+def _dump_all_processes() -> list[str]:
     lines: list[str] = []
     lines.append(f"{'='*70}")
-    lines.append(f"VARRENDO TODOS OS PROCESSOS — busca por: {search_terms}")
+    lines.append("TODOS OS PROCESSOS (raw_name + raw_cmdline)")
+    lines.append(f"{'='*70}")
+
+    for proc in psutil.process_iter(["name", "cmdline", "pid"]):
+        try:
+            raw_name = proc.info.get("name")
+            raw_cmdline = proc.info.get("cmdline")
+            pid = proc.info.get("pid", "?")
+            lines.append(f"raw_name {raw_name}")
+            lines.append(f"raw_cmdline {raw_cmdline}")
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+
+    return lines
+
+
+def _dump_matches(search_terms: list[str]) -> list[str]:
+    termos = [t.lower() for t in search_terms]
+    lines: list[str] = []
+    lines.append(f"\n{'='*70}")
+    lines.append(f"MATCHES — busca por: {search_terms}")
     lines.append(f"{'='*70}")
 
     encontrados = 0
@@ -110,7 +129,8 @@ if __name__ == "__main__":
     all_lines.append(f"DEBUG PROCESS LOG — {datetime.now().isoformat()}")
     all_lines.append("")
 
-    all_lines.extend(_dump_candidates(BLOCK_LIST))
+    all_lines.extend(_dump_all_processes())
+    all_lines.extend(_dump_matches(BLOCK_LIST))
     all_lines.extend(_test_check_running_processes(BLOCK_LIST))
     for name in BLOCK_LIST:
         all_lines.extend(_test_focus_process(name))

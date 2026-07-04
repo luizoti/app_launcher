@@ -169,7 +169,7 @@ class DeviceMonitor(QObject):
     def _find_mapping_key(device_name: str) -> str | None:
         device_lower = device_name.lower()
         for key in settings.mappings:
-            if key.lower() == device_lower or key.lower() in device_lower:
+            if key.lower() in device_lower:
                 return key
         return None
 
