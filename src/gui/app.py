@@ -74,7 +74,6 @@ class AppMainWindow(QMainWindow, ActionManager):
             self.tray_icon.handle_connection_status
         )
 
-        self.device_monitor_worker.action.connect(self.app_grid.action_handler)
         self.device_monitor_worker.action.connect(self.action_handler)
 
     def _set_on_center(self):
@@ -140,10 +139,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         return None
 
     def action_handler(self, action_name: str) -> None:
-        logger.debug(f"action_handler called: {action_name}")
-
         if ActionManager._is_blocked():
-            logger.debug(f"action_handler: blocked ({action_name})")
             return
 
         if action_name == "toggle_view":
@@ -151,10 +147,9 @@ class AppMainWindow(QMainWindow, ActionManager):
             return
 
         if not self.isVisible():
-            logger.debug(f"action_handler: app not visible, ignoring {action_name}")
             return
 
-        method = getattr(self, action_name, None)
+        method = getattr(self.app_grid, action_name, None)
         if callable(method):
             method()
 
