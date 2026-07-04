@@ -13,9 +13,15 @@ class ActionManager:
 
     @staticmethod
     def _is_blocked() -> bool:
+        from src.settings import _get_config_file
+
+        cfg = _get_config_file()
+        logger.debug(f"_is_blocked: config_file={cfg}")
         block_list = get_settings().block_if_running
+        logger.debug(f"_is_blocked: block_list={block_list}")
         if block_list:
             running = check_running_processes(block_list)
+            logger.debug(f"_is_blocked: running={running}")
             if running:
                 return True
         return False
