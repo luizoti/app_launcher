@@ -14,8 +14,12 @@ class ActionManager:
         from src.utils import check_running_processes
 
         block_list = get_settings().block_if_running
+        logger.debug(
+            f"ActionManager.action_handler: {action_name}, block_list={block_list}"
+        )
         if block_list:
             running = check_running_processes(block_list)
+            logger.debug(f"ActionManager.action_handler: running={running}")
             if running:
                 return
 
