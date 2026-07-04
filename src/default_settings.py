@@ -89,7 +89,6 @@ DEFAULT_BLOCK_IF_RUNNING: list[str] = [
     "emulationstation",
     "pegasus",
     "retropie",
-    "moonlight",
     "retroarch",
     "x-terminal-emulator",
     "firefox",

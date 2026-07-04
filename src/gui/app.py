@@ -141,7 +141,9 @@ class AppMainWindow(QMainWindow, ActionManager):
         return None
 
     def action_handler(self, action_name: str) -> None:
+        logger.debug(f"action_handler: {action_name}")
         if ActionManager._is_blocked():
+            logger.debug(f"action_handler: blocked ({action_name})")
             return
 
         if action_name == "toggle_view":
@@ -149,11 +151,14 @@ class AppMainWindow(QMainWindow, ActionManager):
             return
 
         if not self.isVisible():
+            logger.debug(f"action_handler: not visible ({action_name})")
             return
 
         method = getattr(self.app_grid, action_name, None)
         if callable(method):
             method()
+        else:
+            logger.debug(f"action_handler: no method {action_name}")
 
     def _apply_window_mode(self, mode: WindowMode | None = None) -> None:
         mode = mode or settings.window.window_mode

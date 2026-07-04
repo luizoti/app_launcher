@@ -1,5 +1,9 @@
+import logging
+
 from src.settings import get_settings
 from src.utils import check_running_processes
+
+logger = logging.getLogger(__name__)
 
 
 class ActionManager:
@@ -9,5 +13,6 @@ class ActionManager:
         if block_list:
             running = check_running_processes(block_list)
             if running:
+                logger.debug(f"_is_blocked: {running}")
                 return True
         return False

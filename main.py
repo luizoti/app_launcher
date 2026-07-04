@@ -3,7 +3,6 @@ import signal
 import sys
 from logging import Logger, getLogger
 
-from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
 from src.gui.app import AppMainWindow
@@ -31,10 +30,6 @@ def sigterm_handler(signum, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, sigterm_handler)
-
-    timer = QTimer()
-    timer.start(500)
-    timer.timeout.connect(lambda: None)
 
     loaded_pid: int = read_pid_file()
     if loaded_pid:
