@@ -1,6 +1,7 @@
 """Protocols for device/input event handling (evdev, pyudev)."""
 
 import typing
+from collections.abc import Iterator
 
 
 class InputEventProtocol(typing.Protocol):
@@ -13,8 +14,8 @@ class InputEventProtocol(typing.Protocol):
     @property
     def value(self) -> int: ...
 
-    keystate: str
-    scancode: str
+    keystate: int
+    scancode: int
 
 
 class KeyEventProtocol(InputEventProtocol):
@@ -31,7 +32,7 @@ class InputDeviceEvDevProtocol(typing.Protocol):
     @property
     def path(self) -> str: ...
 
-    def read_loop(self): ...  # type: ignore
+    def read_loop(self) -> Iterator[InputEventProtocol]: ...
 
 
 class InputDevicePyDevProtocol(typing.Protocol):

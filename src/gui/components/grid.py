@@ -8,7 +8,6 @@ from PySide6.QtWidgets import QGridLayout, QWidget
 from src.command_executor import CommandExecutor
 from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
-from src.settings import get_settings
 from src.types.schemas import AppsModel
 from src.utils import _extract_process_name, _focus_process
 
@@ -20,7 +19,7 @@ FORCE_FOCUS_ON_NAVIGATE = False
 class AppGrid(QGridLayout, ActionManager):
     actions = Signal(int)
 
-    def __init__(self, row_limit: int = 6):
+    def __init__(self, row_limit: int = 6) -> None:
         super().__init__()
         self.row_limit: int = row_limit
         self.mapped_grid: list[tuple[CustomButton, ...]] = []
@@ -47,7 +46,7 @@ class AppGrid(QGridLayout, ActionManager):
                 label_changer(f"Focused {target}")
                 return
 
-            def on_success():
+            def on_success() -> None:
                 if hide_window:
                     hide_window()
 
@@ -76,7 +75,7 @@ class AppGrid(QGridLayout, ActionManager):
             )
             for x in apps.items()
         )
-        self.mapped_grid: list[tuple[CustomButton, ...]] = list(
+        self.mapped_grid = list(
             more_itertools.batched(
                 iterable=apps_iter,
                 n=self.row_limit,

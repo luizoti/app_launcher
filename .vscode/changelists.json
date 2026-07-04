@@ -1,0 +1,32 @@
+{
+  "changelists": [
+    {
+      "name": "Default",
+      "files": [
+        ".vscode/changelists.json",
+        "src/gui/app.py",
+        "pyproject.toml",
+        "src/command_executor.py",
+        "src/gui/centralized_resolution.py",
+        "src/gui/components/context_menu.py",
+        "src/gui/components/custom_button.py",
+        "src/gui/components/device_monitor.py",
+        "src/gui/components/grid.py",
+        "src/gui/components/tray_icon.py",
+        "src/log.py",
+        "src/utils.py",
+        "uv.lock",
+        "src/types/protocols/device.py",
+        "typings/evdev/ecodes.pyi",
+        "typings/evdev/events.pyi",
+        "typings/evdev/util.pyi",
+        "make.py",
+        "src/settings.py",
+        "src/enums.py",
+        "src/types/protocols/command.py",
+        "tests/test_command_executor.py"
+      ]
+    }
+  ],
+  "active": "Default"
+}

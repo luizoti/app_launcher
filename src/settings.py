@@ -98,19 +98,16 @@ class Settings(BaseSettings):
     def from_json(cls) -> "Settings":
         """Load from JSON, merge with defaults."""
         json_data = cls._load_json()
-
-        merged = {
-            "apps": cls._merge_apps(json_data.get("apps")),
-            "mappings": cls._merge_mappings(json_data.get("mappings")),
-            "menu": json_data.get("menu", DEFAULT_MENU.model_dump()),
-            "tray": json_data.get("tray", DEFAULT_TRAY.model_dump()),
-            "window": json_data.get("window", DEFAULT_WINDOW.model_dump()),
-            "block_if_running": json_data.get(
+        return cls(
+            apps=cls._merge_apps(json_data.get("apps")),
+            mappings=cls._merge_mappings(json_data.get("mappings")),
+            menu=json_data.get("menu", DEFAULT_MENU),
+            tray=json_data.get("tray", DEFAULT_TRAY),
+            window=json_data.get("window", DEFAULT_WINDOW),
+            block_if_running=json_data.get(
                 "block_if_running", DEFAULT_BLOCK_IF_RUNNING
             ),
-        }
-
-        return cls(**merged)
+        )
 
     apps: dict[str, AppsModel] = Field(default=DEFAULT_APPS)
     mappings: dict[str, DeviceMappingsModel] = Field(default=DEFAULT_MAPPINGS)

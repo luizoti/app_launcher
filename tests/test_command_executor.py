@@ -31,9 +31,8 @@ class TestCommandValidator:
 
     def test_none_command_raises_error(self):
         validator = CommandValidator()
-        with pytest.raises(InvalidArgumentError) as exc_info:
+        with pytest.raises(InvalidArgumentError):
             validator.validate(None)
-        assert "None" in str(exc_info.value)
 
     def test_empty_command_raises_error(self):
         validator = CommandValidator()

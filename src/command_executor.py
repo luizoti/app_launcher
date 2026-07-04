@@ -1,7 +1,7 @@
 import logging
 import os
 import shlex
-import subprocess
+import subprocess  # nosec
 import traceback
 import typing
 
@@ -47,8 +47,8 @@ class InvalidArgumentError(CommandError):
 
 class CommandValidator:
     def validate(self, command: list[str] | str) -> None:
-        if command is None:
-            raise InvalidArgumentError("Command cannot be None")
+        if not command:
+            raise InvalidArgumentError("Command cannot be empty")
 
         args_list = shlex.split(command) if isinstance(command, str) else list(command)
 
@@ -91,8 +91,8 @@ class ProcessRunner:
         args: list[str],
         env: dict[str, str],
         timeout: int | None = None,
-    ) -> subprocess.Popen:
-        return subprocess.Popen(
+    ) -> subprocess.Popen[bytes]:
+        return subprocess.Popen(  # nosec
             args=args,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -108,7 +108,7 @@ class CommandExecutor:
         env_cleaner: EnvironmentCleanerProtocol | None = None,
         process_runner: ProcessRunnerProtocol | None = None,
         timeout: int | None = None,
-    ):
+    ) -> None:
         self.validator = validator or CommandValidator()
         self.env_cleaner = env_cleaner or EnvironmentCleaner()
         self.process_runner = process_runner or ProcessRunner()

@@ -23,7 +23,7 @@ class CustomButton(QPushButton):
         name: str | None = None,
         size: tuple[int, ...] | None = None,
         icon_size: QSize | None = None,
-    ):
+    ) -> None:
         self.name = name or ""
         self.on_success = on_success
         self.on_error = on_error
@@ -104,16 +104,16 @@ class CustomButton(QPushButton):
         self._update_visuals(self.hasFocus())
         super().leaveEvent(event)
 
-    def focusInEvent(self, event: QFocusEvent) -> None:
+    def focusInEvent(self, arg__1: QFocusEvent) -> None:
         self._update_visuals(True)
-        super().focusInEvent(event)
+        super().focusInEvent(arg__1)
 
-    def focusOutEvent(self, event: QFocusEvent) -> None:
+    def focusOutEvent(self, arg__1: QFocusEvent) -> None:
         self._update_visuals(self.underMouse())
-        super().focusOutEvent(event)
+        super().focusOutEvent(arg__1)
 
-    def keyPressEvent(self, event: QKeyEvent) -> None:
-        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+    def keyPressEvent(self, arg__1: QKeyEvent) -> None:
+        if arg__1.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.click()
         else:
-            super().keyPressEvent(event)
+            super().keyPressEvent(arg__1)

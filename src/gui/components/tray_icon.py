@@ -15,7 +15,7 @@ class TrayIcon(QSystemTrayIcon):
     def __init__(
         self,
         parent: QObject | None = None,
-    ):
+    ) -> None:
         super().__init__(parent=parent)
         self.settings = settings
         self.menu = ContextMenu()
@@ -25,15 +25,15 @@ class TrayIcon(QSystemTrayIcon):
         self.setContextMenu(self.menu)
         self.setVisible(True)
 
-    def _on_toggle_visibility(self):
+    def _on_toggle_visibility(self) -> None:
         """Callback para alternar a visibilidade da interface."""
         self.tray_action.emit("toggle_view")
 
-    def _on_exit(self):
+    def _on_exit(self) -> None:
         """Callback para fechar a aplicação."""
         self.tray_action.emit("close")
 
-    def _set_signals(self):
+    def _set_signals(self) -> None:
         self.activated.connect(self._handle_tray_click)
 
         if self.menu.change_visibility_action:
@@ -45,17 +45,17 @@ class TrayIcon(QSystemTrayIcon):
             self.menu.exit_action.triggered.connect(self._on_exit)
 
     @Slot(QSystemTrayIcon.ActivationReason)
-    def _handle_tray_click(self, reason: QSystemTrayIcon.ActivationReason):
+    def _handle_tray_click(self, reason: QSystemTrayIcon.ActivationReason) -> None:
         if reason == self.ActivationReason.Trigger:
             self.tray_action.emit("toggle_view")
 
     @Slot(str)
-    def handler_switch_icon(self, reason: str):
+    def handler_switch_icon(self, reason: str) -> None:
         if self.settings:
             self.setIcon(get_icon(getattr(settings.tray, reason)))
 
     @Slot(str)
-    def handle_connection_status(self, status: str):
+    def handle_connection_status(self, status: str) -> None:
         if self.settings:
             if status == "connected":
                 self.setIcon(get_icon(self.settings.tray.connected))

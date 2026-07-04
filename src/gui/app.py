@@ -28,7 +28,7 @@ settings: Settings = get_settings()
 
 
 class AppMainWindow(QMainWindow, ActionManager):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowIcon(get_icon(settings.tray.standby))
         self._apply_window_mode(settings.window.window_mode)
@@ -59,13 +59,15 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.device_monitor_worker.start_monitor()
 
         self._setup_tab_shortcut()
-        QApplication.instance().aboutToQuit.connect(self._on_about_to_quit)
+        app_instance = QApplication.instance()
+        if app_instance:
+            app_instance.aboutToQuit.connect(self._on_about_to_quit)
 
     def _setup_tab_shortcut(self) -> None:
         shortcut = QShortcut(QKeySequence(Qt.Key.Key_Tab), self)
         shortcut.activated.connect(self._cycle_window_mode)
 
-    def _set_signals(self):
+    def _set_signals(self) -> None:
         self.tray_icon.tray_action.connect(self.action_handler)
 
         self.device_monitor_worker.tray_action.connect(
@@ -78,19 +80,19 @@ class AppMainWindow(QMainWindow, ActionManager):
 
         self.device_monitor_worker.action.connect(self.action_handler)
 
-    def _set_on_center(self):
+    def _set_on_center(self) -> None:
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
 
     def _get_apps_list(self) -> dict[str, AppsModel]:
         return settings.apps
 
-    def _open_settings(self):
+    def _open_settings(self) -> None:
         logger.debug("Settings clicked (implement future UI)")
 
     def _change_label_text(self, new_text: str) -> None:
         self.info_label.setText(new_text.capitalize())
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         central_widget = QWidget(self)
         main_layout = QVBoxLayout()
 
@@ -133,7 +135,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.setVisible(True)
         return None
 
-    def toggle_view(self):
+    def toggle_view(self) -> None:
         if self.isVisible():
             self.setVisible(False)
             return None

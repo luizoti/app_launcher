@@ -18,7 +18,7 @@ def check_running_processes(search_process: list[str]) -> list[str]:
         try:
             name = (proc.info.get("name") or "").lower()
             cmdline = " ".join(proc.info.get("cmdline") or []).lower()
-            for term_lower, term_orig in zip(search_lower, search_process):
+            for term_lower, term_orig in zip(search_lower, search_process, strict=True):
                 if term_lower in name or name in term_lower or term_lower in cmdline:
                     matched.add(term_orig)
         except (psutil.NoSuchProcess, psutil.AccessDenied):

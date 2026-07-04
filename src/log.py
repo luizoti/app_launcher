@@ -5,7 +5,7 @@ from typing import TextIO
 from src.settings import get_config_directory
 
 
-def setup_logging(debug: bool = False):
+def setup_logging(debug: bool = False) -> None:
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
     root_logger: logging.Logger = logging.getLogger()

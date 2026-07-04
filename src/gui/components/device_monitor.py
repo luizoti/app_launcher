@@ -1,12 +1,23 @@
+# LLM não remova `# type: ignore[import]`
+# dos blocos e importações eles suprimem erros de importação
+
 import logging
 from typing import cast
 
-import pyudev  # type: ignore
+import pyudev  # type: ignore[import]
 from evdev import ecodes
 from evdev.device import InputDevice
-from evdev.util import categorize, list_devices  # type: ignore
-from PySide6.QtCore import QObject, QRunnable, QThread, QThreadPool, Signal, Slot
-from pyudev.pyside6 import MonitorObserver  # type: ignore
+from evdev.events import InputEvent  # type: ignore[import]
+from evdev.util import categorize, list_devices  # type: ignore[    import]
+from PySide6.QtCore import Slot  # type: ignore[import]
+from PySide6.QtCore import (  # type: ignore[import]
+    QObject,
+    QRunnable,
+    QThread,
+    QThreadPool,
+    Signal,
+)
+from pyudev.pyside6 import MonitorObserver  # type: ignore[import]
 
 from src.settings import Settings, get_settings
 from src.types.protocols.device import (
@@ -48,20 +59,15 @@ class DeviceEventWorker(QRunnable):
             ecodes.ABS_HAT0Y: {-1: "up", 1: "down"},  # type: ignore
         }
 
-    def _get_action(self, event: InputEventProtocol) -> str | None:
+    def _get_action(self, event: InputEvent) -> str | None:
         if not self._device_mappings:
             return None
         try:
-            key_event = cast(KeyEventProtocol, categorize(event))
+            key_event: KeyEventProtocol = cast(KeyEventProtocol, categorize(event))
             if key_event.keystate != 1:
                 return None
             event_code = str(event.code)
             action = self._device_mappings.buttons.get(event_code)
-            if action is None:
-                try:
-                    action = self._device_mappings.buttons.get(int(event_code))
-                except (ValueError, TypeError):
-                    pass
             if action is None:
                 logger.debug(
                     f"No mapping for code {event_code} on {self.input_device.name}"
@@ -71,7 +77,7 @@ class DeviceEventWorker(QRunnable):
             return None
 
     @Slot()
-    def run(self):
+    def run(self) -> None:
         logger.debug(f"Worker thread: {QThread.currentThread()}")
         self.signals.started.emit(self.input_device.path)
         emit_action = self.signals.action.emit
@@ -79,12 +85,12 @@ class DeviceEventWorker(QRunnable):
         try:
             event: InputEventProtocol
             for event in self.input_device.read_loop():
-                if event.type == ecodes.EV_KEY:
-                    action = self._get_action(event)
+                if event.type == ecodes.EV_KEY:  # type: ignore
+                    action = self._get_action(cast(InputEvent, event))
                     if action:
                         logger.debug(f"[ACTION] {action} emitted")
                         emit_action(action)
-                elif event.type == ecodes.EV_ABS:
+                elif event.type == ecodes.EV_ABS:  # type: ignore
                     dpad = self._ev_abs_mapping.get(event.code)
                     if dpad:
                         direction = dpad.get(event.value)
@@ -105,7 +111,7 @@ class DeviceMonitor(QObject):
     tray_action = Signal(str)
     connection_status = Signal(str)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.thread_pool = QThreadPool().globalInstance()
         self.connected_devices: list[str] = []
@@ -123,7 +129,7 @@ class DeviceMonitor(QObject):
         self._print_allowed()
 
     @Slot()
-    def start_monitor(self):
+    def start_monitor(self) -> None:
         self.context = pyudev.Context()
         self.monitor = pyudev.Monitor.from_netlink(self.context)
         self.monitor.filter_by(subsystem="input")
@@ -140,10 +146,9 @@ class DeviceMonitor(QObject):
     def _print_detected(self) -> None:
         logger.info("=== DETECTED DEVICES ===")
         devices = (
-            cast(InputDeviceEvDevProtocol, InputDevice(path))
-            for path in cast(list[str], list_devices())
+            cast(InputDeviceEvDevProtocol, InputDevice(path)) for path in list_devices()
         )
-        for item in devices:  # type: ignore
+        for item in devices:
             logger.info(f"  - {item.name} | {item.path}")
         logger.info("=========================")
 
@@ -190,10 +195,11 @@ class DeviceMonitor(QObject):
         input_device = cast(InputDeviceEvDevProtocol, InputDevice(device_path))
         if self._find_mapping_key(input_device.name):
             return input_device
+        return None
 
     def _get_devices_on_start(self) -> None:
-        for device_path in list_devices():  # type: ignore
-            valid_device = self._valid_device(device_path=device_path)  # type: ignore
+        for device_path in list_devices():
+            valid_device = self._valid_device(device_path)
             if not valid_device:
                 continue
             self.connected_devices.append(valid_device.path)
@@ -202,7 +208,7 @@ class DeviceMonitor(QObject):
         self._check_connection_status()
         return None
 
-    def create_new_treaded_device(self, input_device: InputDeviceEvDevProtocol):
+    def create_new_treaded_device(self, input_device: InputDeviceEvDevProtocol) -> None:
         mapping_key = self._find_mapping_key(input_device.name)
         if not mapping_key:
             return
@@ -240,7 +246,8 @@ class DeviceMonitor(QObject):
                 logger.debug(f"Device already tracked: {device_path}")
                 return
             try:
-                input_device: InputDeviceEvDevProtocol = self._valid_device(device_path)
+                input_device: InputDeviceEvDevProtocol | None
+                input_device = self._valid_device(device_path)
             except Exception as e:
                 logger.error(f"Failed to open device {device_path}: {e}")
                 return

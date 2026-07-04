@@ -1,6 +1,6 @@
 """Protocols for command execution."""
 
-import subprocess
+import subprocess  # type: ignore[import]
 import typing
 
 

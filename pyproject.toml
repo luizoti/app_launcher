@@ -18,6 +18,8 @@ dependencies = [
   "pytest>=7.0.0",
   "pillow>=12.2.0",
   "more-itertools>=11.0.2",
+  "types-psutil>=7.2.2.20260518",
+  "pyside6-stubs>=6.7.3.0",
 ]
 
 [tool.uv]

@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 
 
 class CentralizedAppResolution:
-    def __init__(self, app: QMainWindow):
+    def __init__(self, app: QMainWindow) -> None:
         super().__init__()
         application_primary_screen = QApplication.primaryScreen()
         if application_primary_screen:
