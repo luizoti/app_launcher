@@ -84,4 +84,15 @@ DEFAULT_MENU = MenuModel(
     settings="menu_settings.ico",
 )
 
-DEFAULT_BLOCK_IF_RUNNING: list[str] = []
+DEFAULT_BLOCK_IF_RUNNING: list[str] = [
+    "kodi",
+    "emulationstation",
+    "pegasus",
+    "retropie",
+    "moonlight",
+    "retroarch",
+    "x-terminal-emulator",
+    "firefox",
+    "chromium",
+    "google-chrome",
+]
