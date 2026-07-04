@@ -10,7 +10,7 @@ from src.gui.action_manager import ActionManager
 from src.gui.components.custom_button import CustomButton
 from src.settings import get_settings
 from src.types.schemas import AppsModel
-from src.utils import _extract_process_name, _focus_process, check_running_processes
+from src.utils import _extract_process_name, _focus_process
 
 LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -38,12 +38,9 @@ class AppGrid(QGridLayout, ActionManager):
         """Create a button with command based on app name and app data."""
 
         def on_click(*_: typing.Any) -> None:
-            block_list = get_settings().block_if_running
-            if block_list:
-                running = check_running_processes(block_list)
-                if running:
-                    label_changer(f"Blocked by: {', '.join(running)}")
-                    return
+            if ActionManager._is_blocked():
+                label_changer("Blocked by running process")
+                return
 
             target = _extract_process_name(app_data.cmd)
             if _focus_process(target):

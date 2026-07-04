@@ -21,7 +21,6 @@ from src.gui.icons.cache_loader import get_icon
 from src.instance import destroy_pid_file
 from src.settings import Settings, get_settings
 from src.types.schemas import AppsModel, WindowMode
-from src.utils import check_running_processes
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
@@ -143,11 +142,9 @@ class AppMainWindow(QMainWindow, ActionManager):
     def action_handler(self, action_name: str) -> None:
         logger.debug(f"action_handler called: {action_name}")
 
-        if settings.block_if_running:
-            running = check_running_processes(settings.block_if_running)
-            if running:
-                logger.debug(f"action_handler: blocked by running processes: {running}")
-                return
+        if ActionManager._is_blocked():
+            logger.debug(f"action_handler: blocked ({action_name})")
+            return
 
         if action_name == "toggle_view":
             self.toggle_view()
