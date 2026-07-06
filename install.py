@@ -127,9 +127,10 @@ def build():
 
 
 def install():
-    """Instala binário em ~/.local/bin/."""
-    print("=== Instalação do AppLauncher ===\n")
+    """Build, instala, configura autostart, atalhos, permissões e reinicia."""
+    print("=== Instalação completa do AppLauncher ===\n")
 
+    build()
     user_home = get_user_home(1000)
     target_dir = os.path.join(user_home, ".local", "bin")
     target_bin = os.path.join(target_dir, "app_launcher")
@@ -140,8 +141,7 @@ def install():
     source_bin = os.path.join(script_dir, "dist", "app_launcher")
 
     if not os.path.exists(source_bin):
-        print("Binário não encontrado. Execute 'install.py build' primeiro.")
-        print(f"Procurando em: {source_bin}")
+        print(f"Erro: binário não encontrado em {source_bin}")
         sys.exit(1)
 
     if os.path.exists(target_bin):
@@ -157,7 +157,14 @@ def install():
 
     print(f"Instalação concluída em: {target_bin}")
 
-    print("\n=== Reiniciando AppLauncher ===\n")
+    desktop_shortcuts(skip_bin_check=True)
+    print()
+    autostart(skip_bin_check=True)
+    print()
+    permissions()
+    print()
+
+    print("=== Reiniciando AppLauncher ===\n")
     restart_app(target_bin)
 
 
@@ -178,7 +185,7 @@ def restart_app(binary_path: str) -> None:
     print("AppLauncher reiniciado.")
 
 
-def autostart():
+def autostart(skip_bin_check: bool = False):
     """Cria arquivo XDG autostart em ~/.config/autostart/."""
     print("=== Configuração de Autostart ===\n")
 
@@ -187,7 +194,7 @@ def autostart():
     autostart_dir = os.path.join(user_home, ".config", "autostart")
     autostart_file = os.path.join(autostart_dir, "app_launcher.desktop")
 
-    if not os.path.exists(target_bin):
+    if not skip_bin_check and not os.path.exists(target_bin):
         print(f"Erro: binário não encontrado em {target_bin}")
         print("Execute 'install.py install' primeiro.")
         sys.exit(1)
@@ -216,6 +223,64 @@ X-GNOME-Autostart-enabled=true
         sys.exit(1)
 
     print("Autostart configurado com XDG (sem sudo)")
+
+
+def desktop_shortcuts(skip_bin_check: bool = False):
+    """Cria atalhos .desktop em ~/.local/share/applications/."""
+    print("=== Atalhos de Menu ===\n")
+
+    user_home = get_user_home(1000)
+    target_bin = os.path.join(user_home, ".local", "bin", "app_launcher")
+    apps_dir = os.path.join(user_home, ".local", "share", "applications")
+
+    if not skip_bin_check and not os.path.exists(target_bin):
+        print(f"Erro: binário não encontrado em {target_bin}")
+        print("Execute 'install.py install' primeiro.")
+        sys.exit(1)
+
+    os.makedirs(apps_dir, exist_ok=True)
+
+    entries = [
+        {
+            "filename": "app_launcher.desktop",
+            "name": "AppLauncher",
+            "comment": "Iniciador de aplicativos para games",
+            "exec": target_bin,
+            "terminal": False,
+        },
+        {
+            "filename": "app_launcher-cli.desktop",
+            "name": "AppLauncher (Terminal)",
+            "comment": "Iniciador de aplicativos com saída no terminal",
+            "exec": target_bin,
+            "terminal": True,
+        },
+    ]
+
+    for entry in entries:
+        filepath = os.path.join(apps_dir, entry["filename"])
+        content = f"""[Desktop Entry]
+Type=Application
+Version=1.0
+Name={entry["name"]}
+Comment={entry["comment"]}
+Exec={entry["exec"]}
+Terminal={"true" if entry["terminal"] else "false"}
+Categories=Utility;Game;X-XFCE;
+"""
+
+        if os.path.exists(filepath):
+            backup_file(filepath)
+
+        try:
+            with open(filepath, "w") as f:
+                f.write(content)
+            os.chmod(filepath, 0o644)
+            print(f"Atalho criado: {filepath}")
+        except Exception as e:
+            print(f"Erro ao criar atalho {filepath}: {e}")
+
+    print("\nAtalhos disponíveis no menu iniciar.")
 
 
 def permissions():
@@ -385,35 +450,22 @@ def main():
         "command",
         nargs="?",
         default=None,
-        choices=["build", "install", "autostart", "permissions", "remove", "all"],
-        help="Comando a executar (padrão: all, ou 'all' se executado com sudo)",
+        choices=["build", "install", "autostart", "permissions", "remove", "desktop"],
+        help="Comando a executar (padrão: instalação completa automática)",
     )
     args = parser.parse_args()
 
     command = args.command
     if command is None:
-        if is_running_as_root():
-            command = "all"
-            print("[sudo] Executando fluxo completo automaticamente...\n")
-        else:
-            command = "all"
-
-    if command == "all":
-        print("=== Instalação completa do AppLauncher ===\n")
-        build()
-        print()
         install()
-        print()
-        autostart()
-        print()
-        permissions()
-        print("\n=== Instalação concluída ===")
     elif command == "build":
         build()
     elif command == "install":
         install()
     elif command == "autostart":
         autostart()
+    elif command == "desktop":
+        desktop_shortcuts()
     elif command == "permissions":
         permissions()
     elif command == "remove":
