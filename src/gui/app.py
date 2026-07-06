@@ -68,7 +68,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         shortcut.activated.connect(self._cycle_window_mode)
 
     def _set_signals(self) -> None:
-        self.tray_icon.tray_action.connect(self.action_handler)
+        self.tray_icon.tray_action.connect(self._tray_handler)
 
         self.device_monitor_worker.tray_action.connect(
             self.tray_icon.handler_switch_icon
@@ -79,6 +79,10 @@ class AppMainWindow(QMainWindow, ActionManager):
         )
 
         self.device_monitor_worker.action.connect(self.action_handler)
+
+    def _tray_handler(self, action_name: str) -> None:
+        if action_name == "toggle_view":
+            self.toggle_view()
 
     def _set_on_center(self) -> None:
         self.move(CentralizedAppResolution(app=self).centralized_resolution())
@@ -144,6 +148,7 @@ class AppMainWindow(QMainWindow, ActionManager):
 
     def action_handler(self, action_name: str) -> None:
         logger.debug(f"action_handler: {action_name}")
+
         if ActionManager._is_blocked():
             logger.debug(f"action_handler: blocked ({action_name})")
             return
