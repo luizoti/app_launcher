@@ -109,6 +109,7 @@ class Settings(BaseSettings):
             ),
         )
 
+    app_name: str = "App Launcher"
     apps: dict[str, AppsModel] = Field(default=DEFAULT_APPS)
     mappings: dict[str, DeviceMappingsModel] = Field(default=DEFAULT_MAPPINGS)
     menu: MenuModel = Field(default=DEFAULT_MENU)

@@ -20,7 +20,7 @@ class TrayIcon(QSystemTrayIcon):
         self.settings = settings
         self.menu = ContextMenu()
         self.setIcon(get_icon(settings.tray.standby))
-
+        self.setToolTip(settings.app_name)
         self._set_signals()
         self.setContextMenu(self.menu)
         self.setVisible(True)
