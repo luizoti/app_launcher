@@ -3,6 +3,7 @@ from datetime import datetime
 
 from evdev import UInput
 from evdev import ecodes as e
+from evdev.device import AbsInfo
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import (
@@ -17,17 +18,27 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+# Mapeamento código evdev → ação no app_launcher
+ACTION_MAP: dict[int, str] = {
+    e.BTN_A: "enter",
+    e.BTN_MODE: "toggle_view",
+}
+
+DPAD_ABS_MAP: dict[int, dict[int, str]] = {
+    e.ABS_HAT0X: {-1: "left", 1: "right"},
+    e.ABS_HAT0Y: {-1: "up", 1: "down"},
+}
+
 
 class DualGamepad(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Universal Virtual Controller (Xbox & PS)")
         self.setMinimumWidth(850)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
 
-        # Dicionário para guardar as referências dos botões para o efeito visual
-        self.button_map = {}
+        self.button_map: dict[int, QPushButton] = {}
 
-        # Inicializa o dispositivo virtual
         self.ui = UInput(
             {
                 e.EV_KEY: [
@@ -42,11 +53,11 @@ class DualGamepad(QMainWindow):
                     e.BTN_SELECT,
                     e.BTN_START,
                     e.BTN_MODE,
-                    e.BTN_DPAD_UP,
-                    e.BTN_DPAD_DOWN,
-                    e.BTN_DPAD_LEFT,
-                    e.BTN_DPAD_RIGHT,
-                ]
+                ],
+                e.EV_ABS: [
+                    (e.ABS_HAT0X, AbsInfo(0, -1, 1, 0, 0, 0)),
+                    (e.ABS_HAT0Y, AbsInfo(0, -1, 1, 0, 0, 0)),
+                ],
             },
             name="Virtual Joystick",
         )
@@ -65,24 +76,29 @@ class DualGamepad(QMainWindow):
             ("Guide", "PS", e.BTN_MODE),
         ]
 
-        # Mapeamento Teclado -> Código Evdev
         self.keyboard_map = {
-            Qt.Key_Up: e.BTN_DPAD_UP,
-            Qt.Key_Down: e.BTN_DPAD_DOWN,
-            Qt.Key_Left: e.BTN_DPAD_LEFT,
-            Qt.Key_Right: e.BTN_DPAD_RIGHT,
-            Qt.Key_Z: e.BTN_A,  # Exemplo: Z é o botão A
-            Qt.Key_X: e.BTN_B,  # Exemplo: X é o botão B
-            Qt.Key_Space: e.BTN_START,
+            Qt.Key_Up: (e.EV_ABS, e.ABS_HAT0Y, -1),
+            Qt.Key_Down: (e.EV_ABS, e.ABS_HAT0Y, 1),
+            Qt.Key_Left: (e.EV_ABS, e.ABS_HAT0X, -1),
+            Qt.Key_Right: (e.EV_ABS, e.ABS_HAT0X, 1),
+            Qt.Key_Z: (e.EV_KEY, e.BTN_A, 1),
+            Qt.Key_X: (e.EV_KEY, e.BTN_B, 1),
+            Qt.Key_Space: (e.EV_KEY, e.BTN_START, 1),
         }
 
         self._setup_ui()
+
+    def _action_label(self, code: int) -> str:
+        return ACTION_MAP.get(code, "")
+
+    def _dpad_action_label(self, code: int, val: int) -> str:
+        axis = DPAD_ABS_MAP.get(code, {})
+        return axis.get(val, "")
 
     def _setup_ui(self) -> None:
         main_layout = QVBoxLayout()
         top_layout = QGridLayout()
 
-        # Adicionando botões e registrando no mapa de botões
         top_layout.addWidget(self._create_dual_btn("LT", "L2"), 0, 0)
         top_layout.addWidget(self._create_dual_btn("RT", "R2"), 0, 2)
         top_layout.addWidget(self._create_dual_btn("LB", "L1"), 1, 0)
@@ -92,10 +108,10 @@ class DualGamepad(QMainWindow):
         mid_layout = QHBoxLayout()
 
         dpad_grid = QGridLayout()
-        dpad_grid.addWidget(self._make_raw_btn("▲", e.BTN_DPAD_UP), 0, 1)
-        dpad_grid.addWidget(self._make_raw_btn("◀", e.BTN_DPAD_LEFT), 1, 0)
-        dpad_grid.addWidget(self._make_raw_btn("▶", e.BTN_DPAD_RIGHT), 1, 2)
-        dpad_grid.addWidget(self._make_raw_btn("▼", e.BTN_DPAD_DOWN), 2, 1)
+        dpad_grid.addWidget(self._make_dpad_btn("▲", e.ABS_HAT0Y, -1), 0, 1)
+        dpad_grid.addWidget(self._make_dpad_btn("◀", e.ABS_HAT0X, -1), 1, 0)
+        dpad_grid.addWidget(self._make_dpad_btn("▶", e.ABS_HAT0X, 1), 1, 2)
+        dpad_grid.addWidget(self._make_dpad_btn("▼", e.ABS_HAT0Y, 1), 2, 1)
 
         center_vbox = QVBoxLayout()
         center_vbox.addStretch()
@@ -118,10 +134,12 @@ class DualGamepad(QMainWindow):
 
         self.console = QTextEdit()
         self.console.setReadOnly(True)
-        self.console.setMaximumHeight(120)
+        self.console.setMaximumHeight(140)
         self.console.setStyleSheet(
             "background-color: #121212; color: #00FF41; border: 1px solid #333;"
         )
+        self.console.append("  Event Stream — use botões ou teclado (↑↓←→/Z/X/Space)")
+        self.console.append("")
 
         main_layout.addLayout(top_layout)
         main_layout.addSpacing(20)
@@ -146,7 +164,7 @@ class DualGamepad(QMainWindow):
         """)
 
     def _create_dual_btn(
-        self, xbox_label: str, ps_label: str, color: str = None
+        self, xbox_label: str, ps_label: str, color: str | None = None
     ) -> QPushButton:
         display_text = f"{xbox_label}\n({ps_label})"
         code = next(item[2] for item in self.button_configs if item[0] == xbox_label)
@@ -154,24 +172,42 @@ class DualGamepad(QMainWindow):
         if color:
             btn.setStyleSheet(f"background-color: {color};")
 
-        btn.pressed.connect(lambda: self._trigger(f"{xbox_label}/{ps_label}", code, 1))
-        btn.released.connect(lambda: self._trigger(f"{xbox_label}/{ps_label}", code, 0))
+        btn.pressed.connect(
+            lambda: self._trigger_btn(f"{xbox_label}/{ps_label}", code, 1)
+        )
+        btn.released.connect(
+            lambda: self._trigger_btn(f"{xbox_label}/{ps_label}", code, 0)
+        )
 
-        # Registra o botão no dicionário usando o código evdev como chave
         self.button_map[code] = btn
         return btn
 
-    def _make_raw_btn(self, label: str, code: int) -> QPushButton:
+    def _make_dpad_btn(self, label: str, axis: int, val: int) -> QPushButton:
         btn = QPushButton(label)
-        btn.pressed.connect(lambda: self._trigger(label, code, 1))
-        btn.released.connect(lambda: self._trigger(label, code, 0))
-        self.button_map[code] = btn
+        btn.pressed.connect(lambda: self._trigger_axis(label, axis, val))
+        btn.released.connect(lambda: self._trigger_axis(label, axis, 0))
+        self.button_map[axis + val] = btn  # chave única para visual
         return btn
 
-    def _trigger(self, label: str, code: int, val: int) -> None:
+    def _trigger_btn(self, label: str, code: int, val: int) -> None:
         self.ui.write(e.EV_KEY, code, val)
         self.ui.syn()
-        msg = f"{'PRESSED' if val else 'RELEASED':<10} | {label:<12} | HW_CODE: {code}"
+        action = self._action_label(code)
+        action_str = f" → [{action}]" if action else ""
+        direction = "PRESSED" if val else "RELEASED"
+        msg = f"{direction:<10} | {label:<12} | CODE: {code}{action_str}"
+        self._log(msg)
+
+    def _trigger_axis(self, label: str, axis: int, val: int) -> None:
+        self.ui.write(e.EV_ABS, axis, val)
+        self.ui.syn()
+        action = self._dpad_action_label(axis, val)
+        action_str = f" → [{action}]" if action else ""
+        direction = "PRESSED" if val != 0 else "RELEASED"
+        msg = f"{direction:<10} | {label:<4}         | AXIS: {axis} VAL: {val:+d}{action_str}"
+        self._log(msg)
+
+    def _log(self, msg: str) -> None:
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         self.console.append(f"[{timestamp}] {msg}")
         self.console.moveCursor(QTextCursor.End)
@@ -183,28 +219,41 @@ class DualGamepad(QMainWindow):
             return
         key = event.key()
         if key in self.keyboard_map:
-            code = self.keyboard_map[key]
-            # Efeito Visual: Força o estado de pressionado via Propriedade Dinâmica
-            if code in self.button_map:
-                btn = self.button_map[code]
+            ev_type, code, val = self.keyboard_map[key]
+
+            self.ui.write(ev_type, code, val)
+            self.ui.syn()
+
+            if ev_type == e.EV_KEY:
+                btn_code = code
+            else:
+                btn_code = code + val
+
+            if btn_code in self.button_map:
+                btn = self.button_map[btn_code]
                 btn.setProperty("active", "true")
-                btn.style().unpolish(btn)  # Atualiza o estilo
+                btn.style().unpolish(btn)
                 btn.style().polish(btn)
-                btn.pressed.emit()  # Dispara a lógica de evdev
 
     def keyReleaseEvent(self, event):
         if event.isAutoRepeat():
             return
         key = event.key()
         if key in self.keyboard_map:
-            code = self.keyboard_map[key]
-            # Remove o efeito visual
-            if code in self.button_map:
-                btn = self.button_map[code]
+            ev_type, code, val = self.keyboard_map[key]
+            self.ui.write(ev_type, code, 0)
+            self.ui.syn()
+
+            if ev_type == e.EV_KEY:
+                btn_code = code
+            else:
+                btn_code = code + val
+
+            if btn_code in self.button_map:
+                btn = self.button_map[btn_code]
                 btn.setProperty("active", "false")
                 btn.style().unpolish(btn)
                 btn.style().polish(btn)
-                btn.released.emit()  # Dispara a lógica de evdev
 
 
 if __name__ == "__main__":
