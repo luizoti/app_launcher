@@ -157,6 +157,26 @@ def install():
 
     print(f"Instalação concluída em: {target_bin}")
 
+    print("\n=== Reiniciando AppLauncher ===\n")
+    restart_app(target_bin)
+
+
+def restart_app(binary_path: str) -> None:
+    """Mata instância atual e reinicia o app_launcher destacado."""
+    print("Encerrando instância atual do app_launcher...")
+    subprocess.run(
+        ["pkill", "-f", "^app_launcher"],
+        capture_output=True,
+    )
+    print(f"Iniciando {binary_path}...")
+    subprocess.Popen(
+        [binary_path],
+        start_new_session=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    print("AppLauncher reiniciado.")
+
 
 def autostart():
     """Cria arquivo XDG autostart em ~/.config/autostart/."""
