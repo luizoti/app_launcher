@@ -90,8 +90,4 @@ DEFAULT_BLOCK_IF_RUNNING: list[str] = [
     "pegasus",
     "retropie",
     "retroarch",
-    "x-terminal-emulator",
-    "firefox",
-    "chromium",
-    "google-chrome",
 ]
