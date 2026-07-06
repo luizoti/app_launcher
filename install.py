@@ -130,10 +130,16 @@ def install():
     """Build, instala, configura autostart, atalhos, permissões e reinicia."""
     print("=== Instalação completa do AppLauncher ===\n")
 
-    build()
     user_home = get_user_home(1000)
     target_dir = os.path.join(user_home, ".local", "bin")
     target_bin = os.path.join(target_dir, "app_launcher")
+
+    desktop_shortcuts(skip_bin_check=True)
+    print()
+    autostart(skip_bin_check=True)
+    print()
+
+    build()
 
     os.makedirs(target_dir, exist_ok=True)
 
@@ -157,10 +163,6 @@ def install():
 
     print(f"Instalação concluída em: {target_bin}")
 
-    desktop_shortcuts(skip_bin_check=True)
-    print()
-    autostart(skip_bin_check=True)
-    print()
     permissions()
     print()
 
