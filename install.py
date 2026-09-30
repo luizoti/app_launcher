@@ -67,6 +67,12 @@ def build():
 
     compile_resources()
 
+    sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+    from src.version import write_build_version
+
+    if write_build_version():
+        print("Versão registrada no bundle.")
+
     script_dir = os.path.abspath(os.path.dirname(__file__))
     main_py = os.path.join(script_dir, "main.py")
 
@@ -74,24 +80,20 @@ def build():
         print(f"Erro: main.py não encontrado em {script_dir}")
         sys.exit(1)
 
+    # Apenas imports que src/ realmente alcanca. requests, systemd.journal e
+    # PySide6.QtOpenGL nao sao usados pelo bundle.
     hidden_imports = [
-        "requests",
         "PySide6.QtWidgets",
         "PySide6.QtGui",
         "PySide6.QtCore",
-        "PySide6.QtOpenGL",
-        "systemd.journal",
         "src.gui.icons.rc_icons",
     ]
 
     icons_dir = os.path.join(script_dir, "icons")
-    rc_icons = os.path.join(script_dir, "src", "gui", "icons", "rc_icons.py")
 
     datas = []
     if os.path.exists(icons_dir):
         datas.append((icons_dir, "icons"))
-    if os.path.exists(rc_icons):
-        datas.append((rc_icons, "src/gui/icons/rc_icons.py"))
 
     command = [
         "uv",
@@ -99,6 +101,7 @@ def build():
         "pyinstaller",
         "--onefile",
         "--clean",
+        "--noconfirm",
         "--name=app_launcher",
     ]
 

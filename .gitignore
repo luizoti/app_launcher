@@ -7,3 +7,6 @@
 *.kra~
 *.ico~
 *.log.*
+
+# gerado no build com a versão congelada no bundle
+/src/_build_version.py

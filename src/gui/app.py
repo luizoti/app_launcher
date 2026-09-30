@@ -22,6 +22,7 @@ from src.gui.icons.cache_loader import get_icon
 from src.instance import destroy_pid_file
 from src.settings import Settings, get_settings
 from src.types.schemas import AppsModel, WindowMode
+from src.version import get_version
 
 logger: logging.Logger = logging.getLogger(__name__)
 settings: Settings = get_settings()
@@ -35,6 +36,12 @@ class AppMainWindow(QMainWindow, ActionManager):
         self.app_grid = AppGrid(row_limit=settings.window.apps_per_row)
         self.info_label = QLabel("Select an app")
         self.info_label.setFont(QFont("Arial", 12, weight=QFont.Weight.Bold))
+
+        app_version = get_version()
+        self.version_label = QLabel(app_version)
+        self.version_label.setFont(QFont("Arial", 7))
+        self.version_label.setStyleSheet("color: #7a7f87;")
+        self.version_label.setToolTip(f"App Launcher {app_version}")
 
         self.setWindowTitle("Application Launcher")
         self.setFixedSize(
@@ -110,6 +117,7 @@ class AppMainWindow(QMainWindow, ActionManager):
         main_layout.setAlignment(created_app_grid, Qt.AlignmentFlag.AlignCenter)
 
         config_layout = QHBoxLayout()
+        config_layout.setContentsMargins(8, 0, 0, 4)
 
         config_button = CustomButton(
             name="Settings", size=(48, 48), icon_size=QSize(40, 40)
@@ -126,7 +134,19 @@ class AppMainWindow(QMainWindow, ActionManager):
 
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # canto inferior esquerdo
+        config_layout.addWidget(
+            self.version_label,
+            alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter,
+        )
+        config_layout.addStretch(1)
+
         config_layout.addWidget(self.info_label)
+
+        # stretch após o nome mantém o info_label no centro geométrico da
+        # janela, mesmo com a versão à esquerda e os botões à direita
+        config_layout.addStretch(1)
+
         config_layout.addWidget(hide_button)
         config_layout.addWidget(config_button)
 

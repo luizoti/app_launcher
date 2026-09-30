@@ -1,0 +1,27 @@
+# Build context for Dockerfile.build (ARM64 cross build).
+# Everything here is either regenerated inside the image or host specific.
+
+.git
+.github
+.trunk
+.vscode
+.idea
+
+# Host virtualenv: absolute paths from the build machine, would break uv sync
+.venv
+
+# PyInstaller output, rebuilt inside the image
+build
+dist
+
+# Python caches
+__pycache__
+*.pyc
+*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Logs and local artifacts
+*.log
+app_launcher.spec

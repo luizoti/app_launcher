@@ -1,0 +1,126 @@
+# syntax=docker/dockerfile:1
+
+# Cross build for the Raspberry Pi (aarch64) from an x86_64 host.
+#
+# Base image must stay on glibc 2.36 to match the target
+# (Debian 12 bookworm, glibc 2.36-9+rpt2) and Python must stay on 3.10.8 to
+# match .python-version / requires-python == "==3.10.8" in pyproject.toml.
+#
+# The arm64 platform is not optional: pyproject.toml declares
+# required-environments = aarch64 linux, so uv refuses to sync anywhere else.
+# That also means a plain `docker build` on an x86_64 host fails early and
+# loudly instead of producing a binary for the wrong architecture.
+# Build with: ./build-arm64.sh
+
+FROM python:3.10-slim-bookworm
+
+ARG UV_VERSION=0.11.0
+ARG PYTHON_VERSION=3.10.8
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_CACHE_DIR=/opt/uv-cache \
+    UV_PYTHON=${PYTHON_VERSION}
+
+# build-essential + linux-libc-dev: evdev 1.7.1 ships no wheels at all, only
+# an sdist, so uv compiles it from source and it needs a C toolchain plus
+# linux/input.h and linux/input-event-codes.h from the kernel headers.
+# file is needed by the architecture assertion at the end of this file.
+# The Qt and X11 libraries are needed because PySide6 wheels do not bundle
+# them, so without them PyInstaller cannot resolve PySide6.QtGui/QtWidgets
+# dependencies and the produced binary would miss libGL/libEGL at runtime.
+# libdouble-conversion3, libsm6 and libice6 close the remaining dependency
+# chain of QtCore/QtGui/QtWidgets, of rcc, and of the xcb platform plugin.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        binutils \
+        build-essential \
+        file \
+        linux-libc-dev \
+        libdouble-conversion3 \
+        libglib2.0-0 \
+        libegl1 \
+        libgl1 \
+        libdbus-1-3 \
+        libfontconfig1 \
+        libfreetype6 \
+        libice6 \
+        libsm6 \
+        libx11-6 \
+        libxcb1 \
+        libxcb-cursor0 \
+        libxcb-icccm4 \
+        libxcb-image0 \
+        libxcb-keysyms1 \
+        libxcb-randr0 \
+        libxcb-render-util0 \
+        libxcb-shape0 \
+        libxcb-xinerama0 \
+        libxcb-xkb1 \
+        libxkbcommon0 \
+        libxkbcommon-x11-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir "uv==${UV_VERSION}"
+
+# CPython 3.10.8 from python-build-standalone, the same build the Pi uses for
+# its own .venv. Required because the lockfile pins ==3.10.8.
+RUN uv python install "${PYTHON_VERSION}" && uv python find "${PYTHON_VERSION}"
+
+WORKDIR /app
+
+# Dependency layer: invalidated only when the lockfile changes.
+# --frozen keeps uv from re-resolving (and rewriting) the committed lockfile.
+COPY pyproject.toml uv.lock .python-version ./
+RUN uv sync --frozen --no-install-project --no-progress
+
+COPY main.py ./
+COPY src ./src
+COPY icons ./icons
+
+# Guard: a missing Qt system library only surfaces as an ImportError here or
+# inside pyside6-rcc, deep into the build. Fail early with a clear message.
+RUN uv run --no-sync python -c "\
+from PySide6 import QtCore, QtGui, QtWidgets; \
+print('PySide6', QtCore.__version__, 'import OK')"
+
+# src/gui/icons/rc_icons.py is committed, but regenerate it when icons.qrc is
+# newer so the bundle never ships stale artwork.
+RUN set -eux; \
+    qrc=src/gui/icons/icons.qrc; \
+    out=src/gui/icons/rc_icons.py; \
+    if [ ! -f "$out" ] || [ "$qrc" -nt "$out" ]; then \
+        uv run --no-sync pyside6-rcc -o "$out" "$qrc"; \
+    fi
+
+# .git is not in the build context, so the version cannot be read from git.
+# build-arm64.sh passes the commit-derived version as a build arg, keeping the
+# dependency layer cacheable; without it the version falls back to pyproject.
+ARG APP_LAUNCHER_VERSION=""
+ENV APP_LAUNCHER_VERSION=${APP_LAUNCHER_VERSION}
+
+RUN uv run --no-sync python -c "\
+import sys; sys.path.insert(0, '.'); \
+from src.version import write_build_version; \
+path = write_build_version(); \
+print('build version ->', path.read_text() if path else 'none')"
+
+# Mirrors install.py build(): only imports that src/ actually reaches are listed.
+# requests, systemd.journal and PySide6.QtOpenGL are not used by the bundle.
+RUN uv run --no-sync pyinstaller \
+        --onefile \
+        --clean \
+        --noconfirm \
+        --name=app_launcher \
+        --hidden-import=PySide6.QtCore \
+        --hidden-import=PySide6.QtGui \
+        --hidden-import=PySide6.QtWidgets \
+        --hidden-import=src.gui.icons.rc_icons \
+        --add-data=icons:icons \
+        main.py
+
+# Fail the image build instead of shipping a binary for the wrong architecture.
+RUN set -eux; \
+    file dist/app_launcher; \
+    file dist/app_launcher | grep -q 'ARM aarch64'

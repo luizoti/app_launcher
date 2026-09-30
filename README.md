@@ -8,10 +8,10 @@ The main idea of the project is to allow users to **use and map any joystick or 
 
 With App Launcher, the user can:
 
-* Map **any joystick or keyboard button** to launcher actions
-* Use controller buttons to **navigate the interface**, launch applications, and trigger system actions
-* Assign special buttons (e.g. **PlayStation / Home button**) to **show or hide the launcher interface** at any time
-* Seamlessly access the desktop environment without leaving the couch
+- Map **any joystick or keyboard button** to launcher actions
+- Use controller buttons to **navigate the interface**, launch applications, and trigger system actions
+- Assign special buttons (e.g. **PlayStation / Home button**) to **show or hide the launcher interface** at any time
+- Seamlessly access the desktop environment without leaving the couch
 
 This approach turns the launcher into a **bridge between traditional desktop environments and game‑console‑like interaction**, improving usability in media centers and controller‑based setups.
 
@@ -36,7 +36,8 @@ The project follows a modular structure to make maintenance and future improveme
 ```
 app_launcher/
 ├── main.py                 # Application entry point
-├── requirements.txt        # Project dependencies
+├── pyproject.toml          # Project metadata and dependencies
+├── uv.lock                 # Locked dependency versions
 ├── settings.json           # Application settings
 ├── assets/                 # Icons and images
 ├── src/
@@ -60,10 +61,10 @@ app_launcher/
 
 The interface is built with **PySide6** and uses custom components such as:
 
-* **Application grid**: visually organizes application shortcuts
-* **Custom buttons**: configurable actions with icons
-* **Context menus**: quick actions via right-click
-* **System tray integration**: allows the app to run in the background
+- **Application grid**: visually organizes application shortcuts
+- **Custom buttons**: configurable actions with icons
+- **Context menus**: quick actions via right-click
+- **System tray integration**: allows the app to run in the background
 
 ---
 
@@ -71,9 +72,9 @@ The interface is built with **PySide6** and uses custom components such as:
 
 The single-instance mechanism works by:
 
-* Writing the current process PID to a file
-* Checking whether the stored PID is still active
-* Automatically blocking multiple executions
+- Writing the current process PID to a file
+- Checking whether the stored PID is still active
+- Automatically blocking multiple executions
 
 This ensures that only one instance of the launcher runs at a time.
 
@@ -87,45 +88,92 @@ The project includes automated tests to validate critical features, such as chec
 
 ## 🚀 How to Run
 
-1. Install dependencies:
+Dependencies are managed with [uv](https://docs.astral.sh/uv/); there is no
+`requirements.txt`. The lockfile pins CPython 3.10.8 and only resolves on
+aarch64 Linux, which is the target platform.
+
+1. Install dependencies and create the virtualenv:
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 2. Run the application:
 
 ```bash
-python main.py
+uv run python main.py
 ```
 
 ---
 
 ## 🏗️ Build (PyInstaller)
 
-You can generate a standalone executable using **PyInstaller**.
+### Native build (on the Raspberry Pi)
+
+```bash
+uv run python install.py build
+```
+
+The binary is written to `dist/app_launcher`.
+
+### Cross build (x86_64 host, ARM64 output)
+
+`./build-arm64.sh` builds the same binary through Docker + QEMU, so no ARM64
+machine is needed:
+
+```bash
+./build-arm64.sh              # uses the Docker layer cache
+./build-arm64.sh --no-cache   # full rebuild
+```
+
+How it works:
+
+- `Dockerfile.build` uses `python:3.10-slim-bookworm`, which matches the
+  target's glibc 2.36 and the pinned CPython 3.10.8.
+- The build runs as `linux/arm64`. This is required, not just for speed:
+  `pyproject.toml` declares `required-environments` for aarch64, so `uv`
+  refuses to sync in any other environment.
+- `uv sync --frozen` installs exactly what `uv.lock` pins, without rewriting it.
+- Qt/X11 runtime libraries (`libgl1`, `libegl1`, `libxkbcommon0`, …) are
+  installed because PySide6 wheels do not bundle them; without them
+  PyInstaller cannot resolve `PySide6.QtGui`'s dependencies.
+- The build finishes with a check that the output really is ARM aarch64.
+
+`.dockerignore` excludes `.venv`, since its absolute paths point at the build
+machine and would break `uv sync` inside the image.
 
 ### Build Command
 
-````bash
-pyinstaller \
+The flags used by both builds, kept in sync with `install.py build()`:
+
+```bash
+uv run pyinstaller \
   --onefile \
-  --hidden-import=requests \
-  --hidden-import=PySide6.QtWidgets \
-  --hidden-import=PySide6.QtGui \
+  --clean \
+  --noconfirm \
+  --name=app_launcher \
   --hidden-import=PySide6.QtCore \
-  --hidden-import=systemd.journal \
+  --hidden-import=PySide6.QtGui \
+  --hidden-import=PySide6.QtWidgets \
+  --hidden-import=src.gui.icons.rc_icons \
+  --add-data=icons:icons \
   main.py
-````
+```
 
 After the build completes, the binary will be available in the `dist/` directory.
+
+Deploy to the Pi with:
+
+```bash
+scp ./dist/app_launcher home:~/.local/bin/app_launcher
+```
 
 ### Auto-start Installation (RetroPie Example)
 
 To copy the generated binary to RetroPie autostart:
 
 ```bash
-cp ./dist/main /opt/retropie/configs/all/autostart
+cp ./dist/app_launcher /opt/retropie/configs/all/autostart
 ```
 
 This allows the launcher to start automatically when the system boots.
@@ -134,10 +182,10 @@ This allows the launcher to start automatically when the system boots.
 
 ## 🔧 Possible Improvements
 
-* Visual editor for application configuration
-* Support for multiple profiles
-* Customizable themes
-* Global keyboard shortcuts
+- Visual editor for application configuration
+- Support for multiple profiles
+- Customizable themes
+- Global keyboard shortcuts
 
 ---
 
