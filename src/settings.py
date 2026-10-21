@@ -10,7 +10,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from src.default_settings import (
@@ -83,8 +83,28 @@ class Settings(BaseSettings):
         if not json_apps:
             return DEFAULT_APPS
         defaults = {k.lower(): v for k, v in DEFAULT_APPS.items()}
-        overrides = {k.lower(): v for k, v in json_apps.items()}
+        overrides: dict[str, AppsModel] = {}
+        for key, raw in json_apps.items():
+            try:
+                overrides[key.lower()] = AppsModel.model_validate(raw)
+            except ValidationError as exc:
+                logger.error(f"Invalid app '{key}' in settings.json, ignored: {exc}")
         return {**defaults, **overrides}
+
+    @classmethod
+    def _section_or_default(
+        cls, raw: Any, model: type, default: Any, name: str
+    ) -> Any:
+        """Valida uma seção do JSON; em caso de erro, loga e usa o default."""
+        if raw is None:
+            return default
+        try:
+            return model.model_validate(raw)
+        except ValidationError as exc:
+            logger.error(
+                f"Invalid '{name}' in settings.json, using defaults: {exc}"
+            )
+            return default
 
     @classmethod
     def _merge_mappings(cls, json_mappings: Any) -> dict[str, DeviceMappingsModel]:
@@ -101,8 +121,12 @@ class Settings(BaseSettings):
         return cls(
             apps=cls._merge_apps(json_data.get("apps")),
             mappings=cls._merge_mappings(json_data.get("mappings")),
-            menu=json_data.get("menu", DEFAULT_MENU),
-            tray=json_data.get("tray", DEFAULT_TRAY),
+            menu=cls._section_or_default(
+                json_data.get("menu"), MenuModel, DEFAULT_MENU, "menu"
+            ),
+            tray=cls._section_or_default(
+                json_data.get("tray"), IconsModel, DEFAULT_TRAY, "tray"
+            ),
             window=json_data.get("window", DEFAULT_WINDOW),
             block_if_running=json_data.get(
                 "block_if_running", DEFAULT_BLOCK_IF_RUNNING
